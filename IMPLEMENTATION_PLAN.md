@@ -95,11 +95,11 @@ muslang = "muslang.cli:main"
 ```
 
 **Tasks**:
-- [ ] Create directory structure
-- [ ] Write pyproject.toml with dependencies
-- [ ] Create __init__.py files
-- [ ] Write basic README.md with project description
-- [ ] Initialize git repository
+- [x] Create directory structure
+- [x] Write pyproject.toml with dependencies
+- [x] Create __init__.py files
+- [x] Write basic README.md with project description
+- [x] Initialize git repository
 
 ### 1.2 Configuration & Constants
 
@@ -156,8 +156,8 @@ GM_DRUM_CHANNEL = 9  # 0-indexed (channel 10 in 1-indexed)
 ```
 
 **Tasks**:
-- [ ] Create config.py with all constants
-- [ ] Add docstrings explaining each constant
+- [x] Create config.py with all constants
+- [x] Add docstrings explaining each constant
 
 ---
 
