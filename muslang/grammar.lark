@@ -1,0 +1,261 @@
+// ============================================================================
+// Muslang Grammar Definition - Unambiguous LALR Parser
+// ============================================================================
+//
+// Scientific pitch notation: c4/4 = C octave 4, quarter note
+// Operator prefixes: : (articulation), @ (dynamics), % (ornaments)
+//
+// Design principles:
+// - Each operator prefix has unique meaning - NO CONFLICTS!
+// - No stateful octave tracking - all pitches specified absolutely
+// - Whitespace insensitive
+// - LALR(1) compatible
+// - Left-to-right evaluation (Alda-style)
+
+// ============================================================================
+// Top-Level Structure
+// ============================================================================
+
+?start: composition
+
+composition: instrument+
+
+instrument: INSTRUMENT_NAME ":" events
+
+events: event+
+
+?event: note
+      | rest
+      | chord
+      | grace_note
+      | tuplet
+      | slur
+      | slide
+      | articulation
+      | dynamic_level
+      | dynamic_transition
+      | dynamic_accent
+      | ornament
+      | tremolo
+      | reset
+      | percussion_note
+      | tempo
+      | time_signature
+      | key_signature
+      | pan
+      | voice
+      | variable_def
+      | variable_ref
+      | repeat
+      | bar_line
+
+// ============================================================================
+// NOTES - Scientific Pitch Notation (NO AMBIGUITY!)
+// ============================================================================
+// Examples: c4/4 (C4 quarter note), d5/8. (D5 dotted eighth), e4~ (E4 tied)
+// 
+// Key changes from old grammar:
+// - Octave is ALWAYS specified (c4 not just c)
+// - Duration separated by "/" to avoid ambiguity: c4/4 not c4
+// - No more stateful octave tracking (no o4, >, < operators)
+//
+// This eliminates the "c4" ambiguity - is it C octave 4 or C quarter note?
+// Now: c4 = C octave 4 (uses default duration)
+//      c4/4 = C octave 4, quarter note (explicit duration)
+
+note: NOTE_NAME ACCIDENTAL? ("/" DURATION DOTTED?)? TIE?
+
+// NOTE_NAME matches pitch+octave as a single token (e.g., c4, d5, a3)
+// This prevents conflict with VARNAME
+NOTE_NAME.2: /[cdefgab][0-9]/
+ACCIDENTAL: "+" | "-"  // + for sharp, - for flat  
+DURATION: "1" | "2" | "4" | "8" | "16" | "32" | "64"  // Whole to 64th
+DOTTED: "."  // Dotted note (only valid AFTER duration - no ambiguity!)
+TIE: "~"  // Tie to next note
+
+// Rest: r/4 (quarter rest), r/8. (dotted eighth rest)
+rest: "r" ("/" DURATION DOTTED?)?
+
+// ============================================================================
+// CHORDS - Comma Separator (NOT slash!)
+// ============================================================================
+// OLD: c4/e4/g4 - AMBIGUOUS with duration separator!
+// NEW: c4/4,e4/4,g4/4 - comma groups chord tones, slash is duration
+//
+// Examples: 
+//   c4/4,e4/4,g4/4 (C major triad, quarter notes)
+//   c4,e4,g4 (C major triad, default duration)
+
+chord: note ("," note)+
+
+// ============================================================================
+// GRACE NOTES - Tilde Prefix
+// ============================================================================
+// Example: ~c4/16 (grace note C4 sixteenth)
+// Tilde is both prefix (grace note) and suffix (tie)
+// Context makes it unambiguous: prefix = grace, suffix = tie
+
+grace_note: "~" note
+
+// ============================================================================
+// TUPLETS
+// ============================================================================
+// Example: (c4/8 d4/8 e4/8):3 (triplet of three eighth notes)
+// Uses parentheses to avoid conflict with repeat/variable square brackets
+// Distinguishable from directives because directives have keywords after (
+
+tuplet: "(" event+ ")" ":" INT
+
+// ============================================================================
+// PHRASE GROUPINGS
+// ============================================================================
+
+// Slurs - group notes with legato phrasing
+// Example: {c4/4 d4/4 e4/4}
+slur: "{" event+ "}"
+
+// Slides/glissandi - angle brackets NOW UNAMBIGUOUS!
+// OLD: <note note> conflicted with octave < operator
+// NEW: No octave operators, so < > are ONLY for slides
+//
+// Examples: 
+//   <c4/4 c5/4> (chromatic slide)
+//   <portamento: c4/4 g4/4> (portamento slide)
+//   <stepped: c4/4 c5/4> (stepped slide)
+slide: "<" (slide_type ":")? note note ">"
+slide_type: "portamento" | "stepped"
+// Default is chromatic if no type specified
+
+// ============================================================================
+// ARTICULATIONS - Colon Prefix (:) - NO AMBIGUITY!
+// ============================================================================
+// OLD: .legato .staccato - conflicted with dotted notes!
+// NEW: :legato :staccato - unique prefix for articulations
+//
+// How to play the notes
+
+articulation: ":" ARTICULATION_TYPE
+ARTICULATION_TYPE: "legato" | "staccato" | "tenuto" | "marcato"
+
+// Reset articulation to natural
+// OLD: . or .natural - ambiguous with dotted!
+// NEW: :reset - explicit command
+reset: ":reset"
+
+// ============================================================================
+// DYNAMICS - At-Sign Prefix (@) - NO AMBIGUITY!
+// ============================================================================
+// OLD: .pp .p .f - conflicted with dotted notes!
+// NEW: @pp @p @f - unique prefix for dynamics
+//
+// "At" this loudness level
+
+// Loudness levels
+dynamic_level: "@" DYNAMIC_LEVEL
+DYNAMIC_LEVEL: "pp" | "p" | "mp" | "mf" | "f" | "ff"
+
+// Gradual dynamic changes
+dynamic_transition: "@" DYNAMIC_TRANSITION
+DYNAMIC_TRANSITION: "crescendo" | "diminuendo" | "decresc"
+
+// One-shot dynamic accents
+dynamic_accent: "@" DYNAMIC_ACCENT
+DYNAMIC_ACCENT: "sforzando" | "sfz" | "sf" | "forte-piano" | "fp"
+
+// ============================================================================
+// ORNAMENTS - Percent Prefix (%) - NO AMBIGUITY!
+// ============================================================================
+// OLD: .trill .mordent - conflicted with dotted notes!
+// NEW: %trill %mordent - unique prefix for ornaments
+//
+// Decorative embellishments
+
+ornament: "%" ORNAMENT_TYPE
+ORNAMENT_TYPE: "trill" | "tr" | "mordent" | "turn"
+
+tremolo: "%tremolo"
+
+// ============================================================================
+// MUSICAL DIRECTIVES - Parenthesized Commands
+// ============================================================================
+
+// Tempo: (tempo! 120)
+tempo: "(" TEMPO_KW INT ")"
+TEMPO_KW.2: "tempo!"
+
+// Time signature: (time 4 4)
+time_signature: "(" TIME_KW INT INT ")"
+TIME_KW.2: "time"
+
+// Key signature: (key c 'major) or (key d 'minor) or (key a- 'major)
+// Note: Uses pitch letter WITHOUT octave, but WITH optional accidental
+key_signature: "(" KEY_KW key_root ("'major" | "'minor") ")"
+KEY_KW.2: "key"
+key_root: PITCH_LETTER ACCIDENTAL?
+PITCH_LETTER: "c" | "d" | "e" | "f" | "g" | "a" | "b"
+
+// Pan: (pan 64) - stereo position 0-127
+pan: "(" PAN_KW INT ")"
+PAN_KW.2: "pan"
+
+// ============================================================================
+// STRUCTURE
+// ============================================================================
+
+// Voices - for polyphony
+// Example: V1: c4/4 d4/4 | V2: e4/4 f4/4
+// VOICE token has priority .2 to match before VARNAME
+voice: VOICE ":"
+
+// Variables - for repeated patterns
+// Example: melody = [c4/4 d4/4 e4/4] ... $melody
+variable_def: VARNAME "=" "[" event+ "]"
+variable_ref: "$" VARNAME
+VOICE.2: /V[0-9]+/
+VARNAME: /[a-zA-Z_][a-zA-Z0-9_]*/
+
+// Repeat - loop a section
+// Example: [c4/4 d4/4 e4/4] * 4
+repeat: "[" event+ "]" "*" INT
+
+// Bar lines - visual separators
+bar_line: "|"
+
+// ============================================================================
+// PERCUSSION - General MIDI Drum Mapping
+// ============================================================================
+// Example: kick/4 snare/4 hat/8 hat/8
+
+percussion_note: DRUM_NAME ("/" DURATION DOTTED?)?
+
+// Priority .2 ensures DRUM_NAME matches before VARNAME
+DRUM_NAME.2: "kick" | "kick2"
+         | "snare" | "snare2"
+         | "hat" | "hihat" | "openhat"
+         | "crash" | "crash2"
+         | "ride" | "ride2"
+         | "tom1" | "tom2" | "tom3" | "tom4"
+         | "rimshot" | "rim"
+         | "clap" | "handclap"
+         | "cowbell"
+         | "tambourine" | "tamb"
+         | "splash"
+         | "china"
+
+// ============================================================================
+// LEXICAL ELEMENTS
+// ============================================================================
+
+// Instrument names
+INSTRUMENT_NAME: /[a-zA-Z][a-zA-Z0-9_-]*/
+
+// Comments: # rest of line
+COMMENT: "#" /[^\n]*/
+
+// Import standard terminals
+%import common.INT
+%import common.WS
+
+// Ignore whitespace and comments
+%ignore WS
+%ignore COMMENT

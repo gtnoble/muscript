@@ -1,0 +1,690 @@
+# Muslang Syntax Reference
+
+Complete language specification for the Muslang music composition DSL.
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Basic Structure](#basic-structure)
+3. [Scientific Pitch Notation](#scientific-pitch-notation)
+4. [Notes and Rests](#notes-and-rests)
+5. [Durations](#durations)
+6. [Accidentals](#accidentals)
+7. [Chords](#chords)
+8. [Articulations](#articulations)
+9. [Dynamics](#dynamics)
+10. [Ornaments](#ornaments)
+11. [Rhythm Modifiers](#rhythm-modifiers)
+12. [Grouping Constructs](#grouping-constructs)
+13. [Directives](#directives)
+14. [Structure and Voices](#structure-and-voices)
+15. [Programming Constructs](#programming-constructs)
+16. [Percussion](#percussion)
+17. [Comments](#comments)
+
+---
+
+## Overview
+
+Muslang is a music composition DSL that uses:
+- **Scientific pitch notation**: `c4/4` means C in octave 4, quarter note
+- **Operator prefixes**: `:` for articulations, `@` for dynamics, `%` for ornaments
+- **Left-to-right evaluation**: State changes apply to following notes
+- **Alda-style philosophy**: Concise, readable, composable
+
+---
+
+## Basic Structure
+
+A Muslang composition consists of one or more **instruments**, each containing a sequence of **events**:
+
+```muslang
+instrument-name: event1 event2 event3 ...
+```
+
+Example:
+```muslang
+piano: c4/4 d4/4 e4/4 f4/4
+violin: g5/2 a5/2
+```
+
+---
+
+## Scientific Pitch Notation
+
+Muslang uses **scientific pitch notation** where the octave is always specified with each note.
+
+### Format
+```
+pitch [accidental] octave [/duration] [.] [~]
+```
+
+### Octaves
+- `0-9`: Octave number (C4 = middle C)
+- Always explicitly specified (no stateful octave tracking)
+
+### Example
+```muslang
+c4    # C in octave 4 (middle C)
+d5    # D in octave 5
+a3    # A in octave 3
+```
+
+---
+
+## Notes and Rests
+
+### Notes
+```muslang
+piano: c4 d4 e4 f4 g4 a4 b4 c5
+```
+
+**Pitch letters**: `c`, `d`, `e`, `f`, `g`, `a`, `b` (lowercase)
+
+### Rests
+```muslang
+piano: c4/4 r/4 e4/4 r/4
+```
+
+**Rest syntax**: `r` followed by optional duration
+
+---
+
+## Durations
+
+Duration is specified after a slash `/`:
+
+| Notation | Musical Value | Example |
+|----------|---------------|---------|
+| `/1`     | Whole note    | `c4/1`  |
+| `/2`     | Half note     | `c4/2`  |
+| `/4`     | Quarter note  | `c4/4`  |
+| `/8`     | Eighth note   | `c4/8`  |
+| `/16`    | 16th note     | `c4/16` |
+| `/32`    | 32nd note     | `c4/32` |
+| `/64`    | 64th note     | `c4/64` |
+
+### Dotted Notes
+
+Add a dot `.` after the duration to increase length by 50%:
+
+```muslang
+piano: c4/4.  # Dotted quarter (1.5x quarter)
+       d4/8.  # Dotted eighth (1.5x eighth)
+```
+
+### Default Duration
+
+If duration is omitted, the last specified duration is used:
+
+```muslang
+piano: c4/4 d4 e4 f4  # All are quarter notes
+```
+
+---
+
+## Accidentals
+
+### Sharp: `+` (after octave number)
+```muslang
+piano: c4+/4  # C♯4 quarter note
+       f5+/8  # F♯5 eighth note
+```
+
+### Flat: `-` (after octave number)
+```muslang
+piano: b4-/4  # B♭4 quarter note
+       e5-/8  # E♭5 eighth note
+```
+
+### Natural: (no accidental)
+```muslang
+piano: c4/4   # C natural
+```
+
+### Ties: `~` (after note)
+```muslang
+piano: c4/4~ c4/4  # Tie two quarter notes
+```
+
+---
+
+## Chords
+
+Multiple notes sounding simultaneously, separated by commas:
+
+```muslang
+# C major triad
+piano: c4/4,e4/4,g4/4
+
+# D minor seventh
+piano: d4/2,f4/2,a4/2,c5/2
+```
+
+**Note**: All notes in a chord should have the same duration.
+
+---
+
+## Articulations
+
+Articulations control **how notes are played**. Use `:` prefix.
+
+### Types
+
+| Articulation | Symbol      | Effect                          |
+|--------------|-------------|---------------------------------|
+| Staccato     | `:staccato` | Short, detached (55% duration)  |
+| Legato       | `:legato`   | Smooth, connected (100%)        |
+| Tenuto       | `:tenuto`   | Full value, slightly emphasized |
+| Marcato      | `:marcato`  | Strongly accented (90%)         |
+
+### Syntax
+
+```muslang
+# Apply articulation to following notes
+piano: :staccato c4/4 d4/4 e4/4 f4/4
+
+# Change articulation mid-phrase
+piano: :staccato c4/4 d4/4 :legato e4/4 f4/4
+
+# Reset to natural (default)
+piano: :staccato c4/4 d4/4 :reset e4/4 f4/4
+```
+
+### State Behavior
+
+Articulations are **persistent** - they apply to all following notes until changed:
+
+```muslang
+piano: 
+  c4/4 d4/4          # Natural
+  :staccato e4/4 f4/4 g4/4  # All staccato
+  :legato a4/4 b4/4   # All legato
+  :reset c5/4         # Back to natural
+```
+
+---
+
+## Dynamics
+
+Dynamics control **loudness/volume**. Use `@` prefix.
+
+### Absolute Levels
+
+| Dynamic | Symbol | Velocity | Meaning        |
+|---------|--------|----------|----------------|
+| pp      | `@pp`  | 40       | pianissimo     |
+| p       | `@p`   | 55       | piano          |
+| mp      | `@mp`  | 70       | mezzo-piano    |
+| mf      | `@mf`  | 85       | mezzo-forte    |
+| f       | `@f`   | 100      | forte          |
+| ff      | `@ff`  | 115      | fortissimo     |
+
+### Gradual Transitions
+
+| Transition | Symbol         | Effect                  |
+|------------|----------------|-------------------------|
+| Crescendo  | `@crescendo`   | Gradually louder        |
+| Diminuendo | `@diminuendo`  | Gradually softer        |
+| Decresc    | `@decresc`     | Alias for diminuendo    |
+
+### Accents (One-shot)
+
+| Accent      | Symbol          | Effect                           |
+|-------------|-----------------|----------------------------------|
+| Sforzando   | `@sforzando`    | Sudden strong accent (+20 vel)   |
+| Forte-piano | `@forte-piano`  | Strong then immediately soft     |
+
+### Examples
+
+```muslang
+# Absolute dynamics
+piano: @p c4/4 d4/4 @f e4/4 f4/4
+
+# Crescendo
+piano: @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/4
+
+# Diminuendo
+piano: @f @diminuendo g4/4 f4/4 e4/4 d4/4 @p c4/4
+
+# Accents
+piano: c4/4 @sforzando e4/4 g4/4 @sforzando c5/4
+```
+
+---
+
+## Ornaments
+
+Ornaments are decorative embellishments. Use `%` prefix.
+
+### Types
+
+| Ornament | Symbol    | Effect                                    |
+|----------|-----------|-------------------------------------------|
+| Trill    | `%trill`  | Rapid alternation with upper neighbor     |
+| Mordent  | `%mordent`| Quick note-lower-note figure              |
+| Turn     | `%turn`   | Upper-main-lower-main figure              |
+| Tremolo  | `%tremolo`| Rapid repetition of same note             |
+
+### Syntax
+
+The ornament marker applies to the **immediately following note**:
+
+```muslang
+piano: 
+  %trill c4/2       # Trill on C4 for half note duration
+  %mordent d4/4     # Mordent on D4
+  %turn e4/4        # Turn on E4
+  %tremolo g4/1     # Tremolo on G4 for whole note
+```
+
+**Note**: Ornaments expand into multiple fast notes during compilation.
+
+---
+
+## Rhythm Modifiers
+
+### Tuplets
+
+Group notes to fit into a different time division. Use parentheses `()` and `:ratio`:
+
+```muslang
+# Triplet: 3 eighth notes in the space of 2
+piano: (c4/8 d4/8 e4/8):3
+
+# Quintuplet: 5 notes in the space of 4
+piano: (c4/16 d4/16 e4/16 f4/16 g4/16):5
+
+# Septuplet: 7 notes in the space of 4
+piano: (c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16):7
+```
+
+### Grace Notes
+
+Quick ornamental notes before the main note. Use `~` prefix:
+
+```muslang
+# Grace note before main note
+piano: ~c4/32 d4/4
+
+# Multiple grace notes
+piano: ~c4/32 ~d4/32 e4/4
+```
+
+**Note**: Grace notes "steal" time from the following main note.
+
+---
+
+## Grouping Constructs
+
+### Slurs
+
+Group notes to be played smoothly connected. Use curly braces `{}`:
+
+```muslang
+# Slurred phrase
+piano: {c4/4 d4/4 e4/4 f4/4}
+
+# Multiple slurs
+piano: {c4/4 d4/4} {e4/4 f4/4}
+```
+
+**MIDI implementation**: Sends CC#68 (legato), overlaps notes slightly.
+
+### Slides/Glissandi
+
+Slide from one note to another. Use angle brackets `<>`:
+
+```muslang
+# Chromatic slide (default)
+piano: <c4/2 g4/2>
+
+# Portamento (smooth pitch bend)
+piano: <portamento: c4/2 c5/2>
+
+# Stepped (chromatic scale steps)
+piano: <stepped: c4/2 c5/2>
+```
+
+**Types**:
+- **chromatic** (default): Pitch bend between notes
+- **portamento**: Smooth pitch glide using CC
+- **stepped**: Individual chromatic notes
+
+---
+
+## Directives
+
+Directives set musical context. Use parentheses `()`:
+
+### Tempo
+
+```muslang
+piano: (tempo! 120) c4/4 d4/4 e4/4
+```
+
+**BPM**: Beats per minute (default: 120)
+
+### Time Signature
+
+```muslang
+piano: (time 3 4) c4/4 d4/4 e4/4
+```
+
+**Format**: `(time numerator denominator)`
+
+Common signatures:
+- `(time 4 4)` - 4/4 time (common time)
+- `(time 3 4)` - 3/4 time (waltz)
+- `(time 6 8)` - 6/8 time
+
+### Key Signature
+
+```muslang
+piano: (key g 'major) g4/4 a4/4 b4/4 c5/4
+piano: (key d 'minor) d4/4 e4/4 f4/4 g4/4
+```
+
+**Format**: `(key root 'mode)`
+- **root**: `c`, `d`, `e`, `f`, `g`, `a`, `b` (with optional sharp `+` or flat `-`)
+- **mode**: `'major` or `'minor`
+
+**Examples with accidentals**:
+```muslang
+piano: (key a- 'major) e4-/4 f4/4 g4/4 a4-/4  # A♭ major
+piano: (key f+ 'minor) f4+/4 g4+/4 a4/4 b4/4  # F♯ minor
+```
+
+**Effect**: Automatically applies scale accidentals to notes.
+
+### Pan
+
+```muslang
+piano: (pan 64) c4/4 d4/4  # Center
+piano: (pan 0) c4/4        # Far left
+piano: (pan 127) c4/4      # Far right
+```
+
+**Range**: 0-127 (0=left, 64=center, 127=right)
+
+---
+
+## Structure and Voices
+
+### Multiple Instruments
+
+```muslang
+piano: c4/4 d4/4 e4/4 f4/4
+violin: g5/2 a5/2
+bass: c2/1
+```
+
+Each instrument gets its own MIDI track and channel.
+
+### Voices (Polyphony)
+
+Multiple melodic lines within one instrument. Use `V1:`, `V2:`, etc.:
+
+```muslang
+piano:
+  V1: c4/4 d4/4 e4/4 f4/4
+  V2: e3/2 f3/2
+  V1: g4/4 a4/4 b4/4 c5/4
+```
+
+**Note**: Voices merge into a single MIDI track with interleaved events.
+
+### Voices in Repeat Blocks
+
+Voices can be used inside repeat blocks to create repeating polyphonic patterns:
+
+```muslang
+piano:
+  [
+    V1: c4/4 d4/4 e4/4 f4/4
+    V2: e3/2 f3/2
+  ] * 4
+```
+
+This is especially useful for drum patterns where multiple percussion voices play together:
+
+```muslang
+drums:
+  [
+    V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+  ] * 4
+```
+
+---
+
+## Programming Constructs
+
+### Variables
+
+Define and reuse musical patterns:
+
+```muslang
+# Define variable
+melody = [c4/4 d4/4 e4/4 f4/4]
+
+# Use variable
+piano: $melody $melody g4/2
+```
+
+**Syntax**:
+- **Definition**: `name = [events]`
+- **Reference**: `$name`
+
+### Repeats
+
+Repeat a section multiple times. Use brackets `[]` and `*count`:
+
+```muslang
+# Repeat pattern 4 times
+piano: [c4/4 d4/4 e4/4 f4/4] * 4
+
+# Nested repeats
+piano: [[c4/8 d4/8] * 2 e4/4] * 3
+
+# Repeat with multiple voices (polyphonic patterns)
+piano:
+  [
+    V1: c5/4 d5/4 e5/4 f5/4
+    V2: c3/2 g3/2
+  ] * 4
+```
+
+---
+
+## Percussion
+
+Special drum notation for General MIDI percussion (channel 10).
+
+### Drum Names
+
+Common drums:
+- `kick` - Bass drum
+- `snare` - Snare drum
+- `hat`, `hihat` - Closed hi-hat
+- `openhat` - Open hi-hat
+- `crash`, `crash2` - Crash cymbals
+- `ride` - Ride cymbal
+- `tom1`, `tom2`, `tom3`, `tom4` - Toms
+- `rimshot` - Rimshot/side stick
+- `clap` - Hand clap
+- `cowbell` - Cowbell
+- `tambourine` - Tambourine
+- `splash` - Splash cymbal
+- `china` - China cymbal
+
+### Syntax
+
+```muslang
+# Percussion instrument
+drums: kick/4 snare/4 hat/8 hat/8 kick/4
+
+# Basic rock beat
+drums: [kick/8 hat/8 snare/8 hat/8] * 4
+```
+
+### Example Beat
+
+```muslang
+drums: (tempo! 120)
+  [
+    kick/8 hat/8 snare/8 hat/8 
+    kick/8 hat/8 snare/8 hat/8
+  ] * 8
+```
+
+---
+
+## Comments
+
+Use `#` for single-line comments:
+
+```muslang
+# This is a comment
+piano: c4/4 d4/4  # Another comment
+
+# Comments can span the full line
+# They are ignored by the parser
+```
+
+---
+
+## Complete Example
+
+```muslang
+# Twinkle Twinkle Little Star
+# Demonstrates multiple features
+
+piano: (tempo! 120) (time 4 4) (key c 'major)
+  # Main melody
+  c4/4 c4/4 g4/4 g4/4 | a4/4 a4/4 g4/2 |
+  f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2 |
+  
+  # With dynamics
+  @mp g4/4 g4/4 f4/4 f4/4 | e4/4 e4/4 d4/2 |
+  @mf g4/4 g4/4 f4/4 f4/4 | e4/4 e4/4 d4/2 |
+  
+  # With articulation
+  :staccato c4/4 c4/4 g4/4 g4/4 |
+  :legato a4/4 a4/4 g4/2 |
+  
+  # Repeat ending
+  :reset f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2
+```
+
+---
+
+## Operator Prefix Summary
+
+| Prefix | Purpose      | Examples                                    |
+|--------|--------------|---------------------------------------------|
+| `:`    | Articulation | `:staccato`, `:legato`, `:tenuto`, `:reset` |
+| `@`    | Dynamics     | `@p`, `@ff`, `@crescendo`, `@sforzando`     |
+| `%`    | Ornaments    | `%trill`, `%mordent`, `%turn`, `%tremolo`   |
+| `~`    | Grace notes  | `~c4/32`                                    |
+| `/`    | Duration     | `/4`, `/8`, `/16`                           |
+| `.`    | Dotted       | `/4.`, `/8.`                                |
+| `~`    | Tie          | `c4/4~` (suffix)                            |
+
+---
+
+## Syntax Quick Reference
+
+```muslang
+# Notes
+c4 d4 e4        # Pitches with octaves
+c4/4 d4/8       # With durations
+c4+ d4-         # With accidentals
+c4/4.           # Dotted
+c4/4~ c4/4      # Tied
+
+# Chords
+c4/4,e4/4,g4/4
+
+# Rests
+r/4 r/2
+
+# Articulations
+:staccato :legato :tenuto :marcato :reset
+
+# Dynamics
+@pp @p @mp @mf @f @ff
+@crescendo @diminuendo @sforzando @forte-piano
+
+# Ornaments
+%trill %mordent %turn %tremolo
+
+# Rhythm
+(c4/8 d4/8 e4/8):3  # Tuplet
+~c4/32 d4/4         # Grace note
+
+# Grouping
+{c4/4 d4/4 e4/4}    # Slur
+<c4/2 g4/2>         # Slide
+
+# Directives
+(tempo! 120)
+(time 4 4)
+(key g 'major)
+(pan 64)
+
+# Structure
+instrument: events...
+V1: events...
+
+# Programming
+melody = [c4/4 d4/4]
+$melody
+[c4/4 d4/4] * 4
+
+# Percussion
+drums: kick/4 snare/4 hat/8
+
+# Comments
+# This is a comment
+```
+
+---
+
+## Error Messages
+
+The compiler provides helpful error messages:
+
+```
+Parse error: Expected duration, got 'x' at line 5, column 12
+Semantic error: Octave out of range: 12 at line 8
+Warning: Large slide interval: 26 semitones at line 15
+```
+
+---
+
+## MIDI Output
+
+The compiler generates **General MIDI (GM)** compatible files:
+- **PPQ**: 480 ticks per quarter note (configurable)
+- **Tracks**: One per instrument
+- **Channels**: Automatically assigned (0-15, channel 9 reserved for drums)
+- **Velocity**: Dynamics mapped to MIDI velocity (40-127)
+- **CC messages**: Legato (68), pan (10), portamento (5, 65)
+- **Meta-events**: Tempo, time signature
+
+---
+
+## Further Reading
+
+- [Articulation Guide](articulation_guide.md) - Detailed articulation system
+- [Rhythm Guide](rhythm_guide.md) - Tuplets, time signatures, complex rhythms
+- [Ornaments Guide](ornaments_guide.md) - Trills, mordents, turns, tremolo
+- [Percussion Guide](percussion_guide.md) - Complete drum notation reference
+
+---
+
+## Version
+
+Muslang v0.1.0 - February 2026

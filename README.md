@@ -34,81 +34,140 @@ pip install -e .
 Create a file `melody.mus`:
 
 ```muslang
-# Simple melody
-piano: (tempo! 120) (time 4 4) o4
-  c4 d4 e4 f4 | g2 g2 | a4 a4 a4 a4 | g1
+# Simple melody - using scientific pitch notation
+# Format: pitch+octave/duration (e.g., c4/4 = C octave 4, quarter note)
+piano: (tempo! 120) (time 4 4)
+  c4/4 d4/4 e4/4 f4/4 | g4/2 g4/2 | a4/4 a4/4 a4/4 a4/4 | g4/1
 ```
 
 Compile to MIDI:
 
 ```bash
+# Using python module
+python -m muslang.cli compile melody.mus -o melody.mid
+
+# Or if installed as package
 muslang compile melody.mus -o melody.mid
+```
+
+Check syntax:
+
+```bash
+python -m muslang.cli check melody.mus
 ```
 
 Play the MIDI file:
 
 ```bash
-muslang play melody.mus
+python -m muslang.cli play melody.mus
 ```
+
+## CLI Commands
+
+### compile
+Compile a .mus file to MIDI:
+```bash
+python -m muslang.cli compile input.mus [-o output.mid] [--ppq 480] [-v]
+```
+- `-o, --output`: Output MIDI file path (default: input.mid)
+- `--ppq`: MIDI resolution in pulses per quarter note (default: 480)
+- `-v, --verbose`: Print detailed compilation information
+
+### check
+Validate syntax and semantics:
+```bash
+python -m muslang.cli check input.mus [-v]
+```
+- `-v, --verbose`: Print detailed validation information
+
+### play
+Compile and play immediately:
+```bash
+python -m muslang.cli play input.mus [--player fluidsynth] [--soundfont path/to/soundfont.sf2]
+```
+- `--player`: Choose MIDI player (fluidsynth or timidity)
+- `--soundfont`: Path to soundfont file (for fluidsynth)
 
 ## Language Features
 
-### Basic Notes
+### Basic Notes - Scientific Pitch Notation
+
+Muslang uses scientific pitch notation where each note specifies both pitch and octave:
+- Format: `pitch` + `octave` + `/` + `duration`
+- Example: `c4/4` = C octave 4, quarter note
+- Middle C is `c4`
 
 ```muslang
-piano: c4 d4 e4 f4  # Quarter notes C, D, E, F
+piano: c4/4 d4/4 e4/4 f4/4  # Quarter notes C4, D4, E4, F4
+       c4/2 d4/2             # Half notes
+       c4/1                  # Whole note
+       c4/8 d4/8 e4/8 f4/8  # Eighth notes
 ```
 
 ### Accidentals
 
 ```muslang
-piano: c+4 d-4 e4  # C sharp, D flat, E natural
+piano: c4+/4 d4-/4 e4/4  # C sharp, D flat, E natural (quarter notes)
 ```
 
-### Articulations
+### Articulations (: prefix)
 
 ```muslang
-piano: .staccato c4 d4 e4 f4  # Staccato notes
-       .legato g4 a4 b4 c4     # Legato notes
-       . d4 e4 f4 g4           # Back to natural
+piano: :staccato c4/4 d4/4 e4/4 f4/4  # Staccato notes
+       :legato g4/4 a4/4 b4/4 c5/4     # Legato notes
+       :reset d4/4 e4/4 f4/4 g4/4      # Back to natural
+       :tenuto c4/4 e4/4 g4/4          # Tenuto
+       :marcato c4/4 e4/4 g4/4         # Marcato (accented)
 ```
 
-### Dynamics
+### Dynamics (@ prefix)
 
 ```muslang
-piano: .p c4 d4 e4 f4           # Piano (soft)
-       .f g4 a4 b4 c4           # Forte (loud)
-       .crescendo c4 d4 e4 f4   # Gradual increase
+piano: @p c4/4 d4/4 e4/4 f4/4           # Piano (soft)
+       @f g4/4 a4/4 b4/4 c5/4           # Forte (loud)
+       @crescendo c4/4 d4/4 e4/4 f4/4   # Gradual increase
+       @diminuendo c5/4 b4/4 a4/4 g4/4  # Gradual decrease
+       @sforzando c4/4                  # Sudden accent
 ```
 
 ### Slurs and Slides
 
 ```muslang
-piano: {c4 d4 e4 f4}        # Slurred phrase
-       <c4 g4>              # Chromatic slide
-       <.portamento c4 g4>  # Portamento slide
+piano: {c4/4 d4/4 e4/4 f4/4}        # Slurred phrase
+       <c4/4 g4/4>                   # Chromatic slide
+       <portamento: c4/4 g4/4>       # Portamento slide
+       <stepped: c4/4 g4/4>          # Stepped slide
 ```
 
-### Ornaments
+### Ornaments (% prefix)
 
 ```muslang
-piano: .trill c4    # Trill on C
-       .mordent d4  # Mordent on D
-       .turn e4     # Turn on E
+piano: %trill c4/4    # Trill on C
+       %mordent d4/4  # Mordent on D
+       %turn e4/4     # Turn on E
+       %tremolo g4/2  # Tremolo
 ```
 
 ### Tuplets
 
 ```muslang
-piano: [c8 d e]:3   # Triplet of eighth notes
+piano: (c4/8 d4/8 e4/8):3   # Triplet of eighth notes
+       (c4/16 d4/16 e4/16 f4/16 g4/16):5  # Quintuplet
+```
+
+### Chords (comma-separated)
+
+```muslang
+piano: c4/4,e4/4,g4/4   # C major chord (quarter notes)
+       c4/2,e4-/2,g4/2  # C minor chord (half notes)
 ```
 
 ### Multiple Instruments
 
 ```muslang
-piano: c4 e4 g4 c4
-violin: e4 g4 b4 e4
-bass: c2 c2
+piano: c4/4 e4/4 g4/4 c5/4
+violin: e4/4 g4/4 b4/4 e5/4
+bass: c2/2 c2/2
 ```
 
 ## Development

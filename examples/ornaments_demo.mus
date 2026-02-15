@@ -1,0 +1,115 @@
+# Ornaments Demo
+# Demonstrates all ornament types in Muslang
+# Including trills, mordents, turns, and tremolo
+
+piano: (tempo! 100) (time 4 4) (key c 'major)
+
+# Section 1: Trills
+# Rapid alternation between note and upper neighbor
+@mf :legato
+c4/4 %trill d4/2 c4/4 |
+e4/4 %trill f4/2 e4/4 |
+g4/4 %trill a4/2 g4/4 |
+c5/1 |
+
+# Section 2: Mordents
+# Quick dip to lower neighbor and back
+@mp
+%mordent c4/4 d4/4 %mordent e4/4 f4/4 |
+%mordent g4/4 a4/4 %mordent b4/4 c5/4 |
+c5/2 %mordent g4/2 |
+%mordent c4/1 |
+
+# Section 3: Turns
+# Elegant rotation through neighboring notes
+@mf :legato
+%turn c4/4 d4/4 e4/4 f4/4 |
+%turn g4/4 f4/4 e4/4 d4/4 |
+c4/4 %turn e4/2 d4/4 |
+%turn c4/1 |
+
+# Section 4: Tremolo
+# Rapid repetition of same note
+@p @crescendo
+%tremolo c4/2 %tremolo e4/2 |
+%tremolo g4/2 %tremolo c5/2 |
+@ff %tremolo c5/1 |
+c5/4 g4/4 e4/4 c4/4 |
+
+# Section 5: Mixed Ornaments in Melody
+# Baroque-style ornamented melody
+(key g 'major)
+@mf :legato
+g4/4 a4/4 %trill b4/2 |
+%mordent a4/4 g4/4 %turn f4+/2 |
+e4/4 d4/4 %trill e4/4 f4+/4 |
+%turn g4/2 g4/2 |
+
+# Section 6: Ornaments with Dynamics
+# Expressive phrasing
+(key f 'major)
+@p :legato
+f4/4 %turn a4/4 c5/4 %trill f5/4 |
+
+@mp
+%mordent e5/4 d5/4 c5/4 b4-/4 |
+
+@f
+%trill a4/2. %mordent g4/4 |
+
+@p @diminuendo
+f4/4 e4/4 d4/4 %turn c4/4 |
+@pp f4/1 |
+
+# Section 7: Classical Ornaments
+# Mozart-style embellishments
+(key d 'major)
+@mf :legato
+d4/8 f4+/8 %trill a4/4. g4/8 |
+%mordent f4+/8 e4/8 %turn d4/2 |
+c4+/8 d4/8 e4/8 f4+/8 %trill g4/4 |
+f4+/4 e4/4 %trill d4/2 |
+
+# Section 8: Romantic Expression
+# Chopin-style ornaments with rubato feel
+(key a- 'major) (tempo! 70)
+@p :legato
+e4-/4 %turn a4-/4 c5/4. b4-/8 |
+
+@crescendo
+%trill a4-/4 g4/8 f4/8 e4-/4 d4-/4 |
+
+@mf
+%tremolo c4/2 %mordent d4-/4 e4-/4 |
+
+@diminuendo
+f4/4 %turn e4-/4 d4-/4 c4/4 |
+@pp a3-/1 |
+
+# Section 9: Tremolo Buildup
+# Tense, dramatic crescendo
+(key c 'minor) (tempo! 120)
+@pp @crescendo
+%tremolo c4/2 %tremolo e4-/2 |
+%tremolo g4/2 %tremolo c5/2 |
+@f %tremolo e5-/1 |
+@ff c5/4 g4/4 e4-/4 c4/4 |
+
+# Section 10: Bach-style Ornamentation
+# Contrapuntal ornaments
+(key e- 'major) (tempo! 100)
+V1: @mf :legato
+  %mordent g4/4 f4/8 e4-/8 %turn d4/4 c4/8 b3-/8 |
+  %trill a3-/2. g3/4 |
+  f3/4 g3/4 a3-/4 b3-/4 |
+  %turn c4/2 g3/2 |
+
+V2: @mp :legato
+  e3-/4 d3/4 c3/4 b2-/4 |
+  c3/2 e3-/2 |
+  f3/4 %mordent e3-/4 d3/4 c3/4 |
+  g2/1 |
+
+# Final cadence
+V1: %turn e4-/1
+V2: c3/1
