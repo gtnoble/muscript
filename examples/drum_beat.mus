@@ -1,184 +1,29 @@
-# Drum Beat Demo
-# Demonstrates various drum patterns and percussion techniques
-# Including rock, funk, jazz, and electronic beats
+# Drum Beat Demo (Macro Source)
+# Generate: m4 examples/drum_beat.mus.m4 > examples/drum_beat.mus
+
+
+
+
 
 # Section 1: Basic Rock Beat
 # Classic kick on 1 and 3, snare on 2 and 4, hi-hat eighths
 drums: (tempo! 120) (time 4 4)
-[
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-] * 4
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 
 
 # Section 2: Four-on-the-Floor (Disco/House)
-# Kick on every beat
-[
-  V1: kick/4 kick/4 kick/4 kick/4
-  V2: r/4 snare/4 r/4 snare/4
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-] * 4
+(tempo! 120)
+  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 
+  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 
 
 # Section 3: Funk Pattern with Ghost Notes
-# 16th note groove with quiet ghost notes
 (tempo! 110)
-[
-  V1: kick/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16
-  V2: @mf r/16 r/16 r/16 r/16 snare/16 @pp snare/16 @p snare/16 r/16 r/16 r/16 r/16 r/16 @mf snare/16 @pp snare/16 @p snare/16 @mf snare/16
-  V3: :staccato [hat/16] * 16
-] * 4
+  V1: kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 
+  V2: @mf r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16 r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16 
+  V3: :staccato hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 
 
-# Section 4: Half-Time Feel
-# Slower snare backbeat
-(tempo! 80)
-[
-  V1: kick/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8
-  V2: r/2 snare/4 r/4
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-] * 4
-
-# Section 5: Open Hi-Hat Pattern
-# Alternating closed and open hi-hats
-(tempo! 120)
-[
-  V1: kick/8 r/8 kick/8 r/8 kick/8 r/8 r/8 r/8
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: hat/8 hat/8 openhat/8 hat/8 hat/8 hat/8 openhat/8 hat/8
-] * 4
-
-# Section 6: Drum Fill with Toms
-# Tom-based fill leading to crash
-[
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-] * 3
-
-# Fill!
-V1: @f
-    tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
-
-# Crash back into groove
-V1: crash/4 kick/4 snare/4 kick/4
-
-# Section 7: Ride Pattern (Jazz Feel)
-# Swing on ride cymbal
-(tempo! 140)
-[
-  V1: kick/4. r/8 r/2
-  V2: r/4 rimshot/4 r/4 rimshot/4
-  V3: ride/8. ride/16 ride/8 ride/8. ride/16 ride/8 ride/8. ride/16 ride/8 ride/8. ride/16 ride/8
-] * 4
-
-# Section 8: Breakbeat Pattern
-# Complex syncopated pattern
-(tempo! 140)
-[
-  V1: kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16
-  V2: r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16
-  V3: hat/8 hat/8 openhat/8 hat/8 hat/8 hat/8 openhat/8 hat/8
-] * 4
-
-# Section 9: Latin/Salsa Pattern
-# Clave-based rhythm with cowbell
-(tempo! 110)
-[
-  V1: kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8
-  V2: r/8 r/8 snare/8 r/8 r/8 snare/8 r/8 snare/8
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  V4: cowbell/4 r/8 cowbell/8 r/4 cowbell/8 cowbell/8
-] * 4
-
-# Section 10: Double Bass Metal
-# Fast double kick pattern
-(tempo! 180)
-[
-  V1: [kick/16 kick/16] * 8
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: [hat/16] * 16
-] * 4
-
-# Section 11: Buildup with Dynamics
-# Gradual crescendo build
-(tempo! 130)
-V1: @pp
-    [kick/4 snare/4] * 2
-
-V1: @p @crescendo
-    [kick/4 snare/4] * 2
-
-V1: @mp
-    [kick/4 snare/4] * 2
-
-@mf
-[
-  V1: kick/8 kick/8 kick/8 kick/8
-  V2: snare/8 snare/8 snare/8 snare/8
-] * 2
-
-@f
-@ff tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
-crash/2 kick/4 snare/4
-
-# Section 12: Progressive Time (7/8)
-# Odd meter groove
-(time 7 8)
-(tempo! 130)
-[
-  V1: kick/8 r/8 kick/8 r/8 kick/8 r/8 r/8
-  V2: r/8 r/8 snare/8 r/8 r/8 snare/8 r/8
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-] * 8
-
-# Section 13: Drum Solo
-# Complex fill with all drums
-(time 4 4)
-(tempo! 140)
-V1: @ff
-    # Roll on toms
-    tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32
-    tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32
-    tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32
-    tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32
-
-# Accents with multiple drums
-V1: kick/8 kick/8 kick/8 kick/8
-V2: snare/8 r/8 snare/8 r/8
-V3: crash/4 splash/4
-
-# Big finish
-V1: kick/4 kick/4
-V2: crash/2
-V3: snare/8 snare/8 snare/8 snare/8
-
-# Final hit
-V1: kick/2
-V2: crash/2
-V3: snare/2
-
-# Section 14: Electronic Beat
-# Simple electronic/techno pattern
-(tempo! 128)
-[
-  V1: kick/4 kick/4 kick/4 kick/4
-  V2: r/4 clap/4 r/4 clap/4
-  V3: :staccato [hat/16] * 16
-  V4: r/8 r/8 r/8 r/8 r/8 r/8 openhat/8 r/8
-] * 8
-
-# Final section: Back to basic rock with ending
-(tempo! 120)
-[
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-] * 3
-
-# Ending fill
-V1: tom1/16 tom1/16 tom2/16 tom2/16 tom3/16 tom3/16 tom4/16 tom4/16 tom4/16 tom4/16 tom3/16 tom3/16 tom2/16 tom2/16 tom1/16 tom1/16
-
-# Final hits
-@ff
-V1: kick/4
-V2: crash/4
-V3: snare/4
+# Section 4: Drum Fill with Toms
+  V1: @f tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
+  V1: @ff crash/2 kick/4 snare/4

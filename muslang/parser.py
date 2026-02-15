@@ -31,7 +31,6 @@ from .ast_nodes import (
     DynamicLevel, DynamicTransition, DynamicAccent,
     TimeSignature, KeySignature, Tempo, Pan,
     Voice, Instrument, Sequence,
-    Variable, VariableReference, Repeat,
     SourceLocation,
 )
 from .config import DEFAULT_NOTE_DURATION
@@ -162,7 +161,6 @@ class MuslangTransformer(Transformer):
                         f"Found {type(event).__name__} outside of voice context."
                     )
                 else:
-                    # Other events like Variable, Repeat - allow for now
                     non_voice_events.append(event)
         
         # Require at least one voice
@@ -679,66 +677,6 @@ class MuslangTransformer(Transformer):
         voice_number = int(voice_token[1:])  # Skip the 'V' prefix
         self.current_voice = voice_number
         return Voice(number=voice_number, events=[])
-    
-    # ========================================================================
-    # Programming Constructs
-    # ========================================================================
-    
-    def variable_def(self, items) -> Variable:
-        """
-        Transform variable definition.
-        
-        Grammar: variable_def: VARNAME "=" "[" event+ "]"
-        
-        Args:
-            items: [Token(VARNAME), [events]]
-            
-        Returns:
-            Variable node
-        """
-        name = str(items[0])
-        events = [item for item in items[1:] if item is not None]
-        return Variable(name=name, value=events)
-    
-    def variable_ref(self, items) -> VariableReference:
-        """
-        Transform variable reference.
-        
-        Grammar: variable_ref: "$" VARNAME
-        
-        Args:
-            items: [Token(VARNAME)]
-            
-        Returns:
-            VariableReference node
-        """
-        name = str(items[0])
-        return VariableReference(name=name)
-    
-    def repeat(self, items) -> Repeat:
-        """
-        Transform repeat construct.
-        
-        Grammar: repeat: "[" event+ "]" "*" INT
-        
-        Args:
-            items: [event1, event2, ..., count(Token)]
-            
-        Returns:
-            Repeat node
-        """
-        # Last item is count (Token or int), everything else is events
-        count_item = items[-1]
-        if isinstance(count_item, Token):
-            count = int(count_item.value)
-        elif isinstance(count_item, int):
-            count = count_item
-        else:
-            count = 1
-        
-        events = [item for item in items[:-1] if item is not None]
-        
-        return Repeat(sequence=events, count=count)
     
     # ========================================================================
     # Percussion

@@ -12,7 +12,7 @@ Muslang is a Python-based music composition language that allows composers to wr
 - **Rhythm**: tuplets, grace notes, ties, dotted notes
 - **Phrase groupings**: slurs, slides (chromatic, stepped, portamento)
 - **Musical structure**: multiple instruments, voices, key signatures, time signatures
-- **Programming constructs**: variables, repeats
+- **Macro workflow**: external `m4` preprocessing for reusable motifs/patterns
 - **Percussion**: comprehensive drum notation
 
 ## Installation
@@ -49,6 +49,23 @@ python -m muslang.cli compile melody.mus -o melody.mid
 
 # Or if installed as package
 muslang compile melody.mus -o melody.mid
+```
+
+### Optional macro preprocessing with `m4`
+
+Muslang base syntax no longer includes built-in variables or repeat blocks. For reusable patterns, preprocess a `.mus.m4` source file with `m4`, then compile the generated `.mus` file.
+
+You can implement repeats with recursive `m4` macros, for example:
+
+```m4
+define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')
+define(`RIFF', `c4/8 e4/8 g4/8 e4/8')
+# Usage inside a voice: REPEAT(4, `RIFF ')
+```
+
+```bash
+m4 examples/repeat_demo.mus.m4 > examples/repeat_demo.mus
+python -m muslang.cli compile examples/repeat_demo.mus -o examples/repeat_demo.mid
 ```
 
 Check syntax:

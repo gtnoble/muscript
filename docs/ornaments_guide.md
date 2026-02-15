@@ -263,7 +263,8 @@ Muslang's tremolo is a **single-note tremolo** (bowed tremolo on strings). For *
 ```muslang
 # Fingered tremolo between C and E
 piano:
-  V1: [c4/16 e4/16] * 8
+  V1: c4/16 e4/16 c4/16 e4/16 c4/16 e4/16 c4/16 e4/16
+      c4/16 e4/16 c4/16 e4/16 c4/16 e4/16 c4/16 e4/16
 ```
 
 ---

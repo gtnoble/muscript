@@ -9,10 +9,16 @@ MUSLANG := $(PYTHON) -m muslang.cli
 EXAMPLES_DIR := examples
 
 # Source files
-SOURCES := $(wildcard $(EXAMPLES_DIR)/*.mus)
+M4_SOURCES := $(wildcard $(EXAMPLES_DIR)/*.mus.m4)
+GENERATED_MUS := $(M4_SOURCES:.mus.m4=.mus)
+STATIC_SOURCES := $(filter-out $(GENERATED_MUS),$(wildcard $(EXAMPLES_DIR)/*.mus))
+SOURCES := $(sort $(STATIC_SOURCES) $(GENERATED_MUS))
 
 # Target MIDI files
 MIDIS := $(SOURCES:.mus=.mid)
+
+# Ensure m4 is available when preprocessing macro sources
+M4 := $(shell command -v m4 2>/dev/null)
 
 # Default target: build all examples
 .PHONY: all
@@ -23,9 +29,18 @@ $(EXAMPLES_DIR)/%.mid: $(EXAMPLES_DIR)/%.mus
 	@echo "Building $@..."
 	$(MUSLANG) compile $< -o $@
 
+# Rule to generate a .mus file from a .mus.m4 source file
+$(EXAMPLES_DIR)/%.mus: $(EXAMPLES_DIR)/%.mus.m4
+	@if [ -z "$(M4)" ]; then \
+		echo "❌ m4 is required but not found in PATH"; \
+		exit 1; \
+	fi
+	@echo "Preprocessing $< -> $@..."
+	m4 $< > $@
+
 # Check all examples for syntax/semantic errors
 .PHONY: check
-check:
+check: $(GENERATED_MUS)
 	@echo "Checking all examples..."
 	@for file in $(SOURCES); do \
 		echo "Checking $$file..."; \
@@ -38,11 +53,12 @@ check:
 clean:
 	@echo "Cleaning generated MIDI files..."
 	@rm -f $(MIDIS)
+	@rm -f $(GENERATED_MUS)
 	@echo "✅ Clean complete"
 
 # Show list of targets
 .PHONY: list
-list:
+list: $(GENERATED_MUS)
 	@echo "Available examples:"
 	@for file in $(SOURCES); do \
 		echo "  - $$(basename $$file .mus)"; \

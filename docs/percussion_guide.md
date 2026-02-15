@@ -131,18 +131,21 @@ drums: (tempo! 120)
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
 ```
 
-Or more compactly with voices inside a repeat block:
+Or more compactly with recursive `m4` preprocessing:
 
-```muslang
+```m4
+define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')
+define(`ROCK_KICK', `kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8')
+define(`ROCK_SNARE', `r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8')
+define(`ROCK_HAT', `hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8')
+
 drums: (tempo! 120)
-  [
-    V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  ] * 4
+  V1: REPEAT(4, `ROCK_KICK ')
+  V2: REPEAT(4, `ROCK_SNARE ')
+  V3: REPEAT(4, `ROCK_HAT ')
 ```
 
-**Note**: This syntax allows you to define polyphonic patterns (multiple voices playing simultaneously) and repeat them as a unit.
+**Note**: Use `m4` to generate plain `.mus` before compiling with Muslang.
 
 ### Simple Backbeat
 
@@ -150,10 +153,8 @@ Classic 4/4 with kick and snare:
 
 ```muslang
 drums: (time 4 4) (tempo! 120)
-  [
-    V1: kick/4 kick/4 kick/4 kick/4
-    V2: r/4 snare/4 r/4 snare/4
-  ] * 4
+  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
+  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
 ```
 
 ### Disco Beat
@@ -162,11 +163,9 @@ Famous four-on-the-floor with hi-hat eighths:
 
 ```muslang
 drums: (tempo! 120)
-  [
-    V1: kick/4 kick/4 kick/4 kick/4
-    V2: r/4 snare/4 r/4 snare/4
-    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  ] * 4
+  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
+  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
 ```
 
 ### Funk Pattern
@@ -271,7 +270,9 @@ Fast repeated hits (snare roll):
 ```muslang
 drums:
   # Snare roll (32nd notes)
-  [snare/32] * 16 crash/2
+  snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32
+  snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32
+  crash/2
 ```
 
 ---
@@ -322,11 +323,12 @@ drums:
 
 ```muslang
 drums: (tempo! 120) (time 4 4)
-  [
-    V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  ] * 8
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+      kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+      r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+      hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
 ```
 
 ### Example 2: Buildup with Dynamics
@@ -335,11 +337,11 @@ drums: (tempo! 120) (time 4 4)
 drums: (tempo! 130)
   # Start quiet
   @pp
-  [kick/4 snare/4] * 4
+  kick/4 snare/4 kick/4 snare/4 kick/4 snare/4 kick/4 snare/4
   
   # Build up
   @mp @crescendo
-  [kick/4 snare/4] * 4
+  kick/4 snare/4 kick/4 snare/4 kick/4 snare/4 kick/4 snare/4
   
   # Climax
   @ff
@@ -354,7 +356,7 @@ drums: (tempo! 110)
       kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16
   V2: r/16 r/16 r/16 r/16 snare/16 r/16 @p snare/16 r/16 
       r/16 r/16 r/16 r/16 @mf snare/16 r/16 @p snare/16 @mf snare/16
-  V3: [hat/16] * 16
+  V3: hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
 ```
 
 ### Example 4: Drum Fill with Toms
@@ -362,11 +364,9 @@ drums: (tempo! 110)
 ```muslang
 drums: (tempo! 140)
   # Regular beat
-  [
-    V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  ] * 3
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
   
   # Fill
   @f tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
@@ -381,7 +381,7 @@ drums: (tempo! 100)
       kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16
   V2: r/16 r/16 r/16 r/16 @f snare/16 @pp snare/16 @p snare/16 @pp snare/16 
       r/16 r/16 r/16 r/16 @f snare/16 @pp snare/16 @p snare/16 @f snare/16
-  V3: :staccato [hat/16] * 16
+  V3: :staccato hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
 ```
 
 ### Example 6: Jazz Ride Pattern
@@ -402,16 +402,18 @@ drums: (tempo! 110)
   V2: r/8 r/8 snare/8 r/8 r/8 snare/8 r/8 snare/8
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
   V4: cowbell/4 r/8 cowbell/8 r/4 cowbell/8 cowbell/8
-  V5: [tambourine/16 r/16] * 8
+  V5: tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16
+      tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16
 ```
 
 ### Example 8: Metal Double Bass
 
 ```muslang
 drums: (tempo! 180)
-  V1: [kick/16 kick/16] * 8  # Fast double kick
+  V1: kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16
+      kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16  # Fast double kick
   V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: [hat/16] * 16
+  V3: hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
   V4: r/2 r/4 crash/4  # Occasional crash
 ```
 
@@ -480,27 +482,25 @@ drums:
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
 
 # Even better - voices in repeating pattern
-drums:
-  [
-    V1: kick/4 kick/4 kick/4 kick/4
-    V2: r/4 snare/4 r/4 snare/4
-    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  ] * 4
+drums: (generated from m4)
+  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
+  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
 
 # Won't work - drums can't be chorded like pitched notes
 drums: kick/4,snare/4,hat/8  # ✗ Invalid
 ```
 
-### 2. Use Repeats for Patterns
+### 2. Use Recursive m4 Macros for Patterns
 
-Drum patterns repeat - leverage the repeat syntax:
+Drum patterns repeat - define them once in `.mus.m4` and expand with `m4`:
 
-```muslang
-# Efficient
-drums: [kick/4 snare/4 kick/4 snare/4] * 8
+```m4
+define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')
+define(`BACKBEAT', `kick/4 snare/4 kick/4 snare/4')
 
-# Tedious
-drums: kick/4 snare/4 kick/4 snare/4 kick/4 snare/4 ...
+drums:
+  V1: REPEAT(8, `BACKBEAT ')
 ```
 
 ### 3. Layer Dynamics
@@ -524,11 +524,11 @@ Fast patterns need appropriate tempo:
 ```muslang
 # 16th notes at slow tempo = groovy
 drums: (tempo! 90)
-  [hat/16] * 16
+  hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
 
 # 16th notes at fast tempo = intense
 drums: (tempo! 160)
-  [hat/16] * 16
+  hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
 ```
 
 ### 5. Name Instrument "drums" or "percussion"
@@ -553,8 +553,8 @@ Different time divisions in each voice:
 
 ```muslang
 drums:
-  V1: [kick/4] * 4
-  V2: [(snare/8 r/8 snare/8):3] * 3  # Triplets against quarters
+  V1: kick/4 kick/4 kick/4 kick/4
+  V2: (snare/8 r/8 snare/8):3 (snare/8 r/8 snare/8):3 (snare/8 r/8 snare/8):3  # Triplets against quarters
 ```
 
 ### Changing Patterns
@@ -564,14 +564,21 @@ Vary the beat throughout:
 ```muslang
 drums: (tempo! 120)
   # Verse - simple
-  [kick/4 snare/4 kick/4 snare/4] * 4
+  kick/4 snare/4 kick/4 snare/4 kick/4 snare/4 kick/4 snare/4
   
   # Chorus - busier
-  [
-    V1: kick/8 r/8 kick/16 r/16 r/8 kick/8 r/8 r/8 r/8
-    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-    V3: [hat/16] * 16
-  ] * 4
+  V1: kick/8 r/8 kick/16 r/16 r/8 kick/8 r/8 r/8 r/8
+      kick/8 r/8 kick/16 r/16 r/8 kick/8 r/8 r/8 r/8
+      kick/8 r/8 kick/16 r/16 r/8 kick/8 r/8 r/8 r/8
+      kick/8 r/8 kick/16 r/16 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+      r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+      r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+      r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+      hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+      hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+      hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
 ```
 
 ### Drum Solo

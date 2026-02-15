@@ -18,7 +18,7 @@ Complete language specification for the Muslang music composition DSL.
 12. [Grouping Constructs](#grouping-constructs)
 13. [Directives](#directives)
 14. [Structure and Voices](#structure-and-voices)
-15. [Programming Constructs](#programming-constructs)
+15. [Macro Preprocessing (m4)](#macro-preprocessing-m4)
 16. [Percussion](#percussion)
 17. [Comments](#comments)
 
@@ -479,69 +479,72 @@ piano:
 
 **Note**: Voices merge into a single MIDI track with interleaved events.
 
-### Voices in Repeat Blocks
+### Voice Patterns with External Macros
 
-Voices can be used inside repeat blocks to create repeating polyphonic patterns:
+For repeating polyphonic patterns, author with `m4` macros in a `.mus.m4` file and generate expanded `.mus` before compiling.
 
-```muslang
+```m4
+define(`BAR_V1', `V1: c4/4 d4/4 e4/4 f4/4')
+define(`BAR_V2', `V2: e3/2 f3/2')
+
 piano:
-  [
-    V1: c4/4 d4/4 e4/4 f4/4
-    V2: e3/2 f3/2
-  ] * 4
-```
-
-This is especially useful for drum patterns where multiple percussion voices play together:
-
-```muslang
-drums:
-  [
-    V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  ] * 4
+BAR_V1
+BAR_V2
+BAR_V1
+BAR_V2
 ```
 
 ---
 
-## Programming Constructs
+## Macro Preprocessing (m4)
 
-### Variables
+Muslang base syntax does not include built-in variables or repeat blocks.
+Use external `m4` preprocessing for reusable patterns.
 
-Define and reuse musical patterns:
+### Workflow
 
-```muslang
-# Define variable
-melody = [c4/4 d4/4 e4/4 f4/4]
+1. Author source in `.mus.m4`.
+2. Expand with `m4` to produce `.mus`.
+3. Compile generated `.mus` with Muslang.
 
-# Use variable
-piano:
-  V1: $melody $melody g4/2
+```bash
+m4 score.mus.m4 > score.mus
+python -m muslang.cli compile score.mus -o score.mid
 ```
 
-**Syntax**:
-- **Definition**: `name = [events]`
-- **Reference**: `$name`
+### Example
 
-### Repeats
+```m4
+define(`MOTIF', `c4/4 d4/4 e4/4 f4/4')
 
-Repeat a section multiple times. Use brackets `[]` and `*count`:
+piano:
+  V1: MOTIF MOTIF g4/2
+```
+
+Generated `.mus`:
 
 ```muslang
-# Repeat pattern 4 times
 piano:
-  V1: [c4/4 d4/4 e4/4 f4/4] * 4
+  V1: c4/4 d4/4 e4/4 f4/4 c4/4 d4/4 e4/4 f4/4 g4/2
+```
 
-# Nested repeats
-piano:
-  V1: [[c4/8 d4/8] * 2 e4/4] * 3
+### Recursive Repeat Helper
 
-# Repeat with multiple voices (polyphonic patterns)
-piano:
-  [
-    V1: c5/4 d5/4 e5/4 f5/4
-    V2: c3/2 g3/2
-  ] * 4
+You can implement repeat behavior with recursive `m4` macros:
+
+```m4
+define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')
+define(`PATTERN', `kick/8 r/8 snare/8 r/8')
+
+drums:
+  V1: REPEAT(4, `PATTERN ')
+```
+
+Generated `.mus` (`V1` expanded 4 times):
+
+```muslang
+drums:
+  V1: kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8
 ```
 
 ---
@@ -574,20 +577,18 @@ Common drums:
 drums:
   V1: kick/4 snare/4 hat/8 hat/8 kick/4
 
-# Basic rock beat
+# Basic rock beat (expanded form)
 drums:
-  V1: [kick/8 hat/8 snare/8 hat/8] * 4
+  V1: kick/8 hat/8 snare/8 hat/8 kick/8 hat/8 snare/8 hat/8
 ```
 
 ### Example Beat
 
 ```muslang
 drums: (tempo! 120)
-  [
-    V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
-  ] * 8
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
 ```
 
 ---
@@ -689,10 +690,9 @@ V1: r/4 r/2
 instrument: events...
 V1: events...
 
-# Programming
-melody = [c4/4 d4/4]
-$melody
-[c4/4 d4/4] * 4
+# Macro preprocessing (m4, outside Muslang parser)
+# define(`MELODY', `c4/4 d4/4')
+# V1: MELODY MELODY
 
 # Percussion
 drums: kick/4 snare/4 hat/8

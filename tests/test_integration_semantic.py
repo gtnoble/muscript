@@ -3,6 +3,7 @@ Integration test for semantic analysis with key signatures and ornaments
 """
 
 import pytest
+from lark.exceptions import LarkError
 from muslang.parser import parse_muslang
 from muslang.semantics import SemanticAnalyzer
 
@@ -54,45 +55,27 @@ def test_ornament_expansion():
     assert len(notes) == 8
 
 
-def test_repeat_expansion():
-    """Test repeat expansion"""
+def test_repeat_syntax_rejected():
+    """Repeat syntax is no longer supported in base language"""
     source = """
     piano:
       V1: [c4/4 d4/4 e4/4] * 3
     """
-    
-    # Parse
-    ast = parse_muslang(source)
-    
-    # Analyze
-    analyzer = SemanticAnalyzer()
-    result = analyzer.analyze(ast)
-    
-    # Should have 9 notes (3 notes repeated 3 times)
-    instrument = result.instruments['piano']
-    notes = [e for e in instrument.voices[1] if hasattr(e, 'pitch')]
-    assert len(notes) == 9
+
+    with pytest.raises(LarkError):
+        parse_muslang(source)
 
 
-def test_variable_resolution_integration():
-    """Test variable resolution through full pipeline"""
+def test_variable_syntax_rejected():
+    """Variable syntax is no longer supported in base language"""
     source = """
-    piano: 
+    piano:
       V1: motif = [c4/4 e4/4 g4/4]
       V1: $motif $motif
     """
-    
-    # Parse
-    ast = parse_muslang(source)
-    
-    # Analyze
-    analyzer = SemanticAnalyzer()
-    result = analyzer.analyze(ast)
-    
-    # Should have 6 notes (motif played twice)
-    instrument = result.instruments['piano']
-    notes = [e for e in instrument.voices[1] if hasattr(e, 'pitch')]
-    assert len(notes) == 6
+
+    with pytest.raises(LarkError):
+        parse_muslang(source)
 
 
 def test_complex_combination():
@@ -101,7 +84,7 @@ def test_complex_combination():
     piano: (key d 'major)
       V1: :staccato
       V1: @f
-      V1: [c4/4 d4/4 e4/4] * 2
+      V1: c4/4 d4/4 e4/4
       V1: %mordent f4/4
     """
     

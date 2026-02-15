@@ -21,7 +21,7 @@ def test_validate_note_octave_range():
     
     # Invalid octave - too low
     note = Note(pitch='c', octave=-1, duration=4)
-    instrument = Instrument(name='piano', events=[note])
+    instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -35,7 +35,7 @@ def test_validate_note_octave_range_too_high():
     
     # Invalid octave - too high
     note = Note(pitch='c', octave=11, duration=4)
-    instrument = Instrument(name='piano', events=[note])
+    instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -50,7 +50,7 @@ def test_validate_valid_octave():
     # Valid octaves
     for octave in [0, 4, 8, 10]:
         note = Note(pitch='c', octave=octave, duration=4)
-        instrument = Instrument(name='piano', events=[note])
+        instrument = Instrument(name='piano', events=[], voices={1: [note]})
         ast = Sequence(events=[instrument])
         
         analyzer.errors = []
@@ -64,7 +64,7 @@ def test_validate_note_duration():
     
     # Invalid duration
     note = Note(pitch='c', octave=4, duration=3)  # 3 is not valid
-    instrument = Instrument(name='piano', events=[note])
+    instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -79,7 +79,7 @@ def test_validate_valid_durations():
     valid_durations = [1, 2, 4, 8, 16, 32, 64]
     for duration in valid_durations:
         note = Note(pitch='c', octave=4, duration=duration)
-        instrument = Instrument(name='piano', events=[note])
+        instrument = Instrument(name='piano', events=[], voices={1: [note]})
         ast = Sequence(events=[instrument])
         
         analyzer.errors = []
@@ -94,7 +94,7 @@ def test_validate_slur_minimum_notes():
     # Slur with only one note
     note = Note(pitch='c', octave=4, duration=4)
     slur = Slur(notes=[note])
-    instrument = Instrument(name='piano', events=[slur])
+    instrument = Instrument(name='piano', events=[], voices={1: [slur]})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -109,7 +109,7 @@ def test_validate_tuplet_ratio():
     # Invalid tuplet ratio
     note = Note(pitch='c', octave=4, duration=8)
     tuplet = Tuplet(notes=[note], ratio=1, actual_duration=2)
-    instrument = Instrument(name='piano', events=[tuplet])
+    instrument = Instrument(name='piano', events=[], voices={1: [tuplet]})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -123,7 +123,7 @@ def test_validate_time_signature():
     
     # Invalid numerator
     time_sig = TimeSignature(numerator=0, denominator=4)
-    instrument = Instrument(name='piano', events=[time_sig])
+    instrument = Instrument(name='piano', events=[time_sig], voices={1: []})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -137,7 +137,7 @@ def test_validate_time_signature_denominator():
     
     # Invalid denominator
     time_sig = TimeSignature(numerator=4, denominator=3)
-    instrument = Instrument(name='piano', events=[time_sig])
+    instrument = Instrument(name='piano', events=[time_sig], voices={1: []})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -151,7 +151,7 @@ def test_validate_tempo_warning():
     
     # Very slow tempo
     tempo = Tempo(bpm=10)
-    instrument = Instrument(name='piano', events=[tempo])
+    instrument = Instrument(name='piano', events=[tempo], voices={1: []})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
@@ -167,70 +167,12 @@ def test_validate_slide_large_interval_warning():
     from_note = Note(pitch='c', octave=2, duration=4)
     to_note = Note(pitch='c', octave=5, duration=4)
     slide = Slide(from_note=from_note, to_note=to_note)
-    instrument = Instrument(name='piano', events=[slide])
+    instrument = Instrument(name='piano', events=[], voices={1: [slide]})
     ast = Sequence(events=[instrument])
     
     analyzer._validate_ast(ast)
     assert len(analyzer.warnings) > 0
     assert "Large slide interval" in analyzer.warnings[0]
-
-
-def test_expand_repeats():
-    """Test repeat expansion"""
-    analyzer = SemanticAnalyzer()
-    
-    # Create a repeat with 3 iterations
-    note = Note(pitch='c', octave=4, duration=4)
-    repeat = Repeat(sequence=[note], count=3)
-    
-    result = analyzer._expand_repeats(repeat)
-    
-    assert isinstance(result, Sequence)
-    assert len(result.events) == 3
-    for event in result.events:
-        assert isinstance(event, Note)
-        assert event.pitch == 'c'
-
-
-def test_resolve_variables():
-    """Test variable resolution"""
-    analyzer = SemanticAnalyzer()
-    
-    # Define a variable
-    note1 = Note(pitch='c', octave=4, duration=4)
-    note2 = Note(pitch='e', octave=4, duration=4)
-    var = Variable(name='motif', value=[note1, note2])
-    
-    # Use the variable
-    varref = VariableReference(name='motif')
-    
-    sequence = Sequence(events=[var, varref])
-    
-    result = analyzer._resolve_variables(sequence)
-    
-    # Variable definition should be removed
-    # Variable reference should be expanded and flattened
-    assert isinstance(result, Sequence)
-    # After removing var and expanding varref, we should have the 2 notes flattened
-    assert len(result.events) == 2
-    assert isinstance(result.events[0], Note)
-    assert isinstance(result.events[1], Note)
-    assert result.events[0].pitch == 'c'
-    assert result.events[1].pitch == 'e'
-
-
-def test_resolve_undefined_variable():
-    """Test undefined variable generates error"""
-    analyzer = SemanticAnalyzer()
-    
-    # Use undefined variable
-    varref = VariableReference(name='undefined')
-    sequence = Sequence(events=[varref])
-    
-    analyzer._resolve_variables(sequence)
-    
-    assert len(analyzer.errors) > 0
-    assert "Undefined variable" in analyzer.errors[0]
 
 
 def test_note_to_midi():
@@ -281,7 +223,7 @@ def test_full_analysis_pipeline():
     note1 = Note(pitch='c', octave=4, duration=4)
     note2 = Note(pitch='e', octave=4, duration=4)
     note3 = Note(pitch='g', octave=4, duration=4)
-    instrument = Instrument(name='piano', events=[note1, note2, note3])
+    instrument = Instrument(name='piano', events=[], voices={1: [note1, note2, note3]})
     ast = Sequence(events=[instrument])
     
     # Should not raise any errors
@@ -298,7 +240,7 @@ def test_analysis_with_errors_raises():
     
     # Create AST with error (invalid octave)
     note = Note(pitch='c', octave=11, duration=4)
-    instrument = Instrument(name='piano', events=[note])
+    instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     
     with pytest.raises(SemanticError):

@@ -274,8 +274,22 @@ class MIDIGenerator:
         # Initialize state
         mapper = ArticulationMapper()
         
+        if not instrument.voices:
+            raise ValueError(
+                f"Instrument '{instrument.name}' must contain at least one explicit voice"
+            )
+
+        non_voice_note_types = (
+            Note, Rest, Chord, PercussionNote, Slur, Slide, GraceNote, Tuplet
+        )
+        for event in instrument.events:
+            if isinstance(event, non_voice_note_types):
+                raise ValueError(
+                    f"Instrument '{instrument.name}' contains {type(event).__name__} outside voice context"
+                )
+
         # Process instrument-level directives (tempo, time signature, etc.)
-        # These don't advance time, so we can process them all at time 0
+        # These don't advance time, so process them at time 0.
         for event in instrument.events:
             self._process_event(track_num, channel, event, 0, mapper)
         

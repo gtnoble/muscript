@@ -14,7 +14,7 @@ Node Hierarchy:
     ├── DynamicLevel, DynamicTransition, DynamicAccent, Expression
     ├── TimeSignature, KeySignature, Tempo, Pan
     ├── Voice, Instrument, Sequence
-    └── Variable, VariableReference, Repeat, Import
+    └── Import
 """
 
 from dataclasses import dataclass, field
@@ -569,11 +569,11 @@ class Sequence(ASTNode):
     Sequence of events (represents entire composition or a sub-sequence).
     
     For top-level compositions, uses instruments dict for natural grouping.
-    For sub-sequences (variables, repeats), uses events list.
+    For sub-sequences, uses events list.
     
     Attributes:
         instruments: Dictionary mapping instrument names to Instrument nodes (top-level)
-        events: List of events for sub-sequences (variables, repeats)
+        events: List of events for sub-sequences
         location: Optional source location
     """
     instruments: Dict[str, 'Instrument'] = field(default_factory=dict)
@@ -670,67 +670,6 @@ class Pan(ASTNode):
         return f"Pan({self.position}){loc_str}"
 
 
-# ============================================================================
-# Programming Construct Nodes
-# ============================================================================
-
-@dataclass
-class Variable(ASTNode):
-    """
-    Variable definition.
-    
-    Defines a named sequence of events that can be referenced later.
-    
-    Attributes:
-        name: Variable name (identifier)
-        value: Sequence of events stored in the variable
-    """
-    name: str
-    value: List[ASTNode] = field(default_factory=list)
-    
-    def __repr__(self) -> str:
-        num_events = len(self.value)
-        loc_str = f" at {self.location}" if self.location else ""
-        return f"Variable({self.name} = [{num_events} events]){loc_str}"
-
-
-@dataclass
-class VariableReference(ASTNode):
-    """
-    Variable reference (use).
-    
-    References a previously defined variable, expanding it inline.
-    
-    Attributes:
-        name: Name of the variable to reference
-    """
-    name: str
-    
-    def __repr__(self) -> str:
-        loc_str = f" at {self.location}" if self.location else ""
-        return f"VariableRef(${self.name}){loc_str}"
-
-
-@dataclass
-class Repeat(ASTNode):
-    """
-    Repeat construct.
-    
-    Repeats a sequence of events a specified number of times.
-    
-    Attributes:
-        sequence: Events to repeat
-        count: Number of times to repeat (must be >= 1)
-    """
-    sequence: List[ASTNode] = field(default_factory=list)
-    count: int = 1
-    
-    def __repr__(self) -> str:
-        num_events = len(self.sequence)
-        loc_str = f" at {self.location}" if self.location else ""
-        return f"Repeat([{num_events} events] * {self.count}){loc_str}"
-
-
 @dataclass
 class Import(ASTNode):
     """
@@ -761,5 +700,5 @@ EventNode = Union[
     DynamicLevel, DynamicTransition, DynamicAccent, Expression,
     TimeSignature, KeySignature, Tempo, Pan,
     Voice, Instrument,
-    Variable, VariableReference, Repeat, Import
+    Import
 ]

@@ -160,7 +160,7 @@ class TestBasicMIDIGeneration:
         """Generate MIDI with single note"""
         # Create AST
         note = Note(pitch='c', octave=4, duration=4)
-        instrument = Instrument(name='piano', events=[note])
+        instrument = Instrument(name='piano', events=[], voices={1: [note]})
         ast = Sequence(instruments={'piano': instrument})
         
         # Generate MIDI
@@ -195,7 +195,7 @@ class TestBasicMIDIGeneration:
             Note(pitch='e', octave=4, duration=4),
             Note(pitch='f', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=notes)
+        instrument = Instrument(name='piano', events=[], voices={1: notes})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -225,7 +225,7 @@ class TestBasicMIDIGeneration:
             Rest(duration=4),
             Note(pitch='e', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -260,7 +260,7 @@ class TestBasicMIDIGeneration:
             Note(pitch='g', octave=4, duration=4),
         ]
         chord = Chord(notes=chord_notes)
-        instrument = Instrument(name='piano', events=[chord])
+        instrument = Instrument(name='piano', events=[], voices={1: [chord]})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -303,7 +303,7 @@ class TestArticulationMapping:
             Articulation(type='staccato'),
             Note(pitch='c', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -343,7 +343,7 @@ class TestArticulationMapping:
             DynamicLevel(level='f'),
             Note(pitch='d', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -379,7 +379,7 @@ class TestAdvancedFeatures:
             Note(pitch='e', octave=4, duration=4),
         ]
         slur = Slur(notes=notes)
-        instrument = Instrument(name='piano', events=[slur])
+        instrument = Instrument(name='piano', events=[], voices={1: [slur]})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -404,7 +404,7 @@ class TestAdvancedFeatures:
     def test_percussion(self):
         """Test percussion note generation"""
         perc_note = PercussionNote(drum_sound='kick', duration=4)
-        instrument = Instrument(name='drums', events=[perc_note])
+        instrument = Instrument(name='drums', events=[], voices={1: [perc_note]})
         ast = Sequence(instruments={'drums': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -431,7 +431,7 @@ class TestAdvancedFeatures:
             Tempo(bpm=140),
             Note(pitch='c', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -457,7 +457,7 @@ class TestAdvancedFeatures:
             TimeSignature(numerator=3, denominator=4),
             Note(pitch='c', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -489,7 +489,7 @@ class TestAdvancedFeatures:
             Pan(position=64),  # Center
             Note(pitch='c', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -516,10 +516,10 @@ class TestMultiInstrument:
     def test_two_instruments(self):
         """Generate MIDI with two instruments"""
         piano_notes = [Note(pitch='c', octave=4, duration=4)]
-        piano = Instrument(name='piano', events=piano_notes)
+        piano = Instrument(name='piano', events=[], voices={1: piano_notes})
         
         violin_notes = [Note(pitch='e', octave=5, duration=4)]
-        violin = Instrument(name='violin', events=violin_notes)
+        violin = Instrument(name='violin', events=[], voices={1: violin_notes})
         
         ast = Sequence(instruments={'piano': piano, 'violin': violin})
         
@@ -546,7 +546,7 @@ class TestMultiInstrument:
     
     def test_instrument_program_change(self):
         """Test that different instruments get correct program changes"""
-        violin = Instrument(name='violin', events=[Note(pitch='e', octave=5, duration=4)])
+        violin = Instrument(name='violin', events=[], voices={1: [Note(pitch='e', octave=5, duration=4)]})
         ast = Sequence(instruments={'violin': violin})
         
         gen = MIDIGenerator(ppq=480)
@@ -575,7 +575,7 @@ class TestSlideGeneration:
         from_note = Note(pitch='c', octave=4, duration=4)
         to_note = Note(pitch='c', octave=5, duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
-        instrument = Instrument(name='piano', events=[slide])
+        instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -603,7 +603,7 @@ class TestSlideGeneration:
         from_note = Note(pitch='c', octave=4, duration=4)
         to_note = Note(pitch='e', octave=4, duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='stepped')
-        instrument = Instrument(name='piano', events=[slide])
+        instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -628,7 +628,7 @@ class TestSlideGeneration:
         from_note = Note(pitch='c', octave=4, duration=4)
         to_note = Note(pitch='g', octave=4, duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='portamento')
-        instrument = Instrument(name='piano', events=[slide])
+        instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -686,7 +686,7 @@ class TestEdgeCases:
         """Nested sequences should be flattened"""
         inner_seq = Sequence(events=[Note(pitch='c', octave=4, duration=4)])
         outer_seq = Sequence(events=[inner_seq])
-        instrument = Instrument(name='piano', events=[outer_seq])
+        instrument = Instrument(name='piano', events=[], voices={1: [outer_seq]})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)

@@ -19,7 +19,6 @@ class SemanticAnalyzer:
     """Semantic analysis and AST transformation"""
     
     def __init__(self):
-        self.symbol_table: Dict[str, List[ASTNode]] = {}
         self.current_time_sig = TimeSignature(numerator=4, denominator=4)
         self.current_key_sig: Optional[KeySignature] = None
         self.current_tempo = DEFAULT_TEMPO
@@ -30,26 +29,17 @@ class SemanticAnalyzer:
         """Main entry point for semantic analysis"""
         # Phase 1: Validate structure
         self._validate_ast(ast)
-        
-        # Phase 2: Resolve variables
-        ast = self._resolve_variables(ast)
-        
-        # Phase 3: Expand repeats
-        ast = self._expand_repeats(ast)
-        
-        # Phase 3.5: Regroup events by voice (after repeat expansion)
-        ast = self._regroup_voices(ast)
-        
-        # Phase 4: Apply key signatures
+
+        # Phase 2: Apply key signatures
         ast = self._apply_key_signatures(ast)
-        
-        # Phase 5: Expand ornaments
+
+        # Phase 3: Expand ornaments
         ast = self._expand_ornaments(ast)
-        
-        # Phase 6: Calculate timing
+
+        # Phase 4: Calculate timing
         ast = self._calculate_timing(ast)
-        
-        # Phase 7: Track state
+
+        # Phase 5: Track state
         ast = self._track_state(ast)
         
         if self.errors:
@@ -92,82 +82,25 @@ class SemanticAnalyzer:
         elif isinstance(node, Tempo):
             if node.bpm < 20 or node.bpm > 400:
                 self._warning(f"Unusual tempo: {node.bpm} BPM")
+
+        elif isinstance(node, Instrument):
+            if not node.voices:
+                self._error(
+                    f"Instrument '{node.name}' must declare at least one explicit voice"
+                )
+
+            non_voice_note_types = (
+                Note, Rest, Chord, PercussionNote, Slur, Slide, GraceNote, Tuplet
+            )
+            for event in node.events:
+                if isinstance(event, non_voice_note_types):
+                    self._error(
+                        f"Instrument '{node.name}' contains {type(event).__name__} outside voice context"
+                    )
         
         # Recursively validate children
         for child in self._get_children(node):
             self._validate_ast(child)
-    
-    def _resolve_variables(self, node: ASTNode) -> ASTNode:
-        """Resolve variable references"""
-        if isinstance(node, Variable):
-            self.symbol_table[node.name] = node.value
-            return None  # Remove variable definitions from event stream
-        
-        elif isinstance(node, VariableReference):
-            if node.name not in self.symbol_table:
-                self._error(f"Undefined variable: ${node.name}")
-                return node
-            # Replace reference with expanded value
-            return Sequence(events=self.symbol_table[node.name])
-        
-        # Recursively process
-        return self._transform_children(node, self._resolve_variables)
-    
-    def _expand_repeats(self, node: ASTNode) -> ASTNode:
-        """Expand repeat constructs"""
-        if isinstance(node, Repeat):
-            expanded = []
-            for _ in range(node.count):
-                # Recursively expand each element in case there are nested repeats
-                for item in node.sequence:
-                    expanded_item = self._expand_repeats(item)
-                    expanded.append(expanded_item)
-            return Sequence(events=expanded)
-        
-        elif isinstance(node, (Sequence, Instrument)):
-            # Recursively process children
-            return self._transform_children(node, self._expand_repeats)
-        
-        return node
-    
-    def _regroup_voices(self, node: ASTNode) -> ASTNode:
-        """
-        Regroup events by voice after repeat expansion.
-        
-        Since all notes must be in voices (enforced by parser), this method
-        just ensures Voice declarations are properly handled after repeat expansion.
-        """
-        if isinstance(node, Instrument):
-            # Keep directives at instrument level, regroup voice events
-            directives = list(node.events)
-            
-            # Preserve existing voice structure and expand any Voice nodes within repeats
-            new_voices = {}
-            for voice_num, voice_events in node.voices.items():
-                # Ensure voice number exists in new_voices
-                if voice_num not in new_voices:
-                    new_voices[voice_num] = []
-                
-                # Process events - handle case where a repeat expands to Voice declarations
-                for event in voice_events:
-                    if isinstance(event, Voice):
-                        # Voice declaration from expanded repeat - switch context
-                        expanded_voice_num = event.number
-                        if expanded_voice_num not in new_voices:
-                            new_voices[expanded_voice_num] = []
-                        # Add this voice's events
-                        new_voices[expanded_voice_num].extend(event.events)
-                    else:
-                        # Regular event - keep in current voice
-                        new_voices[voice_num].append(event)
-            
-            return replace(node, events=directives, voices=new_voices)
-        
-        elif isinstance(node, Sequence):
-            # Recursively process instruments
-            return self._transform_children(node, self._regroup_voices)
-        
-        return node
     
     def _apply_key_signatures(self, node: ASTNode) -> ASTNode:
         """Apply key signature accidentals to notes"""
@@ -641,10 +574,6 @@ class SemanticAnalyzer:
             return node.notes
         elif isinstance(node, Tuplet):
             return node.notes
-        elif isinstance(node, Repeat):
-            return node.sequence
-        elif isinstance(node, Variable):
-            return node.value
         else:
             return []
     
