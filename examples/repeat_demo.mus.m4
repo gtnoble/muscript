@@ -11,14 +11,17 @@ define(`ROCK_KICK', `kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8')dnl
 define(`ROCK_SNARE', `r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8')dnl
 define(`ROCK_HAT', `hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8')dnl
 
+REPEAT(2, 
+`
 piano: (tempo! 120) (time 4 4)
-  V1: REPEAT(2, `PIANO_BAR ')
-  V2: REPEAT(2, `BASS_BAR ')
+  V1: PIANO_BAR
+  V2: BASS_BAR
 
 drums: (tempo! 120) (time 4 4)
-  V1: REPEAT(2, `ROCK_KICK ')
-  V2: REPEAT(2, `ROCK_SNARE ')
-  V3: REPEAT(2, `ROCK_HAT ')
+  V1: ROCK_KICK
+  V2: ROCK_SNARE
+  V3: ROCK_HAT
 
 flute: (tempo! 120) (time 4 4)
-  V1: REPEAT(2, `FLUTE_BAR ')
+  V1: FLUTE_BAR
+')

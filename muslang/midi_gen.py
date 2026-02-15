@@ -264,9 +264,17 @@ class MIDIGenerator:
         if is_percussion_instrument(instrument.name):
             channel = GM_DRUM_CHANNEL
         else:
+            # Validate instrument name
+            instrument_lower = instrument.name.lower()
+            if instrument_lower not in INSTRUMENT_MAP:
+                raise ValueError(
+                    f"Unknown instrument '{instrument.name}'. "
+                    f"Valid instruments: {', '.join(sorted(INSTRUMENT_MAP.keys()))}"
+                )
+            
             channel = self._get_next_channel()
             # Set program (instrument sound)
-            program = INSTRUMENT_MAP.get(instrument.name.lower(), 0)
+            program = INSTRUMENT_MAP[instrument_lower]
             self.midi.addProgramChange(track_num, channel, 0, program)
         
         self.instrument_channels[instrument.name] = channel
@@ -555,11 +563,16 @@ class MIDIGenerator:
         """
         from_midi = self._note_to_midi(slide.from_note)
         to_midi = self._note_to_midi(slide.to_note)
-        
-        duration_ticks = self._duration_to_ticks(
+
+        from_duration_ticks = self._duration_to_ticks(
             slide.from_note.duration or DEFAULT_NOTE_DURATION,
             slide.from_note.dotted
         )
+        to_duration_ticks = self._duration_to_ticks(
+            slide.to_note.duration or DEFAULT_NOTE_DURATION,
+            slide.to_note.dotted
+        )
+        velocity = mapper.get_note_velocity()
         
         if slide.style == 'chromatic':
             # Generate pitch bend events
@@ -568,7 +581,7 @@ class MIDIGenerator:
             # Calculate bend values
             steps = SLIDE_STEPS
             for i in range(steps + 1):
-                bend_time_ticks = time_ticks + (duration_ticks * i // steps)
+                bend_time_ticks = time_ticks + (from_duration_ticks * i // steps)
                 bend_time_beats = bend_time_ticks / self.ppq
                 
                 # Calculate pitch bend value
@@ -580,10 +593,9 @@ class MIDIGenerator:
                 
                 self.midi.addPitchWheelEvent(track, channel, bend_time_beats, bend_value)
             
-            # Add the note at original pitch
-            velocity = mapper.get_note_velocity()
+            # Add the source note while pitch bends
             time_beats = time_ticks / self.ppq
-            duration_beats = duration_ticks / self.ppq
+            duration_beats = from_duration_ticks / self.ppq
             
             self.midi.addNote(
                 track, channel, from_midi,
@@ -591,8 +603,15 @@ class MIDIGenerator:
             )
             
             # Reset pitch bend to center (0 for midiutil's signed format)
-            end_time_beats = (time_ticks + duration_ticks) / self.ppq
+            end_time_beats = (time_ticks + from_duration_ticks) / self.ppq
             self.midi.addPitchWheelEvent(track, channel, end_time_beats, 0)
+
+            # Sustain destination note
+            to_duration_beats = to_duration_ticks / self.ppq
+            self.midi.addNote(
+                track, channel, to_midi,
+                end_time_beats, to_duration_beats, velocity
+            )
         
         elif slide.style == 'stepped':
             # Generate intermediate chromatic notes
@@ -600,11 +619,22 @@ class MIDIGenerator:
             num_steps = abs(to_midi - from_midi)
             
             if num_steps == 0:
-                # Same note - just play once
-                return self._generate_note(track, channel, slide.from_note, time_ticks, mapper)
+                # Same note - play source then sustain destination duration
+                from_time_beats = time_ticks / self.ppq
+                from_duration_beats = from_duration_ticks / self.ppq
+                self.midi.addNote(
+                    track, channel, from_midi,
+                    from_time_beats, from_duration_beats, velocity
+                )
+                to_time_beats = (time_ticks + from_duration_ticks) / self.ppq
+                to_duration_beats = to_duration_ticks / self.ppq
+                self.midi.addNote(
+                    track, channel, to_midi,
+                    to_time_beats, to_duration_beats, velocity
+                )
+                return time_ticks + from_duration_ticks + to_duration_ticks
             
-            velocity = mapper.get_note_velocity()
-            step_duration_ticks = duration_ticks // (num_steps + 1)
+            step_duration_ticks = max(1, from_duration_ticks // (num_steps + 1))
             
             current_pitch = from_midi
             current_time_ticks = time_ticks
@@ -629,30 +659,44 @@ class MIDIGenerator:
                 track, channel, to_midi,
                 time_beats, duration_beats, velocity
             )
+
+            # Sustain destination note for explicit to-note duration
+            sustain_time_beats = (time_ticks + from_duration_ticks) / self.ppq
+            sustain_duration_beats = to_duration_ticks / self.ppq
+            self.midi.addNote(
+                track, channel, to_midi,
+                sustain_time_beats, sustain_duration_beats, velocity
+            )
         
         elif slide.style == 'portamento':
             # Use portamento CC
             time_beats = time_ticks / self.ppq
             
             # Set portamento time (0-127, higher = slower)
-            portamento_time = min(127, duration_ticks // 10)
+            portamento_time = min(127, from_duration_ticks // 10)
             self.midi.addControllerEvent(track, channel, time_beats, CC_PORTAMENTO_TIME, portamento_time)
             self.midi.addControllerEvent(track, channel, time_beats, CC_PORTAMENTO_SWITCH, 127)
             
-            # Generate from note
-            velocity = mapper.get_note_velocity()
-            duration_beats = duration_ticks / self.ppq
-            
+            # Generate from note for full glide segment
+            from_duration_beats = from_duration_ticks / self.ppq
             self.midi.addNote(
                 track, channel, from_midi,
-                time_beats, duration_beats, velocity
+                time_beats, from_duration_beats, velocity
+            )
+            
+            # Generate to note sustain after glide
+            to_time_beats = (time_ticks + from_duration_ticks) / self.ppq
+            to_duration_beats = to_duration_ticks / self.ppq
+            self.midi.addNote(
+                track, channel, to_midi,
+                to_time_beats, to_duration_beats, velocity
             )
             
             # Disable portamento
-            end_time_beats = (time_ticks + duration_ticks) / self.ppq
+            end_time_beats = (time_ticks + from_duration_ticks) / self.ppq
             self.midi.addControllerEvent(track, channel, end_time_beats, CC_PORTAMENTO_SWITCH, 0)
         
-        return time_ticks + duration_ticks
+        return time_ticks + from_duration_ticks + to_duration_ticks
     
     def _note_to_midi(self, note: Note) -> int:
         """

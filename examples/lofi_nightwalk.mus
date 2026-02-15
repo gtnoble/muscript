@@ -1,0 +1,113 @@
+# Lo-Fi Nightwalk (Macro Source)
+# Original composition: dusty boom-bap + neo-soul minor chords
+# Generate: m4 examples/lofi_nightwalk.mus.m4 > examples/lofi_nightwalk.mus
+
+
+# ==============================
+# Harmony (1 bar each)
+# Key center: F minor (natural minor / dorian-ish color)
+# Rhythm: dotted-quarter hit, pickup hit, backbeat hit
+# Bar total = /4. + r/8 + /8 + r/8 + /4
+# ==============================
+
+
+# C7(b9) in F minor key: e3+ is E natural, d4 is Db due to key signature
+
+# Slight variation for longer sections (more air)
+
+
+# ==============================
+# Bass (1 bar each)
+# Syncopated 16th pickups, stays inside 4/4
+# ==============================
+
+
+
+
+# ==============================
+# Drums (1 bar each)
+# V1 kick, V2 snare(+ghost), V3 hats
+# ==============================
+
+
+
+
+
+
+# ==============================
+# Lead motifs (1 bar each)
+# Sparse bell/square phrases (pentatonic-ish)
+# ==============================
+
+
+# ==============================
+# Composition
+# 4 intro + 16 main + 8 bridge + 4 outro = 32 bars
+# ==============================
+
+electric_piano_1: (tempo! 84) (time 4 4) (key f 'minor)
+  # Intro (4) - airy comp
+  V1: @mf :legato f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/4 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/8,a3/8,c4/8,e4/8,g4/8 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/4 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/8,a3/8,c4/8,e4/8,g4/8 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | b2/4.,d3/4.,f3/4.,a3/4.,c4/4. r/8 b2/8,d3/8,f3/8,a3/8,c4/8 r/8 b2/4,d3/4,f3/4,a3/4,c4/4 |
+  V2: @mp r/1 | r/1 | f2/1 | b1/1 |
+
+  # Main (16) - steady progression
+  V1: @f :tenuto f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | b2/4.,d3/4.,f3/4.,a3/4.,c4/4. r/8 b2/8,d3/8,f3/8,a3/8,c4/8 r/8 b2/4,d3/4,f3/4,a3/4,c4/4 | e3/4.,g3/4.,b3/4.,d4/4.,f4/4.,c5/4. r/8 e3/8,g3/8,b3/8,d4/8,f4/8 r/8 e3/4,g3/4,b3/4,d4/4,f4/4 | a2/4.,c3/4.,e3/4.,g3/4.,b3/4. r/8 a2/8,c3/8,e3/8,g3/8,b3/8 r/8 a2/4,c3/4,e3/4,g3/4,b3/4 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | b2/4.,d3/4.,f3/4.,a3/4.,c4/4. r/8 b2/8,d3/8,f3/8,a3/8,c4/8 r/8 b2/4,d3/4,f3/4,a3/4,c4/4 | e3/4.,g3/4.,b3/4.,d4/4.,f4/4.,c5/4. r/8 e3/8,g3/8,b3/8,d4/8,f4/8 r/8 e3/4,g3/4,b3/4,d4/4,f4/4 | a2/4.,c3/4.,e3/4.,g3/4.,b3/4. r/8 a2/8,c3/8,e3/8,g3/8,b3/8 r/8 a2/4,c3/4,e3/4,g3/4,b3/4 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | b2/4.,d3/4.,f3/4.,a3/4.,c4/4. r/8 b2/8,d3/8,f3/8,a3/8,c4/8 r/8 b2/4,d3/4,f3/4,a3/4,c4/4 | e3/4.,g3/4.,b3/4.,d4/4.,f4/4.,c5/4. r/8 e3/8,g3/8,b3/8,d4/8,f4/8 r/8 e3/4,g3/4,b3/4,d4/4,f4/4 | a2/4.,c3/4.,e3/4.,g3/4.,b3/4. r/8 a2/8,c3/8,e3/8,g3/8,b3/8 r/8 a2/4,c3/4,e3/4,g3/4,b3/4 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | b2/4.,d3/4.,f3/4.,a3/4.,c4/4. r/8 b2/8,d3/8,f3/8,a3/8,c4/8 r/8 b2/4,d3/4,f3/4,a3/4,c4/4 | e3/4.,g3/4.,b3/4.,d4/4.,f4/4.,c5/4. r/8 e3/8,g3/8,b3/8,d4/8,f4/8 r/8 e3/4,g3/4,b3/4,d4/4,f4/4 | a2/4.,c3/4.,e3/4.,g3/4.,b3/4. r/8 a2/8,c3/8,e3/8,g3/8,b3/8 r/8 a2/4,c3/4,e3/4,g3/4,b3/4 | 
+  V2: @mf f2/1 | b1/1 | e2/1 | a1/1 | f2/1 | b1/1 | e2/1 | a1/1 | f2/1 | b1/1 | e2/1 | a1/1 | f2/1 | b1/1 | e2/1 | a1/1 | 
+
+  # Bridge (8) - turnaround color
+  V1: @f d3/4.,f3/4.,a3/4.,c4/4.,e4/4. r/8 d3/8,f3/8,a3/8,c4/8,e4/8 r/8 d3/4,f3/4,a3/4,c4/4,e4/4 | c3/4.,e3+/4.,g3/4.,b3/4.,d4/4. r/8 c3/8,e3+/8,g3/8,b3/8,d4/8 r/8 c3/4,e3+/4,g3/4,b3/4 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | a2/4.,c3/4.,e3/4.,g3/4.,b3/4. r/8 a2/8,c3/8,e3/8,g3/8,b3/8 r/8 a2/4,c3/4,e3/4,g3/4,b3/4 | d3/4.,f3/4.,a3/4.,c4/4.,e4/4. r/8 d3/8,f3/8,a3/8,c4/8,e4/8 r/8 d3/4,f3/4,a3/4,c4/4,e4/4 | c3/4.,e3+/4.,g3/4.,b3/4.,d4/4. r/8 c3/8,e3+/8,g3/8,b3/8,d4/8 r/8 c3/4,e3+/4,g3/4,b3/4 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | a2/4.,c3/4.,e3/4.,g3/4.,b3/4. r/8 a2/8,c3/8,e3/8,g3/8,b3/8 r/8 a2/4,c3/4,e3/4,g3/4,b3/4 | 
+  V2: @mf d2/1 | c2/1 | f2/1 | a1/1 | d2/1 | c2/1 | f2/1 | a1/1 | 
+
+  # Outro (4) - fade
+  V1: @diminuendo @mf f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/4 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/8,a3/8,c4/8,e4/8,g4/8 | f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8,g4/8 r/8 f3/4,a3/4,c4/4,e4/4,g4/4 | b2/4.,d3/4.,f3/4.,a3/4.,c4/4. r/8 b2/8,d3/8,f3/8,a3/8,c4/8 r/8 b2/4,d3/4,f3/4,a3/4,c4/4 | f3/1,a3/1,c4/1,e4/1,g4/1 |
+  V2: @diminuendo @mp f2/1 | b1/1 | f2/1 | f2/1 |
+
+bass: (tempo! 84) (time 4 4) (key f 'minor)
+  # Intro (4) - enter late
+  V1: @mp r/1 | r/1 | f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | b1/8 r/16 b1/16 f2/8 r/8 a2/8 r/16 a2/16 b2/8 r/8 |
+
+  # Main (16)
+  V1: @f f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | b1/8 r/16 b1/16 f2/8 r/8 a2/8 r/16 a2/16 b2/8 r/8 | e2/8 r/16 e2/16 b2/8 r/8 d3/8 r/16 d3/16 e3/8 r/8 | a1/8 r/16 a1/16 e2/8 r/8 g2/8 r/16 g2/16 a2/8 r/8 | f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | b1/8 r/16 b1/16 f2/8 r/8 a2/8 r/16 a2/16 b2/8 r/8 | e2/8 r/16 e2/16 b2/8 r/8 d3/8 r/16 d3/16 e3/8 r/8 | a1/8 r/16 a1/16 e2/8 r/8 g2/8 r/16 g2/16 a2/8 r/8 | f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | b1/8 r/16 b1/16 f2/8 r/8 a2/8 r/16 a2/16 b2/8 r/8 | e2/8 r/16 e2/16 b2/8 r/8 d3/8 r/16 d3/16 e3/8 r/8 | a1/8 r/16 a1/16 e2/8 r/8 g2/8 r/16 g2/16 a2/8 r/8 | f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | b1/8 r/16 b1/16 f2/8 r/8 a2/8 r/16 a2/16 b2/8 r/8 | e2/8 r/16 e2/16 b2/8 r/8 d3/8 r/16 d3/16 e3/8 r/8 | a1/8 r/16 a1/16 e2/8 r/8 g2/8 r/16 g2/16 a2/8 r/8 | 
+
+  # Bridge (8)
+  V1: @f d2/8 r/16 d2/16 a2/8 r/8 c3/8 r/16 c3/16 d3/8 r/8 | c2/8 r/16 c2/16 g2/8 r/8 b2/8 r/16 b2/16 c3/8 r/8 | f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | a1/8 r/16 a1/16 e2/8 r/8 g2/8 r/16 g2/16 a2/8 r/8 | d2/8 r/16 d2/16 a2/8 r/8 c3/8 r/16 c3/16 d3/8 r/8 | c2/8 r/16 c2/16 g2/8 r/8 b2/8 r/16 b2/16 c3/8 r/8 | f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | a1/8 r/16 a1/16 e2/8 r/8 g2/8 r/16 g2/16 a2/8 r/8 | 
+
+  # Outro (4)
+  V1: @diminuendo @mp f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | b1/8 r/16 b1/16 f2/8 r/8 a2/8 r/16 a2/16 b2/8 r/8 | f1/8 r/16 f1/16 c2/8 r/8 e2/8 r/16 e2/16 f2/8 r/8 | f1/1 |
+
+# Dusty boom-bap kit
+# V1 kick, V2 snare, V3 hats
+
+drums: (tempo! 84) (time 4 4)
+  # Intro (4) - hats first, snare enters bar 3
+  V1: @p r/1 | r/1 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 |
+  V2: r/1 | r/1 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 |
+  V3: hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 hat/16 r/16 hat/16 r/16 hat/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 hat/16 r/16 hat/16 r/16 hat/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 |
+  V4: r/1 | r/1 | crash/4 r/4 r/2 | r/1 |
+
+  # Main (16)
+  V1: @mf kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 |  kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | 
+  V2: r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 |  r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | 
+  V3: hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 |  hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 | hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 | hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 | hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 |  hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 | 
+  V4: crash/4 r/4 r/2 | r/1 | r/1 | r/1 | crash/4 r/4 r/2 | r/1 | r/1 | r/1 | crash/4 r/4 r/2 | r/1 | r/1 | r/1 | crash/4 r/4 r/2 | r/1 | r/1 | r/1 | 
+
+  # Bridge (8) - open hats + slightly busier kick
+  V1: @f kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 | kick/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 kick/8 |  kick/8 r/8 kick/16 tom1/16 tom2/16 tom1/16 snare/8 r/8 kick/8 snare/8 tom2/16 tom1/16 |
+  V2: @mf r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | r/4 snare/8 r/8 r/8 snare/16 r/16 snare/8 r/8 | 
+  V3: @mf hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 openhat/16 r/16 hat/16 r/16 |  ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 | ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 | ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 | ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 ride/8 | 
+  V4: crash/4 r/4 r/2 | r/1 | r/1 | r/1 | crash/4 r/4 r/2 | r/1 | r/1 | r/1 |
+
+  # Outro (4)
+  V1: @mf kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | kick/8 r/8 r/16 kick/16 r/8 r/8 kick/16 r/16 r/8 kick/16 r/16 r/8 | r/2 kick/8 r/8 | r/1 |
+  V2: r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/4 snare/8 r/16 snare/16 r/4 snare/8 r/8 | r/2 snare/8 r/8 | r/1 |
+  V3: @diminuendo hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | hat/16 r/16 hat/16 hat/16 r/16 hat/16 r/16 hat/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | r/1 |
+  V4: crash/4 r/4 r/2 | r/1 | r/1 | r/1 |
+
+# Bell-like lead; keep it sparse and late
+lead_1_square: (tempo! 84) (time 4 4) (key f 'minor)
+  # 32 bars total: 4 intro rest + 16 main + 8 bridge + 4 outro
+  V1: @pp r/1 | r/1 | r/1 | r/1 | 
+  V1: @p :legato r/2 c5/16 e5/16 g5/8 r/8 f5/8 e5/16 c5/16 r/8 | r/4 a4/16 c5/16 r/8 e5/8 r/8 d5/8 c5/16 a4/16 r/4 | r/2 r/8 g5/8 a5/8 c6/8 g5/4 r/8 | r/4 r/8 e5/16 f5/16 e5/8 c5/8 a4/8 g4/8 r/8 r/8 | r/2 c5/16 e5/16 g5/8 r/8 f5/8 e5/16 c5/16 r/8 | r/4 a4/16 c5/16 r/8 e5/8 r/8 d5/8 c5/16 a4/16 r/4 | r/2 r/8 g5/8 a5/8 c6/8 g5/4 r/8 | r/4 r/8 e5/16 f5/16 e5/8 c5/8 a4/8 g4/8 r/8 r/8 | 
+  V1: @mp r/4 a4/16 c5/16 r/8 e5/8 r/8 d5/8 c5/16 a4/16 r/4 | r/2 c5/16 e5/16 g5/8 r/8 f5/8 e5/16 c5/16 r/8 | r/2 r/8 g5/8 a5/8 c6/8 g5/4 r/8 | r/4 r/8 e5/16 f5/16 e5/8 c5/8 a4/8 g4/8 r/8 r/8 | r/4 a4/16 c5/16 r/8 e5/8 r/8 d5/8 c5/16 a4/16 r/4 | r/2 c5/16 e5/16 g5/8 r/8 f5/8 e5/16 c5/16 r/8 | r/2 r/8 g5/8 a5/8 c6/8 g5/4 r/8 | r/4 r/8 e5/16 f5/16 e5/8 c5/8 a4/8 g4/8 r/8 r/8 | 
+  V1: @mf r/2 r/8 g5/8 a5/8 c6/8 g5/4 r/8 | r/4 r/8 e5/16 f5/16 e5/8 c5/8 a4/8 g4/8 r/8 r/8 | r/2 c5/16 e5/16 g5/8 r/8 f5/8 e5/16 c5/16 r/8 | r/4 a4/16 c5/16 r/8 e5/8 r/8 d5/8 c5/16 a4/16 r/4 | r/2 r/8 g5/8 a5/8 c6/8 g5/4 r/8 | r/4 r/8 e5/16 f5/16 e5/8 c5/8 a4/8 g4/8 r/8 r/8 | r/2 c5/16 e5/16 g5/8 r/8 f5/8 e5/16 c5/16 r/8 | r/4 a4/16 c5/16 r/8 e5/8 r/8 d5/8 c5/16 a4/16 r/4 | 
+  V1: @diminuendo r/4 a4/16 c5/16 r/8 e5/8 r/8 d5/8 c5/16 a4/16 r/4 | r/2 c5/16 e5/16 g5/8 r/8 f5/8 e5/16 c5/16 r/8 | r/1 | r/1 |

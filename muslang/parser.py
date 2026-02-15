@@ -293,7 +293,18 @@ class MuslangTransformer(Transformer):
         dotted = False
         
         for item in items:
-            if isinstance(item, int):
+            if isinstance(item, Token):
+                if item.type == 'DURATION':
+                    duration = int(str(item))
+                elif item.type == 'DOTTED' or str(item) == '.':
+                    dotted = True
+            elif isinstance(item, Tree):
+                if item.data == 'duration' and item.children:
+                    duration_token = item.children[0]
+                    duration = int(str(duration_token))
+                elif item.data == 'dotted':
+                    dotted = True
+            elif isinstance(item, int):
                 duration = item
             elif item == '.':
                 dotted = True
@@ -397,10 +408,10 @@ class MuslangTransformer(Transformer):
     
     def slide(self, items) -> Slide:
         """
-        Grammar: slide: "<" (slide_type ":")? note note ">"
+        Grammar: slide: "<" (SLIDE_TYPE ":")? note note ">"
         
         Args:
-            items: [slide_type(str)?, Note, Note]
+            items: [SLIDE_TYPE(Token)?, Note, Note]
             
         Returns:
             Slide node
@@ -409,7 +420,12 @@ class MuslangTransformer(Transformer):
         notes = []
         
         for item in items:
-            if isinstance(item, str) and item in ['portamento', 'stepped']:
+            # Check if item is a Token (from SLIDE_TYPE)
+            if hasattr(item, 'type') and item.type == 'SLIDE_TYPE':
+                style_val = item.value
+                if style_val in ['portamento', 'stepped']:
+                    style = style_val
+            elif isinstance(item, str) and item in ['portamento', 'stepped']:
                 style = item
             elif isinstance(item, Note):
                 notes.append(item)
@@ -418,10 +434,8 @@ class MuslangTransformer(Transformer):
         to_note = notes[1] if len(notes) > 1 else None
         
         return Slide(from_note=from_note, to_note=to_note, style=style)
-    
-    def slide_type(self, items) -> str:
-        """Transform slide type token."""
-        return str(items[0])
+
+    # slide_type is now a TOKEN (SLIDE_TYPE), not a rule, so no transformer needed
     
     def slide_style(self, items) -> str:
         """Transform slide style."""

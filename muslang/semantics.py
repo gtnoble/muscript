@@ -326,11 +326,19 @@ class SemanticAnalyzer:
             return replace(event, notes=updated_notes), total_duration
         
         elif isinstance(event, Slide):
-            # Slide takes the duration of the from_note
-            from_note_updated, duration = self._calculate_event_timing(event.from_note, start_time)
-            # to_note happens at the end (same endpoint)
-            to_note_updated = replace(event.to_note, start_time=start_time, end_time=start_time + duration)
-            return replace(event, from_note=from_note_updated, to_note=to_note_updated), duration
+            # Slide consumes both note durations:
+            # from_note = glide duration, to_note = destination sustain duration
+            from_note_updated, from_duration = self._calculate_event_timing(event.from_note, start_time)
+            to_note_updated, to_duration = self._calculate_event_timing(
+                event.to_note,
+                start_time + from_duration,
+            )
+            total_duration = from_duration + to_duration
+            return replace(
+                event,
+                from_note=from_note_updated,
+                to_note=to_note_updated,
+            ), total_duration
         
         elif isinstance(event, Tempo):
             # Tempo changes affect subsequent timing but don't consume time themselves

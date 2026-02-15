@@ -65,16 +65,18 @@ list: $(GENERATED_MUS)
 	done
 
 # Build a specific example
-.PHONY: basic_melody articulation_showcase drum_beat dynamics_demo orchestral ornaments_demo piano_voices repeat_demo rhythm_complex
+.PHONY: basic_melody articulation_showcase drum_beat dynamics_demo lofi_beat orchestral ornaments_demo piano_voices repeat_demo rhythm_complex smooth_jazz
 basic_melody: $(EXAMPLES_DIR)/basic_melody.mid
 articulation_showcase: $(EXAMPLES_DIR)/articulation_showcase.mid
 drum_beat: $(EXAMPLES_DIR)/drum_beat.mid
 dynamics_demo: $(EXAMPLES_DIR)/dynamics_demo.mid
+lofi_beat: $(EXAMPLES_DIR)/lofi_beat.mid
 orchestral: $(EXAMPLES_DIR)/orchestral.mid
 ornaments_demo: $(EXAMPLES_DIR)/ornaments_demo.mid
 piano_voices: $(EXAMPLES_DIR)/piano_voices.mid
 repeat_demo: $(EXAMPLES_DIR)/repeat_demo.mid
 rhythm_complex: $(EXAMPLES_DIR)/rhythm_complex.mid
+smooth_jazz: $(EXAMPLES_DIR)/smooth_jazz.mid
 
 # Help target
 .PHONY: help

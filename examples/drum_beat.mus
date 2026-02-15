@@ -8,15 +8,43 @@
 # Section 1: Basic Rock Beat
 # Classic kick on 1 and 3, snare on 2 and 4, hi-hat eighths
 drums: (tempo! 120) (time 4 4)
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 
+
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
 
 # Section 2: Four-on-the-Floor (Disco/House)
 (tempo! 120)
-  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 
-  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 
+
+  V1: kick/4 kick/4 kick/4 kick/4
+  V2: r/4 snare/4 r/4 snare/4
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
+  V1: kick/4 kick/4 kick/4 kick/4
+  V2: r/4 snare/4 r/4 snare/4
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
+  V1: kick/4 kick/4 kick/4 kick/4
+  V2: r/4 snare/4 r/4 snare/4
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
+  V1: kick/4 kick/4 kick/4 kick/4
+  V2: r/4 snare/4 r/4 snare/4
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+
 
 # Section 3: Funk Pattern with Ghost Notes
 (tempo! 110)

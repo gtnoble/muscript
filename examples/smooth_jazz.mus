@@ -1,0 +1,97 @@
+# Smooth Jazz (rewrite from scratch)
+# 56 bars: Intro 8 + A1 16 + A2 16 + Bridge 8 + Outro 8
+# Generate: m4 examples/smooth_jazz.mus.m4 > examples/smooth_jazz.mus
+
+
+# ==============================
+# Harmony (8-bar loop, D minor)
+# Dm9 | Gm9 | C13 | Fmaj9 | Bbmaj9 | Em7b5 A7(b9) | Dm9 | A7sus
+# ==============================
+
+
+# Comp patterns (each = one 4/4 bar in eighth grid)
+
+
+
+# ==============================
+# Bass (walking eighths)
+# ==============================
+
+
+
+# ==============================
+# Drums (swing ride + light backbeat)
+# ==============================
+
+
+
+
+# ==============================
+# Composition
+# ==============================
+
+electric_piano_1: (tempo! 96) (time 4 4) (key d 'minor) (pan 48)
+  # Intro (8)
+  V1: @mp :legato r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 | d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |
+  V1: @mp :tenuto r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 | d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |
+
+  # A1 (16)
+  V1: @mf :tenuto r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 | d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 | d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |
+
+  # A2 (16)
+  V1: @mf :legato r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 | d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 | d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |
+
+  # Bridge (8)
+  V1: @mp r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 | d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |
+
+  # Outro (8)
+  V1: @mf r/8 f3/8 r/4 f3/8 r/8 r/8 f3/8 | b2-/8 r/8 r/8 b2-/8 r/4 b2-/8 r/8 | r/8 e3/8 r/4 e3/8 r/8 r/8 e3/8 | a2/8 r/8 r/8 a2/8 r/4 a2/8 r/8 | r/8 d3/8 r/4 d3/8 r/8 r/8 d3/8 | r/8 g3/8,b3-/8,d4/8,f4/8 r/8 g3/8,b3-/8,d4/8,f4/8 r/8 c4+/8,e4/8,g4/8,b3-/8 r/8 c4+/8,e4/8,g4/8,b3-/8 | r/8 f3/8 r/8 f3/8 r/8 f3/8 r/8 f3/8 |
+  V1: @diminuendo d4/8 r/8 r/8 d4/8 r/4 d4/8 r/8 |
+  V1: @p d3/1,f3/1,a3/1,c4/1 |
+
+bass: (tempo! 96) (time 4 4) (key d 'minor) (pan 64)
+  # Intro (8)
+  V1: @mp r/1 | r/1 | r/1 | r/1 |
+  V1: d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | g1/8 b1-/8 d2/8 f2/8 a2/8 g2/8 f2/8 d2/8 | c2/8 e2/8 g2/8 b2-/8 d3/8 c3/8 b2-/8 g2/8 | f1/8 a1/8 c2/8 e2/8 g2/8 f2/8 e2/8 c2/8 | b1-/8 d2/8 f2/8 a2/8 c3/8 b2-/8 a2/8 f2/8 | e2/8 g2/8 b2-/8 d3/8 a1/8 c2+/8 e2/8 g2/8 | d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | a1/8 d2/8 e2/8 g2/8 a2/8 g2/8 e2/8 d2/8 |
+
+  # A1 (16)
+  V1: @mf d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | g1/8 b1-/8 d2/8 f2/8 a2/8 g2/8 f2/8 d2/8 | c2/8 e2/8 g2/8 b2-/8 d3/8 c3/8 b2-/8 g2/8 | f1/8 a1/8 c2/8 e2/8 g2/8 f2/8 e2/8 c2/8 | b1-/8 d2/8 f2/8 a2/8 c3/8 b2-/8 a2/8 f2/8 | e2/8 g2/8 b2-/8 d3/8 a1/8 c2+/8 e2/8 g2/8 | d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | a1/8 d2/8 e2/8 g2/8 a2/8 g2/8 e2/8 d2/8 |d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | g1/8 b1-/8 d2/8 f2/8 a2/8 g2/8 f2/8 d2/8 | c2/8 e2/8 g2/8 b2-/8 d3/8 c3/8 b2-/8 g2/8 | f1/8 a1/8 c2/8 e2/8 g2/8 f2/8 e2/8 c2/8 | b1-/8 d2/8 f2/8 a2/8 c3/8 b2-/8 a2/8 f2/8 | e2/8 g2/8 b2-/8 d3/8 a1/8 c2+/8 e2/8 g2/8 | d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | a1/8 d2/8 e2/8 g2/8 a2/8 g2/8 e2/8 d2/8 |
+
+  # A2 (16)
+  V1: @mf d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | g1/8 b1-/8 d2/8 f2/8 a2/8 g2/8 f2/8 d2/8 | c2/8 e2/8 g2/8 b2-/8 d3/8 c3/8 b2-/8 g2/8 | f1/8 a1/8 c2/8 e2/8 g2/8 f2/8 e2/8 c2/8 | b1-/8 d2/8 f2/8 a2/8 c3/8 b2-/8 a2/8 f2/8 | e2/8 g2/8 b2-/8 d3/8 a1/8 c2+/8 e2/8 g2/8 | d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | a1/8 d2/8 e2/8 g2/8 a2/8 g2/8 e2/8 d2/8 |d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | g1/8 b1-/8 d2/8 f2/8 a2/8 g2/8 f2/8 d2/8 | c2/8 e2/8 g2/8 b2-/8 d3/8 c3/8 b2-/8 g2/8 | f1/8 a1/8 c2/8 e2/8 g2/8 f2/8 e2/8 c2/8 | b1-/8 d2/8 f2/8 a2/8 c3/8 b2-/8 a2/8 f2/8 | e2/8 g2/8 b2-/8 d3/8 a1/8 c2+/8 e2/8 g2/8 | d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | a1/8 d2/8 e2/8 g2/8 a2/8 g2/8 e2/8 d2/8 |
+
+  # Bridge (8)
+  V1: @mp d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | g1/8 b1-/8 d2/8 f2/8 a2/8 g2/8 f2/8 d2/8 | c2/8 e2/8 g2/8 b2-/8 d3/8 c3/8 b2-/8 g2/8 | f1/8 a1/8 c2/8 e2/8 g2/8 f2/8 e2/8 c2/8 | b1-/8 d2/8 f2/8 a2/8 c3/8 b2-/8 a2/8 f2/8 | e2/8 g2/8 b2-/8 d3/8 a1/8 c2+/8 e2/8 g2/8 | d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | a1/8 d2/8 e2/8 g2/8 a2/8 g2/8 e2/8 d2/8 |
+
+  # Outro (8)
+  V1: @mf d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | g1/8 b1-/8 d2/8 f2/8 a2/8 g2/8 f2/8 d2/8 | c2/8 e2/8 g2/8 b2-/8 d3/8 c3/8 b2-/8 g2/8 | f1/8 a1/8 c2/8 e2/8 g2/8 f2/8 e2/8 c2/8 | b1-/8 d2/8 f2/8 a2/8 c3/8 b2-/8 a2/8 f2/8 | e2/8 g2/8 b2-/8 d3/8 a1/8 c2+/8 e2/8 g2/8 | d2/8 f2/8 a2/8 c3/8 e3/8 d3/8 c3/8 a2/8 | @diminuendo a1/8 d2/8 e2/8 g2/8 a2/8 g2/8 e2/8 d2/8 |
+  V1: @p d2/1 |
+
+drums: (tempo! 96) (time 4 4)
+  # Intro (8) — brushes-ish (hat only), then groove
+  V1: @p r/1 | r/1 | r/1 | r/1 |
+  V1: @mp kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 
+  V2: @p r/1 | r/1 | r/1 | r/1 |
+  V2: @mp r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 
+  V3: @p hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 
+  V3: @mp hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16  hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 openhat/8. hat/16
+
+  # A1 (16)
+  V1: @mp kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8  kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 
+  V2: @mp r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8  r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 
+  V3: @mp ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16  ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16
+
+  # A2 (16)
+  V1: @mf kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8  tom2/16 tom3/16 tom4/16 tom3/16 tom2/16 tom1/16 snare/16 r/16 crash/8 kick/8 r/8 r/8
+  V2: @mf r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 r/8 snare/16 r/16 rimshot/8 r/8 
+  V3: @mf ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 
+
+  # Bridge (8)
+  V1: @mp kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 
+  V2: @mp r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 
+  V3: @mp ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 ride/8. ride/16 
+
+  # Outro (8)
+  V1: @mf kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 kick/8  tom2/16 tom3/16 tom4/16 tom3/16 tom2/16 tom1/16 snare/16 r/16 crash/8 kick/8 r/8 r/8
+  V2: @mf r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 r/4 rimshot/8 r/8 r/4 snare/8 r/8 
+  V3: @diminuendo hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16 hat/8. hat/16  r/1

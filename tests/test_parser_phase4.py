@@ -143,6 +143,44 @@ def test_dotted_and_tied():
     
     print("✓ Dotted and tied notes test passed")
 
+def test_rest_duration_parsing():
+    """Test explicit rest durations are parsed correctly."""
+    from muslang.ast_nodes import Rest
+
+    source = """
+    piano:
+      V1: r/16 c4/4 r/8
+    """
+    ast = parse_muslang(source)
+
+    voice_events = ast.instruments['piano'].voices[1]
+    assert isinstance(voice_events[0], Rest)
+    assert voice_events[0].duration == 16
+    assert voice_events[0].dotted is False
+
+    assert isinstance(voice_events[2], Rest)
+    assert voice_events[2].duration == 8
+    assert voice_events[2].dotted is False
+
+    print("✓ Rest duration parsing test passed")
+
+def test_dotted_rest_parsing():
+    """Test dotted rests are parsed correctly."""
+    from muslang.ast_nodes import Rest
+
+    source = """
+    piano:
+      V1: c4/8 r/8. d4/8
+    """
+    ast = parse_muslang(source)
+
+    voice_events = ast.instruments['piano'].voices[1]
+    assert isinstance(voice_events[1], Rest)
+    assert voice_events[1].duration == 8
+    assert voice_events[1].dotted is True
+
+    print("✓ Dotted rest parsing test passed")
+
 def test_directives():
     """Test tempo, time signature, and key signature."""
     from muslang.ast_nodes import Tempo, TimeSignature, KeySignature
@@ -243,6 +281,8 @@ if __name__ == "__main__":
         test_chord()
         test_accidentals()
         test_dotted_and_tied()
+        test_rest_duration_parsing()
+        test_dotted_rest_parsing()
         test_directives()
         test_slur()
         test_slide()

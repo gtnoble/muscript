@@ -17,15 +17,21 @@ define(`BREAK_HAT', `hat/8 hat/8 openhat/8 hat/8 hat/8 hat/8 openhat/8 hat/8')dn
 # Section 1: Basic Rock Beat
 # Classic kick on 1 and 3, snare on 2 and 4, hi-hat eighths
 drums: (tempo! 120) (time 4 4)
-  V1: REPEAT(4, `ROCK_KICK ')
-  V2: REPEAT(4, `ROCK_SNARE ')
-  V3: REPEAT(4, `ROCK_HAT ')
+REPEAT(4,
+`
+  V1: ROCK_KICK
+  V2: ROCK_SNARE
+  V3: ROCK_HAT
+')
 
 # Section 2: Four-on-the-Floor (Disco/House)
 (tempo! 120)
-  V1: REPEAT(4, `FLOOR_KICK ')
-  V2: REPEAT(4, `FLOOR_SNARE ')
-  V3: REPEAT(4, `ROCK_HAT ')
+REPEAT(4,
+`
+  V1: FLOOR_KICK
+  V2: FLOOR_SNARE
+  V3: ROCK_HAT
+')
 
 # Section 3: Funk Pattern with Ghost Notes
 (tempo! 110)

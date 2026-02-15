@@ -201,6 +201,26 @@ class TestTimingCalculation:
         
         assert processed_slur.notes[2].start_time == 2 * DEFAULT_MIDI_PPQ
         assert processed_slur.notes[2].end_time == 3 * DEFAULT_MIDI_PPQ
+
+    def test_slide_timing_uses_both_note_durations(self):
+        """Test slide timing includes both from-note and to-note durations."""
+        analyzer = SemanticAnalyzer()
+
+        slide = Slide(
+            from_note=Note(pitch='c', octave=4, duration=4),
+            to_note=Note(pitch='g', octave=4, duration=4),
+            style='chromatic',
+        )
+        instrument = Instrument(name='piano', events=[], voices={1: [slide]})
+        seq = Sequence(events=[instrument])
+
+        result = analyzer._calculate_timing(seq)
+
+        processed_slide = result.events[0].voices[1][0]
+        assert processed_slide.from_note.start_time == 0.0
+        assert processed_slide.from_note.end_time == DEFAULT_MIDI_PPQ
+        assert processed_slide.to_note.start_time == DEFAULT_MIDI_PPQ
+        assert processed_slide.to_note.end_time == 2 * DEFAULT_MIDI_PPQ
     
     def test_duration_to_ticks(self):
         """Test _duration_to_ticks helper method"""
