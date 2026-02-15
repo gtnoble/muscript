@@ -7,7 +7,8 @@ from muslang.ast_nodes import Instrument, Note, Chord, Articulation, DynamicLeve
 def test_basic_notes():
     """Test parsing basic notes with scientific pitch notation."""
     source = """
-    piano: c4/4 d4/4 e4/4 f4/4
+    piano:
+      V1: c4/4 d4/4 e4/4 f4/4
     """
     ast = parse_muslang(source)
     
@@ -15,10 +16,10 @@ def test_basic_notes():
     instrument = ast.instruments['piano']
     assert isinstance(instrument, Instrument)
     assert instrument.name == "piano"
-    assert len(instrument.events) == 4
+    assert len(instrument.voices[1]) == 4
     
     # Check first note: c4/4
-    note1 = instrument.events[0]
+    note1 = instrument.voices[1][0]
     assert isinstance(note1, Note)
     assert note1.pitch == 'c'
     assert note1.octave == 4
@@ -31,55 +32,61 @@ def test_basic_notes():
 def test_articulations():
     """Test articulation parsing with colon prefix."""
     source = """
-    piano: :staccato c4/4 d4/4 :legato e4/4 f4/4
+    piano:
+      V1: :staccato c4/4 d4/4 :legato e4/4 f4/4
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
-    assert len(instrument.events) == 6  # 2 articulations + 4 notes
+    voice_events = instrument.voices[1]
+    assert len(voice_events) == 6  # 2 articulations + 4 notes
     
     # First event should be staccato articulation
-    assert isinstance(instrument.events[0], Articulation)
-    assert instrument.events[0].type == 'staccato'
+    assert isinstance(voice_events[0], Articulation)
+    assert voice_events[0].type == 'staccato'
     
     # Fourth event should be legato articulation (not third!)
-    assert isinstance(instrument.events[3], Articulation)
-    assert instrument.events[3].type == 'legato'
+    assert isinstance(voice_events[3], Articulation)
+    assert voice_events[3].type == 'legato'
     
     print("✓ Articulations test passed")
 
 def test_dynamics():
     """Test dynamic markings with @ prefix."""
     source = """
-    piano: @p c4/4 @f d4/4
+    piano:
+      V1: @p c4/4 @f d4/4
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
-    assert len(instrument.events) == 4  # 2 dynamics + 2 notes
+    voice_events = instrument.voices[1]
+    assert len(voice_events) == 4  # 2 dynamics + 2 notes
     
     # First event should be piano dynamic
-    assert isinstance(instrument.events[0], DynamicLevel)
-    assert instrument.events[0].level == 'p'
+    assert isinstance(voice_events[0], DynamicLevel)
+    assert voice_events[0].level == 'p'
     
     # Third event should be forte dynamic
-    assert isinstance(instrument.events[2], DynamicLevel)
-    assert instrument.events[2].level == 'f'
+    assert isinstance(voice_events[2], DynamicLevel)
+    assert voice_events[2].level == 'f'
     
     print("✓ Dynamics test passed")
 
 def test_chord():
     """Test chord parsing with comma separator."""
     source = """
-    piano: c4/4,e4/4,g4/4
+    piano:
+      V1: c4/4,e4/4,g4/4
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
-    assert len(instrument.events) == 1
+    voice_events = instrument.voices[1]
+    assert len(voice_events) == 1
     
     # Should be a chord
-    chord = instrument.events[0]
+    chord = voice_events[0]
     assert isinstance(chord, Chord)
     assert len(chord.notes) == 3
     assert chord.notes[0].pitch == 'c'
@@ -91,44 +98,48 @@ def test_chord():
 def test_accidentals():
     """Test sharp and flat accidentals."""
     source = """
-    piano: c4+/4 d4-/4 e4/4
+    piano:
+      V1: c4+/4 d4-/4 e4/4
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
-    assert len(instrument.events) == 3
+    voice_events = instrument.voices[1]
+    assert len(voice_events) == 3
     
     # C sharp
-    assert instrument.events[0].accidental == 'sharp'
+    assert voice_events[0].accidental == 'sharp'
     
     # D flat
-    assert instrument.events[1].accidental == 'flat'
+    assert voice_events[1].accidental == 'flat'
     
     # E natural (no accidental)
-    assert instrument.events[2].accidental is None
+    assert voice_events[2].accidental is None
     
     print("✓ Accidentals test passed")
 
 def test_dotted_and_tied():
     """Test dotted notes and ties."""
     source = """
-    piano: c4/4. d4/4~ e4/4
+    piano:
+      V1: c4/4. d4/4~ e4/4
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
+    voice_events = instrument.voices[1]
     
     # C dotted quarter
-    assert instrument.events[0].dotted == True
-    assert instrument.events[0].tied == False
+    assert voice_events[0].dotted == True
+    assert voice_events[0].tied == False
     
     # D quarter tied
-    assert instrument.events[1].dotted == False
-    assert instrument.events[1].tied == True
+    assert voice_events[1].dotted == False
+    assert voice_events[1].tied == True
     
     # E quarter (normal)
-    assert instrument.events[2].dotted == False
-    assert instrument.events[2].tied == False
+    assert voice_events[2].dotted == False
+    assert voice_events[2].tied == False
     
     print("✓ Dotted and tied notes test passed")
 
@@ -137,13 +148,14 @@ def test_directives():
     from muslang.ast_nodes import Tempo, TimeSignature, KeySignature
     
     source = """
-    piano: (tempo! 120) (time 4 4) (key c 'major) c4/4
+    piano: (tempo! 120) (time 4 4) (key c 'major)
+      V1: c4/4
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
     
-    # Check tempo
+    # Check tempo (directives are at instrument level)
     assert isinstance(instrument.events[0], Tempo)
     assert instrument.events[0].bpm == 120
     
@@ -164,14 +176,16 @@ def test_slur():
     from muslang.ast_nodes import Slur
     
     source = """
-    piano: {c4/4 d4/4 e4/4}
+    piano:
+      V1: {c4/4 d4/4 e4/4}
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
-    assert len(instrument.events) == 1
+    voice_events = instrument.voices[1]
+    assert len(voice_events) == 1
     
-    slur = instrument.events[0]
+    slur = voice_events[0]
     assert isinstance(slur, Slur)
     assert len(slur.notes) == 3
     
@@ -182,14 +196,16 @@ def test_slide():
     from muslang.ast_nodes import Slide
     
     source = """
-    piano: <c4/4 c5/4>
+    piano:
+      V1: <c4/4 c5/4>
     """
     ast = parse_muslang(source)
     
     instrument = ast.instruments['piano']
-    assert len(instrument.events) == 1
+    voice_events = instrument.voices[1]
+    assert len(voice_events) == 1
     
-    slide = instrument.events[0]
+    slide = voice_events[0]
     assert isinstance(slide, Slide)
     assert slide.from_note.pitch == 'c'
     assert slide.from_note.octave == 4
@@ -202,8 +218,10 @@ def test_slide():
 def test_multiple_instruments():
     """Test multiple instruments."""
     source = """
-    piano: c4/4 d4/4
-    guitar: e4/4 f4/4
+    piano:
+      V1: c4/4 d4/4
+    guitar:
+      V1: e4/4 f4/4
     """
     ast = parse_muslang(source)
     

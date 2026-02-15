@@ -27,7 +27,7 @@ from .ast_nodes import (
     Note, Rest, Chord, PercussionNote,
     GraceNote, Tuplet,
     Slur, Slide,
-    Articulation, Ornament, Tremolo, Reset,
+    Articulation, Ornament, Tremolo, Reset, Expression,
     DynamicLevel, DynamicTransition, DynamicAccent,
     TimeSignature, KeySignature, Tempo, Pan,
     Voice, Instrument, Sequence,
@@ -115,9 +115,8 @@ class MuslangTransformer(Transformer):
         """
         Transform instrument declaration, grouping events by voice.
         
-        Scans events for Voice nodes and groups subsequent events
-        under that voice number. Multiple declarations of the same
-        voice are concatenated.
+        ALL notes must be in voices. Only directives (tempo, time signature, etc.)
+        are allowed at the instrument level.
         
         Args:
             items: [Token(INSTRUMENT_NAME), events_list]
@@ -127,10 +126,16 @@ class MuslangTransformer(Transformer):
         """
         name_token = items[0]
         events_list = items[1] if len(items) > 1 else []
+        instrument_name = str(name_token)
         
         # Reset state for each instrument
         self.current_duration = DEFAULT_NOTE_DURATION
         self.current_voice = None
+        
+        # Allowed directive types (not notes/chords/percussion)
+        DIRECTIVE_TYPES = (Tempo, TimeSignature, KeySignature, Pan, 
+                          Articulation, DynamicLevel, DynamicTransition, 
+                          DynamicAccent, Reset, Ornament, Tremolo, Expression)
         
         # Group events by voice
         voices = {}
@@ -147,11 +152,28 @@ class MuslangTransformer(Transformer):
                 # We're in a voice context - add to that voice
                 voices[current_voice].append(event)
             else:
-                # No voice context - add to non-voice events
-                non_voice_events.append(event)
+                # No voice context - only directives allowed
+                if isinstance(event, DIRECTIVE_TYPES):
+                    non_voice_events.append(event)
+                elif isinstance(event, (Note, Rest, Chord, PercussionNote, Slur, Slide, GraceNote, Tuplet)):
+                    raise ValueError(
+                        f"Error in instrument '{instrument_name}': "
+                        f"All notes must be in a voice (e.g., V1:). "
+                        f"Found {type(event).__name__} outside of voice context."
+                    )
+                else:
+                    # Other events like Variable, Repeat - allow for now
+                    non_voice_events.append(event)
+        
+        # Require at least one voice
+        if not voices:
+            raise ValueError(
+                f"Error in instrument '{instrument_name}': "
+                f"At least one voice (e.g., V1:) is required."
+            )
         
         return Instrument(
-            name=str(name_token),
+            name=instrument_name,
             events=non_voice_events,
             voices=voices,
         )
@@ -739,7 +761,20 @@ class MuslangTransformer(Transformer):
         dotted = False
         
         for item in items[1:]:
-            if isinstance(item, int):
+            if isinstance(item, Token):
+                if item.type == 'DURATION':
+                    duration = int(str(item))
+                elif item.type == 'DOTTED' or str(item) == '.':
+                    dotted = True
+            elif isinstance(item, Tree):
+                # Handle tree nodes from inline rules (duration, etc.)
+                if item.data == 'duration' and item.children:
+                    # Duration tree has the matched token as child
+                    duration_token = item.children[0]
+                    duration = int(str(duration_token))
+                elif item.data == 'dotted':
+                    dotted = True
+            elif isinstance(item, int):
                 duration = item
             elif item == '.':
                 dotted = True

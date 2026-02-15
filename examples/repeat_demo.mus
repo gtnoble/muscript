@@ -1,0 +1,71 @@
+# Repeat Functionality Demonstration
+# This example showcases various repeat patterns and their capabilities
+
+# Example 1: Simple melodic repeat
+piano: (tempo! 120) (time 4 4)
+  V1: [
+        c4/4 d4/4 e4/4 f4/4
+      ] * 2
+
+# Example 2: Nested repeats creating a phrase structure
+  V1: [
+        [c4/8 e4/8] * 2  # Two eighth notes, repeated twice
+        [g4/8 f4/8] * 2
+      ] * 2  # Whole pattern repeated twice
+
+# Example 3: Voices inside repeats (demonstrating simultaneous playback)
+[
+    V1: c4/4 e4/4 g4/4 c5/4
+    V2: e3/4 g3/4 c4/4 e4/4
+    V3: c3/4 c3/4 c3/4 c3/4
+] * 2
+
+# Example 4: Dynamics within repeats
+  V1: [
+        @pp c4/4 e4/4 g4/4 c5/4
+        @mf c4/4 e4/4 g4/4 c5/4
+        @f c4/4 e4/4 g4/4 c5/4
+        @ff c4/4 e4/4 g4/4 c5/4
+      ] * 2
+
+# Example 5: Articulations within repeats
+  V1: [
+        :staccato [c4/8 d4/8 e4/8 f4/8] * 2
+        :legato [g4/8 a4/8 b4/8 c5/8] * 2
+      ] * 2
+
+# Example 6: Creating rhythmic variation through nested repeats
+  V1: [
+        [c4/8 e4/8 g4/8] * 3 c4/4
+        [g4/8 e4/8 c4/8] * 3 c4/4
+      ] * 2
+
+# Example 7: Very nested repeats
+  V1: [
+        [
+            [c4/16 d4/16] * 2
+            [e4/16 f4/16] * 2
+        ] * 2
+        [g4/8 a4/8 b4/8 c5/8] * 1
+      ] * 2
+
+# Example 8: Drum rhythm pattern with repeats
+drums: (tempo! 120) (time 4 4)
+  V1: [
+        kick/16 r/16 kick/16 snare/16  kick/16 r/16 r/16 snare/16
+        kick/16 kick/16 r/16 snare/16  kick/16 r/16 kick/16 snare/16
+      ] * 4
+
+# Example 9: Complex multi-voice drum pattern with repeats
+[
+    V1: [kick/8 r/8 kick/16 kick/16] * 4
+    V2: [r/8 snare/8 r/8 snare/8] * 4
+    V3: [hat/16 hat/16] * 16
+] * 2
+
+# Example 10: Combining multiple instruments with repeats
+flute: (tempo! 120) (time 4 4)
+  V1: [c5/4 d5/4 e5/4 f5/4] * 2
+
+cello: (tempo! 120) (time 4 4)
+  V1: [c3/2 g3/2] * 2

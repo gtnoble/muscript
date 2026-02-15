@@ -3,74 +3,74 @@
 # Including tuplets, grace notes, time signature changes, and complex patterns
 
 piano: (tempo! 120)
+V1:
+  # Section 1: Triplets (3 notes in space of 2)
+  (time 4 4)
+  c4/4 d4/4 (e4/8 f4/8 g4/8):3   a4/4 |
+  b4/4 c5/4 (d5/8 c5/8 b4/8):3 a4/4 |
 
-# Section 1: Triplets (3 notes in space of 2)
-(time 4 4)
-c4/4 d4/4 (e4/8 f4/8 g4/8):3 a4/4 |
-b4/4 c5/4 (d5/8 c5/8 b4/8):3 a4/4 |
+  # Section 2: Grace Notes
+  ~c4/32 d4/4 ~e4/32 f4/4 ~g4/32 a4/4 ~b4/32 c5/4 |
+  ~c5/32 ~b4/32 a4/2 ~g4/32 f4/2 |
 
-# Section 2: Grace Notes
-~c4/32 d4/4 ~e4/32 f4/4 ~g4/32 a4/4 ~b4/32 c5/4 |
-~c5/32 ~b4/32 a4/2 ~g4/32 f4/2 |
+  # Section 3: Dotted Rhythms
+  c4/4. d4/8 e4/4. f4/8 |
+  g4/8. a4/16 g4/8. f4/16 e4/4 d4/4 |
 
-# Section 3: Dotted Rhythms
-c4/4. d4/8 e4/4. f4/8 |
-g4/8. a4/16 g4/8. f4/16 e4/4 d4/4 |
+  # Section 4: Quintuplets (5 notes in space of 4)
+  c4/4 (d4/16 e4/16 f4/16 g4/16 a4/16):5 b4/4 c5/4 |
 
-# Section 4: Quintuplets (5 notes in space of 4)
-c4/4 (d4/16 e4/16 f4/16 g4/16 a4/16):5 b4/4 c5/4 |
+  # Section 5: Mixed Tuplets
+  c4/4 (d4/8 e4/8 f4/8):3 g4/4 (a4/16 b4/16 c5/16 d5/16 e5/16):5 |
+  f5/2 (e5/8 d5/8 c5/8):3 b4/4 |
 
-# Section 5: Mixed Tuplets
-c4/4 (d4/8 e4/8 f4/8):3 g4/4 (a4/16 b4/16 c5/16 d5/16 e5/16):5 |
-f5/2 (e5/8 d5/8 c5/8):3 b4/4 |
+  # Section 6: 16th Note Patterns
+  c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16 c5/16 |
+  c5/16 b4/16 a4/16 g4/16 f4/16 e4/16 d4/16 c4/16 |
 
-# Section 6: 16th Note Patterns
-c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16 c5/16 |
-c5/16 b4/16 a4/16 g4/16 f4/16 e4/16 d4/16 c4/16 |
+  # Section 7: Syncopation
+  r/8 c4/8 r/8 e4/4 g4/8 r/4 |
+  r/8 c5/8 r/4 g4/8 e4/8 c4/4 |
 
-# Section 7: Syncopation
-r/8 c4/8 r/8 e4/4 g4/8 r/4 |
-r/8 c5/8 r/4 g4/8 e4/8 c4/4 |
+  # Section 8: 3/4 Time (Waltz)
+  (time 3 4)
+  c4/4 e4/4 g4/4 |
+  c5/4. b4/8 a4/8 g4/8 |
+  f4/4 d4/4 b3/4 |
+  c4/2. |
 
-# Section 8: 3/4 Time (Waltz)
-(time 3 4)
-c4/4 e4/4 g4/4 |
-c5/4. b4/8 a4/8 g4/8 |
-f4/4 d4/4 b3/4 |
-c4/2. |
+  # Section 9: 6/8 Time (Compound Meter)
+  (time 6 8)
+  c4/8 e4/8 g4/8 c5/4. |
+  b4/8 g4/8 e4/8 d4/4. |
+  c4/4. d4/4. |
+  e4/8 f4/8 g4/8 a4/8 b4/8 c5/8 |
 
-# Section 9: 6/8 Time (Compound Meter)
-(time 6 8)
-c4/8 e4/8 g4/8 c5/4. |
-b4/8 g4/8 e4/8 d4/4. |
-c4/4. d4/4. |
-e4/8 f4/8 g4/8 a4/8 b4/8 c5/8 |
+  # Section 10: 5/4 Time (Irregular Meter)
+  (time 5 4)
+  c4/4 d4/4 e4/4 f4/4 g4/4 |
+  a4/2. g4/2 |
+  f4/4 e4/4 d4/4 c4/2 |
 
-# Section 10: 5/4 Time (Irregular Meter)
-(time 5 4)
-c4/4 d4/4 e4/4 f4/4 g4/4 |
-a4/2. g4/2 |
-f4/4 e4/4 d4/4 c4/2 |
+  # Section 11: 7/8 Time (Progressive)
+  (time 7 8)
+  c4/8 d4/8 e4/8 f4/8 g4/8 a4/8 b4/8 |
+  c5/4. b4/4 |
+  a4/8 g4/8 f4/8 e4/8 d4/8 c4/4 |
 
-# Section 11: 7/8 Time (Progressive)
-(time 7 8)
-c4/8 d4/8 e4/8 f4/8 g4/8 a4/8 b4/8 |
-c5/4. b4/4 |
-a4/8 g4/8 f4/8 e4/8 d4/8 c4/4 |
+  # Section 12: Back to 4/4 with Complex Patterns
+  (time 4 4)
+  # Triplet eighths alternating with regular eighths
+  (c4/8 d4/8 e4/8):3 f4/8 (g4/8 a4/8 b4/8):3 c5/8 |
 
-# Section 12: Back to 4/4 with Complex Patterns
-(time 4 4)
-# Triplet eighths alternating with regular eighths
-(c4/8 d4/8 e4/8):3 f4/8 (g4/8 a4/8 b4/8):3 c5/8 |
+  # Grace notes before triplets
+  ~b4/32 (c5/8 b4/8 a4/8):3 g4/4 ~f4/32 e4/4 |
 
-# Grace notes before triplets
-~b4/32 (c5/8 b4/8 a4/8):3 g4/4 ~f4/32 e4/4 |
+  # Septuplets (7 notes in space of 4)
+  c4/4 (d4/16 e4/16 f4/16 g4/16 a4/16 b4/16 c5/16):7 r/4 |
 
-# Septuplets (7 notes in space of 4)
-c4/4 (d4/16 e4/16 f4/16 g4/16 a4/16 b4/16 c5/16):7 r/4 |
-
-# Final cadence with dotted rhythm
-c5/4. b4/8 a4/4 g4/4 |
-f4/2~ f4/4 e4/4 |
-d4/1 |
-c4/1 |
+  # Final cadence with dotted rhythm
+  c5/4. b4/8 a4/4 g4/4 |
+  f4/2~ f4/4 e4/4 |
+  d4/1 |
+  c4/1 |

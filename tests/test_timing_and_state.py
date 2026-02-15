@@ -16,13 +16,13 @@ class TestTimingCalculation:
         analyzer = SemanticAnalyzer()
         
         note = Note(pitch='c', octave=4, duration=4, dotted=False)
-        instrument = Instrument(name='piano', events=[note])
+        instrument = Instrument(name='piano', events=[], voices={1: [note]})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
         # Check that note has timing information
-        processed_note = result.events[0].events[0]
+        processed_note = result.events[0].voices[1][0]
         assert processed_note.start_time == 0.0
         assert processed_note.end_time == DEFAULT_MIDI_PPQ  # Quarter note = 1 * PPQ
     
@@ -35,12 +35,12 @@ class TestTimingCalculation:
             Note(pitch='d', octave=4, duration=4),  # Quarter note
             Note(pitch='e', octave=4, duration=2),  # Half note
         ]
-        instrument = Instrument(name='piano', events=notes)
+        instrument = Instrument(name='piano', events=[], voices={1: notes})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
-        processed_notes = result.events[0].events
+        processed_notes = result.events[0].voices[1]
         
         # First note: 0 to PPQ
         assert processed_notes[0].start_time == 0.0
@@ -59,12 +59,12 @@ class TestTimingCalculation:
         analyzer = SemanticAnalyzer()
         
         note = Note(pitch='c', octave=4, duration=4, dotted=True)
-        instrument = Instrument(name='piano', events=[note])
+        instrument = Instrument(name='piano', events=[], voices={1: [note]})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
-        processed_note = result.events[0].events[0]
+        processed_note = result.events[0].voices[1][0]
         expected_duration = DEFAULT_MIDI_PPQ * 1.5  # Dotted quarter = 1.5 * quarter
         
         assert processed_note.start_time == 0.0
@@ -79,12 +79,12 @@ class TestTimingCalculation:
             Rest(duration=4),
             Note(pitch='d', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
         # First note: 0 to PPQ
         assert processed_events[0].start_time == 0.0
@@ -106,12 +106,12 @@ class TestTimingCalculation:
             Note(pitch='g', octave=4, duration=4),
         ]
         chord = Chord(notes=chord_notes)
-        instrument = Instrument(name='piano', events=[chord])
+        instrument = Instrument(name='piano', events=[], voices={1: [chord]})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
-        processed_chord = result.events[0].events[0]
+        processed_chord = result.events[0].voices[1][0]
         
         # All notes in chord should start at same time
         for note in processed_chord.notes:
@@ -132,12 +132,12 @@ class TestTimingCalculation:
             Note(pitch='e', octave=4, duration=8),
         ]
         tuplet = Tuplet(notes=tuplet_notes, ratio=3, actual_duration=2)
-        instrument = Instrument(name='piano', events=[tuplet])
+        instrument = Instrument(name='piano', events=[], voices={1: [tuplet]})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
-        processed_tuplet = result.events[0].events[0]
+        processed_tuplet = result.events[0].voices[1][0]
         
         # Tuplet should fit 3 notes into space of half note (2*PPQ)
         expected_per_note = (2 * DEFAULT_MIDI_PPQ) / 3
@@ -159,13 +159,13 @@ class TestTimingCalculation:
         grace = GraceNote(note=grace_note)
         main_note = Note(pitch='d', octave=4, duration=4)
         
-        instrument = Instrument(name='piano', events=[grace, main_note])
+        instrument = Instrument(name='piano', events=[], voices={1: [grace, main_note]})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
-        processed_grace = result.events[0].events[0]
-        processed_main = result.events[0].events[1]
+        processed_grace = result.events[0].voices[1][0]
+        processed_main = result.events[0].voices[1][1]
         
         # Grace note should have small duration
         grace_duration = DEFAULT_MIDI_PPQ * GRACE_NOTE_DURATION_RATIO
@@ -185,12 +185,12 @@ class TestTimingCalculation:
             Note(pitch='e', octave=4, duration=4),
         ]
         slur = Slur(notes=slur_notes)
-        instrument = Instrument(name='piano', events=[slur])
+        instrument = Instrument(name='piano', events=[], voices={1: [slur]})
         seq = Sequence(events=[instrument])
         
         result = analyzer._calculate_timing(seq)
         
-        processed_slur = result.events[0].events[0]
+        processed_slur = result.events[0].voices[1][0]
         
         # Notes in slur should be sequential
         assert processed_slur.notes[0].start_time == 0.0
@@ -230,14 +230,14 @@ class TestStateTracking:
         analyzer = SemanticAnalyzer()
         
         note = Note(pitch='c', octave=4, duration=4)
-        instrument = Instrument(name='piano', events=[note])
+        instrument = Instrument(name='piano', events=[], voices={1: [note]})
         seq = Sequence(events=[instrument])
         
         # Add timing first
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_note = result.events[0].events[0]
+        processed_note = result.events[0].voices[1][0]
         
         # Default state should be natural articulation and mf dynamic
         assert processed_note.articulation == 'natural'
@@ -255,13 +255,13 @@ class TestStateTracking:
             Articulation(type='legato'),
             Note(pitch='e', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
         # First note should have staccato
         assert processed_events[1].articulation == 'staccato'
@@ -283,13 +283,13 @@ class TestStateTracking:
             DynamicLevel(level='f'),
             Note(pitch='e', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
         # First note should be piano
         assert processed_events[1].dynamic_level == 'p'
@@ -315,13 +315,13 @@ class TestStateTracking:
             Note(pitch='e', octave=4, duration=4),
             Note(pitch='f', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
         # Extract notes (skip directive events)
         notes = [e for e in processed_events if isinstance(e, Note)]
@@ -344,13 +344,13 @@ class TestStateTracking:
             Note(pitch='e', octave=4, duration=4),
             Note(pitch='f', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
         # Extract notes
         notes = [e for e in processed_events if isinstance(e, Note)]
@@ -371,13 +371,13 @@ class TestStateTracking:
             Reset(type='natural'),
             Note(pitch='d', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
         # First note should be staccato
         assert processed_events[1].articulation == 'staccato'
@@ -396,13 +396,13 @@ class TestStateTracking:
             Reset(type='full'),
             Note(pitch='d', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
         # First note should be staccato and ff
         assert processed_events[2].articulation == 'staccato'
@@ -426,13 +426,13 @@ class TestStateTracking:
                 Note(pitch='g', octave=4, duration=4),
             ]),
         ]
-        instrument = Instrument(name='piano', events=events)
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_chord = result.events[0].events[2]
+        processed_chord = result.events[0].voices[1][2]
         
         # All notes in chord should have same state
         for note in processed_chord.notes:
@@ -448,13 +448,13 @@ class TestStateTracking:
             DynamicLevel(level='ff'),
             PercussionNote(drum_sound='kick', duration=4),
         ]
-        instrument = Instrument(name='drums', events=events)
+        instrument = Instrument(name='drums', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
         
         seq = analyzer._calculate_timing(seq)
         result = analyzer._track_state(seq)
         
-        processed_perc = result.events[0].events[1]
+        processed_perc = result.events[0].voices[1][1]
         
         # Percussion should have velocity assigned
         assert processed_perc.velocity == VELOCITY_FF
@@ -477,19 +477,23 @@ class TestIntegratedTimingAndState:
             DynamicLevel(level='f'),
             Note(pitch='e', octave=4, duration=4),
         ]
-        instrument = Instrument(name='piano', events=events)
+        # For analyze(), need to wrap in Voice node which _regroup_voices expects
+        voice_events = [Voice(number=1, events=[])] + events
+        instrument = Instrument(name='piano', events=[], voices={1: voice_events})
         seq = Sequence(events=[instrument])
         
         # Run full analysis
         result = analyzer.analyze(seq)
         
-        processed_events = result.events[0].events
+        processed_events = result.events[0].voices[1]
         
-        # Extract notes and rest
-        note1 = processed_events[2]  # After directives
-        note2 = processed_events[3]
-        rest = processed_events[4]
-        note3 = processed_events[7]  # After new directives
+        # Extract only notes and rests (filter out directives)
+        notes_and_rests = [e for e in processed_events if isinstance(e, (Note, Rest))]
+        
+        note1 = notes_and_rests[0]  # First note
+        note2 = notes_and_rests[1]  # Second note
+        rest = notes_and_rests[2]   # Rest
+        note3 = notes_and_rests[3]  # Third note
         
         # Check timing
         assert note1.start_time == 0.0
@@ -532,20 +536,24 @@ class TestIntegratedTimingAndState:
             Note(pitch='e', octave=5, duration=2),
         ]
         
+        # For analyze(), need to wrap in Voice nodes which _regroup_voices expects
+        piano_voice_events = [Voice(number=1, events=[])] + piano_events
+        violin_voice_events = [Voice(number=1, events=[])] + violin_events
+        
         seq = Sequence(events=[
-            Instrument(name='piano', events=piano_events),
-            Instrument(name='violin', events=violin_events),
+            Instrument(name='piano', events=[], voices={1: piano_voice_events}),
+            Instrument(name='violin', events=[], voices={1: violin_voice_events}),
         ])
         
         result = analyzer.analyze(seq)
         
         # Check piano timing (independent)
-        piano_notes = [e for e in result.events[0].events if isinstance(e, Note)]
+        piano_notes = [e for e in result.events[0].voices[1] if isinstance(e, Note)]
         assert piano_notes[0].start_time == 0.0
         assert piano_notes[0].velocity == VELOCITY_MF
         
         # Check violin timing (independent, also starts at 0)
-        violin_notes = [e for e in result.events[1].events if isinstance(e, Note)]
+        violin_notes = [e for e in result.events[1].voices[1] if isinstance(e, Note)]
         assert violin_notes[0].start_time == 0.0
         assert violin_notes[0].velocity == VELOCITY_F
         assert violin_notes[0].articulation == 'legato'

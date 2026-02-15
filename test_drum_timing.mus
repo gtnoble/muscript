@@ -1,0 +1,11 @@
+# Simple drum test to check timing
+drums: (tempo! 120) (time 4 4)
+
+# Basic pattern with different durations
+kick/4 snare/4 kick/4 snare/4
+kick/8 kick/8 snare/4 kick/8 kick/8 snare/4
+
+# Voice test
+V1: kick/4 kick/4 kick/4 kick/4
+V2: r/4 snare/4 r/4 snare/4
+V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8

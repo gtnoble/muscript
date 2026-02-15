@@ -253,8 +253,8 @@ class MIDIGenerator:
         """
         Process an instrument and generate MIDI events.
         
-        Handles both voices (simultaneous, all start at time 0) and
-        non-voice events (sequential from time 0).
+        All notes must be in voices. Directives (tempo, time signature, etc.)
+        are at the instrument level and don't advance time.
         
         Args:
             track_num: MIDI track number
@@ -274,20 +274,16 @@ class MIDIGenerator:
         # Initialize state
         mapper = ArticulationMapper()
         
-        # Process voices if present (all start at time 0)
-        if instrument.voices:
-            for voice_num, voice_events in instrument.voices.items():
-                # Each voice starts at time 0 (simultaneous playback)
-                time_ticks = 0
-                for event in voice_events:
-                    time_ticks = self._process_event(
-                        track_num, channel, event, time_ticks, mapper
-                    )
+        # Process instrument-level directives (tempo, time signature, etc.)
+        # These don't advance time, so we can process them all at time 0
+        for event in instrument.events:
+            self._process_event(track_num, channel, event, 0, mapper)
         
-        # Process non-voice events (sequential from time 0)
-        if instrument.events:
+        # Process voices (each voice starts at time 0, plays simultaneously)
+        for voice_num, voice_events in instrument.voices.items():
+            # Each voice starts at time 0 (simultaneous playback)
             time_ticks = 0
-            for event in instrument.events:
+            for event in voice_events:
                 time_ticks = self._process_event(
                     track_num, channel, event, time_ticks, mapper
                 )

@@ -36,16 +36,22 @@ Muslang is a music composition DSL that uses:
 
 ## Basic Structure
 
-A Muslang composition consists of one or more **instruments**, each containing a sequence of **events**:
+A Muslang composition consists of one or more **instruments**, each containing **voices** with musical **events**:
 
 ```muslang
-instrument-name: event1 event2 event3 ...
+instrument-name: [directives]
+  V1: event1 event2 event3 ...
+  V2: event1 event2 event3 ...
 ```
+
+**Important**: All notes, rests, chords, and other musical events must be contained within a voice (V1:, V2:, etc.). Only directives like tempo and time signature can appear at the instrument level.
 
 Example:
 ```muslang
-piano: c4/4 d4/4 e4/4 f4/4
-violin: g5/2 a5/2
+piano: (tempo! 120)
+  V1: c4/4 d4/4 e4/4 f4/4
+violin:
+  V1: g5/2 a5/2
 ```
 
 ---
@@ -76,14 +82,16 @@ a3    # A in octave 3
 
 ### Notes
 ```muslang
-piano: c4 d4 e4 f4 g4 a4 b4 c5
+piano:
+  V1: c4 d4 e4 f4 g4 a4 b4 c5
 ```
 
 **Pitch letters**: `c`, `d`, `e`, `f`, `g`, `a`, `b` (lowercase)
 
 ### Rests
 ```muslang
-piano: c4/4 r/4 e4/4 r/4
+piano:
+  V1: c4/4 r/4 e4/4 r/4
 ```
 
 **Rest syntax**: `r` followed by optional duration
@@ -127,24 +135,28 @@ piano: c4/4 d4 e4 f4  # All are quarter notes
 
 ### Sharp: `+` (after octave number)
 ```muslang
-piano: c4+/4  # C♯4 quarter note
-       f5+/8  # F♯5 eighth note
+piano:
+  V1: c4+/4  # C♯4 quarter note
+      f5+/8  # F♯5 eighth note
 ```
 
 ### Flat: `-` (after octave number)
 ```muslang
-piano: b4-/4  # B♭4 quarter note
-       e5-/8  # E♭5 eighth note
+piano:
+  V1: b4-/4  # B♭4 quarter note
+      e5-/8  # E♭5 eighth note
 ```
 
 ### Natural: (no accidental)
 ```muslang
-piano: c4/4   # C natural
+piano:
+  V1: c4/4   # C natural
 ```
 
 ### Ties: `~` (after note)
 ```muslang
-piano: c4/4~ c4/4  # Tie two quarter notes
+piano:
+  V1: c4/4~ c4/4  # Tie two quarter notes
 ```
 
 ---
@@ -155,10 +167,12 @@ Multiple notes sounding simultaneously, separated by commas:
 
 ```muslang
 # C major triad
-piano: c4/4,e4/4,g4/4
+piano:
+  V1: c4/4,e4/4,g4/4
 
 # D minor seventh
-piano: d4/2,f4/2,a4/2,c5/2
+piano:
+  V1: d4/2,f4/2,a4/2,c5/2
 ```
 
 **Note**: All notes in a chord should have the same duration.
@@ -182,13 +196,16 @@ Articulations control **how notes are played**. Use `:` prefix.
 
 ```muslang
 # Apply articulation to following notes
-piano: :staccato c4/4 d4/4 e4/4 f4/4
+piano:
+  V1: :staccato c4/4 d4/4 e4/4 f4/4
 
 # Change articulation mid-phrase
-piano: :staccato c4/4 d4/4 :legato e4/4 f4/4
+piano:
+  V1: :staccato c4/4 d4/4 :legato e4/4 f4/4
 
 # Reset to natural (default)
-piano: :staccato c4/4 d4/4 :reset e4/4 f4/4
+piano:
+  V1: :staccato c4/4 d4/4 :reset e4/4 f4/4
 ```
 
 ### State Behavior
@@ -196,11 +213,11 @@ piano: :staccato c4/4 d4/4 :reset e4/4 f4/4
 Articulations are **persistent** - they apply to all following notes until changed:
 
 ```muslang
-piano: 
-  c4/4 d4/4          # Natural
-  :staccato e4/4 f4/4 g4/4  # All staccato
-  :legato a4/4 b4/4   # All legato
-  :reset c5/4         # Back to natural
+piano:
+  V1: c4/4 d4/4          # Natural
+      :staccato e4/4 f4/4 g4/4  # All staccato
+      :legato a4/4 b4/4   # All legato
+      :reset c5/4         # Back to natural
 ```
 
 ---
@@ -239,16 +256,20 @@ Dynamics control **loudness/volume**. Use `@` prefix.
 
 ```muslang
 # Absolute dynamics
-piano: @p c4/4 d4/4 @f e4/4 f4/4
+piano:
+  V1: @p c4/4 d4/4 @f e4/4 f4/4
 
 # Crescendo
-piano: @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/4
+piano:
+  V1: @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/4
 
 # Diminuendo
-piano: @f @diminuendo g4/4 f4/4 e4/4 d4/4 @p c4/4
+piano:
+  V1: @f @diminuendo g4/4 f4/4 e4/4 d4/4 @p c4/4
 
 # Accents
-piano: c4/4 @sforzando e4/4 g4/4 @sforzando c5/4
+piano:
+  V1: c4/4 @sforzando e4/4 g4/4 @sforzando c5/4
 ```
 
 ---
@@ -271,11 +292,11 @@ Ornaments are decorative embellishments. Use `%` prefix.
 The ornament marker applies to the **immediately following note**:
 
 ```muslang
-piano: 
-  %trill c4/2       # Trill on C4 for half note duration
-  %mordent d4/4     # Mordent on D4
-  %turn e4/4        # Turn on E4
-  %tremolo g4/1     # Tremolo on G4 for whole note
+piano:
+  V1: %trill c4/2       # Trill on C4 for half note duration
+      %mordent d4/4     # Mordent on D4
+      %turn e4/4        # Turn on E4
+      %tremolo g4/1     # Tremolo on G4 for whole note
 ```
 
 **Note**: Ornaments expand into multiple fast notes during compilation.
@@ -290,13 +311,16 @@ Group notes to fit into a different time division. Use parentheses `()` and `:ra
 
 ```muslang
 # Triplet: 3 eighth notes in the space of 2
-piano: (c4/8 d4/8 e4/8):3
+piano:
+  V1: (c4/8 d4/8 e4/8):3
 
 # Quintuplet: 5 notes in the space of 4
-piano: (c4/16 d4/16 e4/16 f4/16 g4/16):5
+piano:
+  V1: (c4/16 d4/16 e4/16 f4/16 g4/16):5
 
 # Septuplet: 7 notes in the space of 4
-piano: (c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16):7
+piano:
+  V1: (c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16):7
 ```
 
 ### Grace Notes
@@ -305,10 +329,12 @@ Quick ornamental notes before the main note. Use `~` prefix:
 
 ```muslang
 # Grace note before main note
-piano: ~c4/32 d4/4
+piano:
+  V1: ~c4/32 d4/4
 
 # Multiple grace notes
-piano: ~c4/32 ~d4/32 e4/4
+piano:
+  V1: ~c4/32 ~d4/32 e4/4
 ```
 
 **Note**: Grace notes "steal" time from the following main note.
@@ -323,10 +349,12 @@ Group notes to be played smoothly connected. Use curly braces `{}`:
 
 ```muslang
 # Slurred phrase
-piano: {c4/4 d4/4 e4/4 f4/4}
+piano:
+  V1: {c4/4 d4/4 e4/4 f4/4}
 
 # Multiple slurs
-piano: {c4/4 d4/4} {e4/4 f4/4}
+piano:
+  V1: {c4/4 d4/4} {e4/4 f4/4}
 ```
 
 **MIDI implementation**: Sends CC#68 (legato), overlaps notes slightly.
@@ -337,13 +365,16 @@ Slide from one note to another. Use angle brackets `<>`:
 
 ```muslang
 # Chromatic slide (default)
-piano: <c4/2 g4/2>
+piano:
+  V1: <c4/2 g4/2>
 
 # Portamento (smooth pitch bend)
-piano: <portamento: c4/2 c5/2>
+piano:
+  V1: <portamento: c4/2 c5/2>
 
 # Stepped (chromatic scale steps)
-piano: <stepped: c4/2 c5/2>
+piano:
+  V1: <stepped: c4/2 c5/2>
 ```
 
 **Types**:
@@ -360,7 +391,8 @@ Directives set musical context. Use parentheses `()`:
 ### Tempo
 
 ```muslang
-piano: (tempo! 120) c4/4 d4/4 e4/4
+piano: (tempo! 120)
+  V1: c4/4 d4/4 e4/4
 ```
 
 **BPM**: Beats per minute (default: 120)
@@ -368,7 +400,8 @@ piano: (tempo! 120) c4/4 d4/4 e4/4
 ### Time Signature
 
 ```muslang
-piano: (time 3 4) c4/4 d4/4 e4/4
+piano: (time 3 4)
+  V1: c4/4 d4/4 e4/4
 ```
 
 **Format**: `(time numerator denominator)`
@@ -381,8 +414,10 @@ Common signatures:
 ### Key Signature
 
 ```muslang
-piano: (key g 'major) g4/4 a4/4 b4/4 c5/4
-piano: (key d 'minor) d4/4 e4/4 f4/4 g4/4
+piano: (key g 'major)
+  V1: g4/4 a4/4 b4/4 c5/4
+piano: (key d 'minor)
+  V1: d4/4 e4/4 f4/4 g4/4
 ```
 
 **Format**: `(key root 'mode)`
@@ -391,8 +426,10 @@ piano: (key d 'minor) d4/4 e4/4 f4/4 g4/4
 
 **Examples with accidentals**:
 ```muslang
-piano: (key a- 'major) e4-/4 f4/4 g4/4 a4-/4  # A♭ major
-piano: (key f+ 'minor) f4+/4 g4+/4 a4/4 b4/4  # F♯ minor
+piano: (key a- 'major)
+  V1: e4-/4 f4/4 g4/4 a4-/4  # A♭ major
+piano: (key f+ 'minor)
+  V1: f4+/4 g4+/4 a4/4 b4/4  # F♯ minor
 ```
 
 **Effect**: Automatically applies scale accidentals to notes.
@@ -400,9 +437,12 @@ piano: (key f+ 'minor) f4+/4 g4+/4 a4/4 b4/4  # F♯ minor
 ### Pan
 
 ```muslang
-piano: (pan 64) c4/4 d4/4  # Center
-piano: (pan 0) c4/4        # Far left
-piano: (pan 127) c4/4      # Far right
+piano: (pan 64)
+  V1: c4/4 d4/4  # Center
+piano: (pan 0)
+  V1: c4/4        # Far left
+piano: (pan 127)
+  V1: c4/4      # Far right
 ```
 
 **Range**: 0-127 (0=left, 64=center, 127=right)
@@ -414,9 +454,12 @@ piano: (pan 127) c4/4      # Far right
 ### Multiple Instruments
 
 ```muslang
-piano: c4/4 d4/4 e4/4 f4/4
-violin: g5/2 a5/2
-bass: c2/1
+piano:
+  V1: c4/4 d4/4 e4/4 f4/4
+violin:
+  V1: g5/2 a5/2
+bass:
+  V1: c2/1
 ```
 
 Each instrument gets its own MIDI track and channel.
@@ -431,6 +474,8 @@ piano:
   V2: e3/2 f3/2
   V1: g4/4 a4/4 b4/4 c5/4
 ```
+
+**Important**: All notes must be in voices. Voices are required even for single-line melodies.
 
 **Note**: Voices merge into a single MIDI track with interleaved events.
 
@@ -470,7 +515,8 @@ Define and reuse musical patterns:
 melody = [c4/4 d4/4 e4/4 f4/4]
 
 # Use variable
-piano: $melody $melody g4/2
+piano:
+  V1: $melody $melody g4/2
 ```
 
 **Syntax**:
@@ -483,10 +529,12 @@ Repeat a section multiple times. Use brackets `[]` and `*count`:
 
 ```muslang
 # Repeat pattern 4 times
-piano: [c4/4 d4/4 e4/4 f4/4] * 4
+piano:
+  V1: [c4/4 d4/4 e4/4 f4/4] * 4
 
 # Nested repeats
-piano: [[c4/8 d4/8] * 2 e4/4] * 3
+piano:
+  V1: [[c4/8 d4/8] * 2 e4/4] * 3
 
 # Repeat with multiple voices (polyphonic patterns)
 piano:
@@ -523,10 +571,12 @@ Common drums:
 
 ```muslang
 # Percussion instrument
-drums: kick/4 snare/4 hat/8 hat/8 kick/4
+drums:
+  V1: kick/4 snare/4 hat/8 hat/8 kick/4
 
 # Basic rock beat
-drums: [kick/8 hat/8 snare/8 hat/8] * 4
+drums:
+  V1: [kick/8 hat/8 snare/8 hat/8] * 4
 ```
 
 ### Example Beat
@@ -534,8 +584,9 @@ drums: [kick/8 hat/8 snare/8 hat/8] * 4
 ```muslang
 drums: (tempo! 120)
   [
-    kick/8 hat/8 snare/8 hat/8 
-    kick/8 hat/8 snare/8 hat/8
+    V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
+    V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
+    V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
   ] * 8
 ```
 
@@ -562,20 +613,20 @@ piano: c4/4 d4/4  # Another comment
 # Demonstrates multiple features
 
 piano: (tempo! 120) (time 4 4) (key c 'major)
-  # Main melody
-  c4/4 c4/4 g4/4 g4/4 | a4/4 a4/4 g4/2 |
-  f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2 |
+  V1: # Main melody
+      c4/4 c4/4 g4/4 g4/4 | a4/4 a4/4 g4/2 |
+      f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2 |
   
-  # With dynamics
-  @mp g4/4 g4/4 f4/4 f4/4 | e4/4 e4/4 d4/2 |
-  @mf g4/4 g4/4 f4/4 f4/4 | e4/4 e4/4 d4/2 |
+      # With dynamics
+      @mp g4/4 g4/4 f4/4 f4/4 | e4/4 e4/4 d4/2 |
+      @mf g4/4 g4/4 f4/4 f4/4 | e4/4 e4/4 d4/2 |
   
-  # With articulation
-  :staccato c4/4 c4/4 g4/4 g4/4 |
-  :legato a4/4 a4/4 g4/2 |
+      # With articulation
+      :staccato c4/4 c4/4 g4/4 g4/4 |
+      :legato a4/4 a4/4 g4/2 |
   
-  # Repeat ending
-  :reset f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2
+      # Repeat ending
+      :reset f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2
 ```
 
 ---
@@ -597,18 +648,18 @@ piano: (tempo! 120) (time 4 4) (key c 'major)
 ## Syntax Quick Reference
 
 ```muslang
-# Notes
-c4 d4 e4        # Pitches with octaves
-c4/4 d4/8       # With durations
-c4+ d4-         # With accidentals
-c4/4.           # Dotted
-c4/4~ c4/4      # Tied
+# Notes (must be in voices)
+V1: c4 d4 e4        # Pitches with octaves
+    c4/4 d4/8       # With durations
+    c4+ d4-         # With accidentals
+    c4/4.           # Dotted
+    c4/4~ c4/4      # Tied
 
 # Chords
-c4/4,e4/4,g4/4
+V1: c4/4,e4/4,g4/4
 
 # Rests
-r/4 r/2
+V1: r/4 r/2
 
 # Articulations
 :staccato :legato :tenuto :marcato :reset

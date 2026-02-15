@@ -36,8 +36,9 @@ Create a file `melody.mus`:
 ```muslang
 # Simple melody - using scientific pitch notation
 # Format: pitch+octave/duration (e.g., c4/4 = C octave 4, quarter note)
+# All notes must be in a voice (V1:, V2:, etc.)
 piano: (tempo! 120) (time 4 4)
-  c4/4 d4/4 e4/4 f4/4 | g4/2 g4/2 | a4/4 a4/4 a4/4 a4/4 | g4/1
+  V1: c4/4 d4/4 e4/4 f4/4 | g4/2 g4/2 | a4/4 a4/4 a4/4 a4/4 | g4/1
 ```
 
 Compile to MIDI:
@@ -98,76 +99,87 @@ Muslang uses scientific pitch notation where each note specifies both pitch and 
 - Middle C is `c4`
 
 ```muslang
-piano: c4/4 d4/4 e4/4 f4/4  # Quarter notes C4, D4, E4, F4
-       c4/2 d4/2             # Half notes
-       c4/1                  # Whole note
-       c4/8 d4/8 e4/8 f4/8  # Eighth notes
+piano:
+  V1: c4/4 d4/4 e4/4 f4/4  # Quarter notes C4, D4, E4, F4
+      c4/2 d4/2             # Half notes
+      c4/1                  # Whole note
+      c4/8 d4/8 e4/8 f4/8  # Eighth notes
 ```
 
 ### Accidentals
 
 ```muslang
-piano: c4+/4 d4-/4 e4/4  # C sharp, D flat, E natural (quarter notes)
+piano:
+  V1: c4+/4 d4-/4 e4/4  # C sharp, D flat, E natural (quarter notes)
 ```
 
 ### Articulations (: prefix)
 
 ```muslang
-piano: :staccato c4/4 d4/4 e4/4 f4/4  # Staccato notes
-       :legato g4/4 a4/4 b4/4 c5/4     # Legato notes
-       :reset d4/4 e4/4 f4/4 g4/4      # Back to natural
-       :tenuto c4/4 e4/4 g4/4          # Tenuto
-       :marcato c4/4 e4/4 g4/4         # Marcato (accented)
+piano:
+  V1: :staccato c4/4 d4/4 e4/4 f4/4  # Staccato notes
+      :legato g4/4 a4/4 b4/4 c5/4     # Legato notes
+      :reset d4/4 e4/4 f4/4 g4/4      # Back to natural
+      :tenuto c4/4 e4/4 g4/4          # Tenuto
+      :marcato c4/4 e4/4 g4/4         # Marcato (accented)
 ```
 
 ### Dynamics (@ prefix)
 
 ```muslang
-piano: @p c4/4 d4/4 e4/4 f4/4           # Piano (soft)
-       @f g4/4 a4/4 b4/4 c5/4           # Forte (loud)
-       @crescendo c4/4 d4/4 e4/4 f4/4   # Gradual increase
-       @diminuendo c5/4 b4/4 a4/4 g4/4  # Gradual decrease
-       @sforzando c4/4                  # Sudden accent
+piano:
+  V1: @p c4/4 d4/4 e4/4 f4/4           # Piano (soft)
+      @f g4/4 a4/4 b4/4 c5/4           # Forte (loud)
+      @crescendo c4/4 d4/4 e4/4 f4/4   # Gradual increase
+      @diminuendo c5/4 b4/4 a4/4 g4/4  # Gradual decrease
+      @sforzando c4/4                  # Sudden accent
 ```
 
 ### Slurs and Slides
 
 ```muslang
-piano: {c4/4 d4/4 e4/4 f4/4}        # Slurred phrase
-       <c4/4 g4/4>                   # Chromatic slide
-       <portamento: c4/4 g4/4>       # Portamento slide
-       <stepped: c4/4 g4/4>          # Stepped slide
+piano:
+  V1: {c4/4 d4/4 e4/4 f4/4}        # Slurred phrase
+      <c4/4 g4/4>                   # Chromatic slide
+      <portamento: c4/4 g4/4>       # Portamento slide
+      <stepped: c4/4 g4/4>          # Stepped slide
 ```
 
 ### Ornaments (% prefix)
 
 ```muslang
-piano: %trill c4/4    # Trill on C
-       %mordent d4/4  # Mordent on D
-       %turn e4/4     # Turn on E
-       %tremolo g4/2  # Tremolo
+piano:
+  V1: %trill c4/4    # Trill on C
+      %mordent d4/4  # Mordent on D
+      %turn e4/4     # Turn on E
+      %tremolo g4/2  # Tremolo
 ```
 
 ### Tuplets
 
 ```muslang
-piano: (c4/8 d4/8 e4/8):3   # Triplet of eighth notes
-       (c4/16 d4/16 e4/16 f4/16 g4/16):5  # Quintuplet
+piano:
+  V1: (c4/8 d4/8 e4/8):3   # Triplet of eighth notes
+      (c4/16 d4/16 e4/16 f4/16 g4/16):5  # Quintuplet
 ```
 
 ### Chords (comma-separated)
 
 ```muslang
-piano: c4/4,e4/4,g4/4   # C major chord (quarter notes)
-       c4/2,e4-/2,g4/2  # C minor chord (half notes)
+piano:
+  V1: c4/4,e4/4,g4/4   # C major chord (quarter notes)
+      c4/2,e4-/2,g4/2  # C minor chord (half notes)
 ```
 
 ### Multiple Instruments
 
 ```muslang
-piano: c4/4 e4/4 g4/4 c5/4
-violin: e4/4 g4/4 b4/4 e5/4
-bass: c2/2 c2/2
+piano:
+  V1: c4/4 e4/4 g4/4 c5/4
+violin:
+  V1: e4/4 g4/4 b4/4 e5/4
+bass:
+  V1: c2/2 c2/2
 ```
 
 ## Development

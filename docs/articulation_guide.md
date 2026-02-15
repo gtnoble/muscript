@@ -47,10 +47,10 @@ Articulations use the **`:` prefix**:
 Articulations apply to **all following notes** until changed:
 
 ```muslang
-piano: 
-  c4/4 d4/4           # Natural (default)
-  :staccato e4/4 f4/4 # Both staccato
-  :legato g4/4 a4/4   # Both legato
+piano:
+  V1: c4/4 d4/4           # Natural (default)
+      :staccato e4/4 f4/4 # Both staccato
+      :legato g4/4 a4/4   # Both legato
 ```
 
 ---
@@ -62,7 +62,8 @@ piano:
 The default articulation - notes play at 92% of their written duration with slight separation.
 
 ```muslang
-piano: c4/4 d4/4 e4/4 f4/4
+piano:
+  V1: c4/4 d4/4 e4/4 f4/4
 ```
 
 **MIDI effect**:
@@ -75,7 +76,8 @@ piano: c4/4 d4/4 e4/4 f4/4
 Short, detached notes.
 
 ```muslang
-piano: :staccato c4/4 d4/4 e4/4 f4/4
+piano:
+  V1: :staccato c4/4 d4/4 e4/4 f4/4
 ```
 
 **MIDI effect**:
@@ -90,7 +92,8 @@ piano: :staccato c4/4 d4/4 e4/4 f4/4
 Smooth, connected notes with no silence between them.
 
 ```muslang
-piano: :legato c4/4 d4/4 e4/4 f4/4
+piano:
+  V1: :legato c4/4 d4/4 e4/4 f4/4
 ```
 
 **MIDI effect**:
@@ -106,7 +109,8 @@ piano: :legato c4/4 d4/4 e4/4 f4/4
 Full value, slightly emphasized notes.
 
 ```muslang
-piano: :tenuto c4/4 d4/4 e4/4 f4/4
+piano:
+  V1: :tenuto c4/4 d4/4 e4/4 f4/4
 ```
 
 **MIDI effect**:
@@ -121,7 +125,8 @@ piano: :tenuto c4/4 d4/4 e4/4 f4/4
 Strongly accented, marked notes.
 
 ```muslang
-piano: :marcato c4/4 d4/4 e4/4 f4/4
+piano:
+  V1: :marcato c4/4 d4/4 e4/4 f4/4
 ```
 
 **MIDI effect**:
@@ -136,9 +141,9 @@ piano: :marcato c4/4 d4/4 e4/4 f4/4
 Return to natural articulation.
 
 ```muslang
-piano: 
-  :staccato c4/4 d4/4
-  :reset e4/4 f4/4     # Back to natural
+piano:
+  V1: :staccato c4/4 d4/4
+      :reset e4/4 f4/4     # Back to natural
 ```
 
 ---
@@ -151,10 +156,10 @@ Articulations remain active until explicitly changed:
 
 ```muslang
 piano:
-  c4/4 d4/4           # Natural
-  :staccato           # Switch to staccato
-  e4/4 f4/4 g4/4 a4/4 # All staccato
-  b4/4 c5/4           # Still staccato!
+  V1: c4/4 d4/4           # Natural
+      :staccato           # Switch to staccato
+      e4/4 f4/4 g4/4 a4/4 # All staccato
+      b4/4 c5/4           # Still staccato!
 ```
 
 ### Changing Articulation
@@ -163,10 +168,10 @@ Simply specify a new articulation:
 
 ```muslang
 piano:
-  :staccato c4/4 d4/4 # Staccato
-  :legato e4/4 f4/4   # Now legato
-  :marcato g4/4 a4/4  # Now marcato
-  :reset b4/4 c5/4    # Natural
+  V1: :staccato c4/4 d4/4 # Staccato
+      :legato e4/4 f4/4   # Now legato
+      :marcato g4/4 a4/4  # Now marcato
+      :reset b4/4 c5/4    # Natural
 ```
 
 ### Scope
@@ -174,11 +179,15 @@ piano:
 Articulations are **per-instrument**. Each instrument tracks its own state:
 
 ```muslang
-piano: :staccato c4/4 d4/4 e4/4
-violin: :legato g5/4 a5/4 b5/4  # Independent state
+piano:
+  V1: :staccato c4/4 d4/4 e4/4
+violin:
+  V1: :legato g5/4 a5/4 b5/4  # Independent state
 
-piano: f4/4 g4/4                # Still staccato
-violin: c6/4 d6/4               # Still legato
+piano:
+  V1: f4/4 g4/4                # Still staccato
+violin:
+  V1: c6/4 d6/4               # Still legato
 ```
 
 ---
@@ -215,9 +224,9 @@ Like articulations, dynamics are persistent:
 
 ```muslang
 piano:
-  c4/4 d4/4      # Default @mf (velocity 85)
-  @p e4/4 f4/4   # Soft (velocity 55)
-  @ff g4/4 a4/4  # Very loud (velocity 115)
+  V1: c4/4 d4/4      # Default @mf (velocity 85)
+      @p e4/4 f4/4   # Soft (velocity 55)
+      @ff g4/4 a4/4  # Very loud (velocity 115)
 ```
 
 ### Gradual Changes
@@ -226,9 +235,9 @@ Dynamics can change smoothly between levels:
 
 ```muslang
 piano:
-  @p c4/4        # Start soft
-  d4/4 e4/4      # Still soft
-  @f f4/4        # Suddenly loud
+  V1: @p c4/4        # Start soft
+      d4/4 e4/4      # Still soft
+      @f f4/4        # Suddenly loud
 ```
 
 ---
@@ -241,7 +250,7 @@ Gradually increase volume over following notes.
 
 ```muslang
 piano:
-  @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/4
+  V1: @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/4
 ```
 
 **Effect**:
@@ -258,7 +267,7 @@ Gradually decrease volume over following notes.
 
 ```muslang
 piano:
-  @f @diminuendo g4/4 f4/4 e4/4 d4/4 @p c4/4
+  V1: @f @diminuendo g4/4 f4/4 e4/4 d4/4 @p c4/4
 ```
 
 **Effect**:
@@ -275,9 +284,9 @@ Transitions continue until a new absolute dynamic is specified:
 
 ```muslang
 piano:
-  @p @crescendo c4/4 d4/4 e4/4 f4/4 g4/4 @f a4/4
-  # Crescendo ends at @f
-  b4/4 c5/4  # Stay at @f
+  V1: @p @crescendo c4/4 d4/4 e4/4 f4/4 g4/4 @f a4/4
+      # Crescendo ends at @f
+      b4/4 c5/4  # Stay at @f
 ```
 
 ---
@@ -290,8 +299,8 @@ Sudden, strong accent on a single note. Returns to previous dynamic immediately 
 
 ```muslang
 piano:
-  @p c4/4 d4/4 @sforzando e4/4 f4/4
-  # e4 is accented (+20 velocity), f4 returns to @p
+  V1: @p c4/4 d4/4 @sforzando e4/4 f4/4
+      # e4 is accented (+20 velocity), f4 returns to @p
 ```
 
 **MIDI effect**:
@@ -307,7 +316,7 @@ Strong attack followed immediately by soft. "fp" in classical notation.
 
 ```muslang
 piano:
-  @forte-piano c4/4 d4/4 e4/4
+  V1: @forte-piano c4/4 d4/4 e4/4
 ```
 
 **MIDI effect**:
@@ -329,14 +338,14 @@ Articulations and dynamics work **independently** and can be combined:
 
 ```muslang
 piano:
-  # Soft staccato
-  @p :staccato c4/4 d4/4 e4/4
-  
-  # Loud legato
-  @ff :legato f4/4 g4/4 a4/4
-  
-  # Dynamic marcato with crescendo
-  @mp :marcato @crescendo b4/4 c5/4 d5/4 @f e5/4
+  V1: # Soft staccato
+      @p :staccato c4/4 d4/4 e4/4
+      
+      # Loud legato
+      @ff :legato f4/4 g4/4 a4/4
+      
+      # Dynamic marcato with crescendo
+      @mp :marcato @crescendo b4/4 c5/4 d5/4 @f e5/4
 ```
 
 ### Order Independence
@@ -344,8 +353,10 @@ piano:
 Articulation and dynamic markers can appear in any order:
 
 ```muslang
-piano: :staccato @f c4/4    # Same as...
-piano: @f :staccato c4/4    # ...this
+piano:
+  V1: :staccato @f c4/4    # Same as...
+piano:
+  V1: @f :staccato c4/4    # ...this
 ```
 
 ### State Interaction
@@ -415,14 +426,13 @@ Slurs `{...}` use similar technique:
 # Demonstrates dynamic levels
 piano: (tempo! 100)
   (time 4 4)
-  
-  # Theme at different dynamics
-  @pp c4/4 e4/4 g4/4 c5/4 |  # Very soft
-  @p c4/4 e4/4 g4/4 c5/4 |   # Soft
-  @mp c4/4 e4/4 g4/4 c5/4 |  # Medium soft
-  @mf c4/4 e4/4 g4/4 c5/4 |  # Medium loud
-  @f c4/4 e4/4 g4/4 c5/4 |   # Loud
-  @ff c4/4 e4/4 g4/4 c5/4 |  # Very loud
+  V1: # Theme at different dynamics
+      @pp c4/4 e4/4 g4/4 c5/4 |  # Very soft
+      @p c4/4 e4/4 g4/4 c5/4 |   # Soft
+      @mp c4/4 e4/4 g4/4 c5/4 |  # Medium soft
+      @mf c4/4 e4/4 g4/4 c5/4 |  # Medium loud
+      @f c4/4 e4/4 g4/4 c5/4 |   # Loud
+      @ff c4/4 e4/4 g4/4 c5/4 |  # Very loud
 ```
 
 ### Example 2: Articulation Showcase
@@ -430,24 +440,23 @@ piano: (tempo! 100)
 ```muslang
 # Demonstrates articulation types
 piano: (tempo! 120) @mf
-  
-  # Natural
-  c4/4 d4/4 e4/4 f4/4 |
-  
-  # Staccato - light and bouncy
-  :staccato g4/4 a4/4 b4/4 c5/4 |
-  
-  # Legato - smooth and singing
-  :legato c5/4 b4/4 a4/4 g4/4 |
-  
-  # Tenuto - full value, sustained
-  :tenuto f4/4 g4/4 a4/4 b4/4 |
-  
-  # Marcato - strong accents
-  :marcato c5/4 g4/4 e4/4 c4/4 |
-  
-  # Back to natural
-  :reset c4/1 |
+  V1: # Natural
+      c4/4 d4/4 e4/4 f4/4 |
+      
+      # Staccato - light and bouncy
+      :staccato g4/4 a4/4 b4/4 c5/4 |
+      
+      # Legato - smooth and singing
+      :legato c5/4 b4/4 a4/4 g4/4 |
+      
+      # Tenuto - full value, sustained
+      :tenuto f4/4 g4/4 a4/4 b4/4 |
+      
+      # Marcato - strong accents
+      :marcato c5/4 g4/4 e4/4 c4/4 |
+      
+      # Back to natural
+      :reset c4/1 |
 ```
 
 ### Example 3: Crescendo and Diminuendo
@@ -455,18 +464,17 @@ piano: (tempo! 120) @mf
 ```muslang
 # Dynamic transitions
 piano: (tempo! 100)
-  
-  # Long crescendo
-  @p @crescendo
-  c4/4 d4/4 e4/4 f4/4 |
-  g4/4 a4/4 b4/4 c5/4 |
-  @f d5/2 |  # End crescendo
-  
-  # Long diminuendo
-  @diminuendo
-  c5/4 b4/4 a4/4 g4/4 |
-  f4/4 e4/4 d4/4 c4/4 |
-  @p c4/1 |  # End diminuendo
+  V1: # Long crescendo
+      @p @crescendo
+      c4/4 d4/4 e4/4 f4/4 |
+      g4/4 a4/4 b4/4 c5/4 |
+      @f d5/2 |  # End crescendo
+      
+      # Long diminuendo
+      @diminuendo
+      c5/4 b4/4 a4/4 g4/4 |
+      f4/4 e4/4 d4/4 c4/4 |
+      @p c4/1 |  # End diminuendo
 ```
 
 ### Example 4: Sforzando Accents
@@ -474,13 +482,12 @@ piano: (tempo! 100)
 ```muslang
 # Dramatic accents
 piano: (tempo! 120) @mp
-  
-  # Regular pattern with accents
-  c4/4 e4/4 @sforzando g4/4 e4/4 |
-  c4/4 e4/4 @sforzando g4/4 e4/4 |
-  
-  # Forte-piano (strong then soft)
-  @forte-piano c5/2 | g4/2 | c4/1 |
+  V1: # Regular pattern with accents
+      c4/4 e4/4 @sforzando g4/4 e4/4 |
+      c4/4 e4/4 @sforzando g4/4 e4/4 |
+      
+      # Forte-piano (strong then soft)
+      @forte-piano c5/2 | g4/2 | c4/1 |
 ```
 
 ### Example 5: Combined Techniques
@@ -489,22 +496,21 @@ piano: (tempo! 120) @mp
 # Everything together
 piano: (tempo! 120)
   (time 3 4)
-  
-  # Theme 1: Soft and legato
-  @p :legato
-  c4/4 e4/4 g4/4 | c5/4 b4/4 a4/4 | g4/2. |
-  
-  # Theme 2: Loud and staccato
-  @f :staccato
-  g4/4 a4/4 b4/4 | c5/4 d5/4 e5/4 | d5/2. |
-  
-  # Theme 3: Crescendo with marcato
-  @mp :marcato @crescendo
-  c4/4 d4/4 e4/4 | f4/4 g4/4 a4/4 | @ff b4/2. |
-  
-  # Ending: Dramatic with accents
-  :reset @f
-  @sforzando c5/4 g4/4 e4/4 | @sforzando c4/2. |
+  V1: # Theme 1: Soft and legato
+      @p :legato
+      c4/4 e4/4 g4/4 | c5/4 b4/4 a4/4 | g4/2. |
+      
+      # Theme 2: Loud and staccato
+      @f :staccato
+      g4/4 a4/4 b4/4 | c5/4 d5/4 e5/4 | d5/2. |
+      
+      # Theme 3: Crescendo with marcato
+      @mp :marcato @crescendo
+      c4/4 d4/4 e4/4 | f4/4 g4/4 a4/4 | @ff b4/2. |
+      
+      # Ending: Dramatic with accents
+      :reset @f
+      @sforzando c5/4 g4/4 e4/4 | @sforzando c4/2. |
 ```
 
 ### Example 6: Expressive Melody
@@ -513,25 +519,24 @@ piano: (tempo! 120)
 # A lyrical melody using articulation and dynamics
 piano: (tempo! 80)
   (key f 'major)
-  
-  # Opening phrase - soft and smooth
-  @p :legato
-  f4/4 g4/4 a4/4 b4-/4 |
-  c5/2 a4/4 f4/4 |
-  
-  # Building phrase - crescendo
-  @crescendo
-  g4/4 a4/4 b4-/4 c5/4 |
-  @mf d5/4 c5/4 b4-/4 a4/4 |
-  
-  # Climax - loud with accents
-  @f @sforzando g4/4 :marcato f5/2 e5/4 |
-  
-  # Ending - diminuendo to soft
-  :legato @diminuendo
-  d5/4 c5/4 b4-/4 a4/4 |
-  @p g4/2 f4/2 |
-  f4/1 |
+  V1: # Opening phrase - soft and smooth
+      @p :legato
+      f4/4 g4/4 a4/4 b4-/4 |
+      c5/2 a4/4 f4/4 |
+      
+      # Building phrase - crescendo
+      @crescendo
+      g4/4 a4/4 b4-/4 c5/4 |
+      @mf d5/4 c5/4 b4-/4 a4/4 |
+      
+      # Climax - loud with accents
+      @f @sforzando g4/4 :marcato f5/2 e5/4 |
+      
+      # Ending - diminuendo to soft
+      :legato @diminuendo
+      d5/4 c5/4 b4-/4 a4/4 |
+      @p g4/2 f4/2 |
+      f4/1 |
 ```
 
 ---
@@ -544,10 +549,12 @@ Start with natural articulation and add articulation only where musically necess
 
 ```muslang
 # Good - articulation for emphasis
-piano: c4/4 d4/4 :staccato e4/4 :reset f4/4
+piano:
+  V1: c4/4 d4/4 :staccato e4/4 :reset f4/4
 
 # Overdone - unnecessary articulation changes
-piano: :tenuto c4/4 :legato d4/4 :staccato e4/4 :tenuto f4/4
+piano:
+  V1: :tenuto c4/4 :legato d4/4 :staccato e4/4 :tenuto f4/4
 ```
 
 ### 2. Dynamic Contrast
@@ -556,10 +563,12 @@ Don't stay at one dynamic level - use contrast for interest:
 
 ```muslang
 # Good - varied dynamics
-piano: @p c4/2 @f g4/2 @mp e4/1
+piano:
+  V1: @p c4/2 @f g4/2 @mp e4/1
 
 # Boring - no contrast
-piano: @mf c4/2 g4/2 e4/1
+piano:
+  V1: @mf c4/2 g4/2 e4/1
 ```
 
 ### 3. Smooth Transitions
@@ -568,10 +577,12 @@ Use crescendo/diminuendo for gradual changes rather than sudden jumps:
 
 ```muslang
 # Good - smooth crescendo
-piano: @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/2
+piano:
+  V1: @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/2
 
 # Jarring - sudden change
-piano: @p c4/4 d4/4 e4/4 f4/4 @ff g4/2
+piano:
+  V1: @p c4/4 d4/4 e4/4 f4/4 @ff g4/2
 ```
 
 ### 4. Reset When Needed
@@ -580,10 +591,12 @@ Use `:reset` to return to baseline, especially after special articulations:
 
 ```muslang
 # Good - explicit reset
-piano: :marcato c4/4 d4/4 :reset e4/4 f4/4
+piano:
+  V1: :marcato c4/4 d4/4 :reset e4/4 f4/4
 
 # Unclear - marcato continues
-piano: :marcato c4/4 d4/4 e4/4 f4/4
+piano:
+  V1: :marcato c4/4 d4/4 e4/4 f4/4
 ```
 
 ### 5. Instrument-Appropriate Articulation
@@ -592,13 +605,16 @@ Some articulations suit certain instruments better:
 
 ```muslang
 # Good - staccato strings
-violin: :staccato g5/8 g5/8 g5/8 g5/8
+violin:
+  V1: :staccato g5/8 g5/8 g5/8 g5/8
 
 # Good - legato woodwinds
-flute: :legato c5/4 d5/4 e5/4 f5/4
+flute:
+  V1: :legato c5/4 d5/4 e5/4 f5/4
 
 # Consider - staccato on sustained instruments
-organ: :staccato c4/4 d4/4 e4/4 f4/4  # May not be effective
+organ:
+  V1: :staccato c4/4 d4/4 e4/4 f4/4  # May not be effective
 ```
 
 ---
@@ -609,7 +625,8 @@ organ: :staccato c4/4 d4/4 e4/4 f4/4  # May not be effective
 
 **Solution**: Use slur groups `{}` for tighter connection:
 ```muslang
-piano: :legato {c4/4 d4/4 e4/4 f4/4}
+piano:
+  V1: :legato {c4/4 d4/4 e4/4 f4/4}
 ```
 
 ### Problem: Crescendo not audible enough
@@ -617,23 +634,28 @@ piano: :legato {c4/4 d4/4 e4/4 f4/4}
 **Solution**: Use wider dynamic range:
 ```muslang
 # Wider range - more noticeable
-piano: @pp @crescendo c4/4 d4/4 e4/4 f4/4 @ff g4/2
+piano:
+  V1: @pp @crescendo c4/4 d4/4 e4/4 f4/4 @ff g4/2
 ```
 
 ### Problem: Accents not strong enough
 
 **Solution**: Combine accent with louder base dynamic or use marcato:
 ```muslang
-piano: @f @sforzando c4/4  # Louder accent
-piano: :marcato c4/4        # Strong articulation
+piano:
+  V1: @f @sforzando c4/4  # Louder accent
+piano:
+  V1: :marcato c4/4        # Strong articulation
 ```
 
 ### Problem: Staccato too short/choppy
 
 **Solution**: Use tenuto instead, or adjust tempo:
 ```muslang
-piano: :tenuto c4/4 d4/4 e4/4 f4/4  # Fuller than staccato
-piano: (tempo! 80) :staccato c4/4 d4/4  # Slower = less choppy
+piano:
+  V1: :tenuto c4/4 d4/4 e4/4 f4/4  # Fuller than staccato
+piano: (tempo! 80)
+  V1: :staccato c4/4 d4/4  # Slower = less choppy
 ```
 
 ---
@@ -646,10 +668,10 @@ Classical baroque style with sudden dynamic changes:
 
 ```muslang
 piano: (tempo! 120)
-  @f c4/4 d4/4 e4/4 f4/4 |
-  @p c4/4 d4/4 e4/4 f4/4 |
-  @f g4/4 a4/4 b4/4 c5/4 |
-  @p g4/4 a4/4 b4/4 c5/4 |
+  V1: @f c4/4 d4/4 e4/4 f4/4 |
+      @p c4/4 d4/4 e4/4 f4/4 |
+      @f g4/4 a4/4 b4/4 c5/4 |
+      @p g4/4 a4/4 b4/4 c5/4 |
 ```
 
 ### Echo Effects
@@ -658,9 +680,9 @@ Repeat phrases at softer dynamics:
 
 ```muslang
 piano:
-  @f c4/4 e4/4 g4/4 c5/4 |
-  @mp c4/4 e4/4 g4/4 c5/4 |  # Echo
-  @pp c4/4 e4/4 g4/4 c5/4 |  # Distant echo
+  V1: @f c4/4 e4/4 g4/4 c5/4 |
+      @mp c4/4 e4/4 g4/4 c5/4 |  # Echo
+      @pp c4/4 e4/4 g4/4 c5/4 |  # Distant echo
 ```
 
 ### Crescendo/Diminuendo Arcs
@@ -669,11 +691,11 @@ Build and release tension:
 
 ```muslang
 piano:
-  # Build up
-  @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/2 |
-  
-  # Release
-  @diminuendo f4/4 e4/4 d4/4 c4/4 @p c4/1 |
+  V1: # Build up
+      @p @crescendo c4/4 d4/4 e4/4 f4/4 @f g4/2 |
+      
+      # Release
+      @diminuendo f4/4 e4/4 d4/4 c4/4 @p c4/1 |
 ```
 
 ### Mixed Articulation

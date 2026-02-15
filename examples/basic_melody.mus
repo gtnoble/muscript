@@ -1,5 +1,5 @@
 # Simple melody demonstrating basic features
 # Scientific pitch notation: c4/4 = C octave 4, quarter note
 piano: (tempo! 120) (time 4 4)
-  c4/4 d4/4 e4/4 f4/4 | g4/2 g4/2 | a4/4 a4/4 a4/4 a4/4 | g4/1 |
-  f4/4 f4/4 f4/4 f4/4 | e4/2 e4/2 | d4/4 d4/4 d4/4 d4/4 | c4/1
+  V1: c4/4 d4/4 e4/4 f4/4 | g4/2 g4/2 | a4/4 a4/4 a4/4 a4/4 | g4/1 |
+      f4/4 f4/4 f4/4 f4/4 | e4/2 e4/2 | d4/4 d4/4 d4/4 d4/4 | c4/1

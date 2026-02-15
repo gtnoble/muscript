@@ -1,8 +1,8 @@
 # Dynamic markings and transitions
 # Uses @ prefix for dynamics
 piano: (tempo! 120)
-  # Piano to forte
-  @p c4/4 d4/4 e4/4 f4/4 @f g4/4 a4/4 b4/4 c5/4 |
+  V1: # Piano to forte
+      @p c4/4 d4/4 e4/4 f4/4 @f g4/4 a4/4 b4/4 c5/4 |
   
   # Crescendo
   @p @crescendo c4/4 d4/4 e4/4 f4/4 g4/4 a4/4 b4/4 @f c5/4 |

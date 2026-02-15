@@ -55,11 +55,11 @@ drums: (tempo! 120) (time 4 4)
 ] * 3
 
 # Fill!
-@f
-tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
+V1: @f
+    tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
 
 # Crash back into groove
-crash/4 kick/4 snare/4 kick/4
+V1: crash/4 kick/4 snare/4 kick/4
 
 # Section 7: Ride Pattern (Jazz Feel)
 # Swing on ride cymbal
@@ -101,14 +101,14 @@ crash/4 kick/4 snare/4 kick/4
 # Section 11: Buildup with Dynamics
 # Gradual crescendo build
 (tempo! 130)
-@pp
-[kick/4 snare/4] * 2
+V1: @pp
+    [kick/4 snare/4] * 2
 
-@p @crescendo
-[kick/4 snare/4] * 2
+V1: @p @crescendo
+    [kick/4 snare/4] * 2
 
-@mp
-[kick/4 snare/4] * 2
+V1: @mp
+    [kick/4 snare/4] * 2
 
 @mf
 [
@@ -134,12 +134,12 @@ crash/2 kick/4 snare/4
 # Complex fill with all drums
 (time 4 4)
 (tempo! 140)
-@ff
-# Roll on toms
-tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32
-tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32
-tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32
-tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32
+V1: @ff
+    # Roll on toms
+    tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32 tom1/32
+    tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32 tom2/32
+    tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32 tom3/32
+    tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32 tom4/32
 
 # Accents with multiple drums
 V1: kick/8 kick/8 kick/8 kick/8
@@ -175,7 +175,7 @@ V3: snare/2
 ] * 3
 
 # Ending fill
-tom1/16 tom1/16 tom2/16 tom2/16 tom3/16 tom3/16 tom4/16 tom4/16 tom4/16 tom4/16 tom3/16 tom3/16 tom2/16 tom2/16 tom1/16 tom1/16
+V1: tom1/16 tom1/16 tom2/16 tom2/16 tom3/16 tom3/16 tom4/16 tom4/16 tom4/16 tom4/16 tom3/16 tom3/16 tom2/16 tom2/16 tom1/16 tom1/16
 
 # Final hits
 @ff

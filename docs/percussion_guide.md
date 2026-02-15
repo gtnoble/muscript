@@ -47,7 +47,7 @@ percussion: drum_name/duration ...
 
 ```muslang
 drums:
-  kick/4 snare/4 hat/8 hat/8
+  V1: kick/4 snare/4 hat/8 hat/8
 ```
 
 ### Duration
@@ -56,9 +56,9 @@ Drums use the same duration syntax as melodic notes:
 
 ```muslang
 drums:
-  kick/4      # Quarter note kick
-  snare/8     # Eighth note snare
-  hat/16      # Sixteenth note hi-hat
+  V1: kick/4      # Quarter note kick
+      snare/8     # Eighth note snare
+      hat/16      # Sixteenth note hi-hat
 ```
 
 ### Multiple Drums Simultaneously

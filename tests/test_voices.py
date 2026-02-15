@@ -108,9 +108,12 @@ class TestInstrumentMerging:
     def test_instrument_merging(self):
         """Test multiple declarations of same instrument merge"""
         source = """
-        violin: c4/4 d4/4
-        piano: e4/4
-        violin: f4/4 g4/4
+        violin:
+          V1: c4/4 d4/4
+        piano:
+          V1: e4/4
+        violin:
+          V1: f4/4 g4/4
         """
         ast = parse_muslang(source)
         
@@ -119,23 +122,25 @@ class TestInstrumentMerging:
         assert 'violin' in ast.instruments
         assert 'piano' in ast.instruments
         
-        # Violin should have 4 notes
-        assert len(ast.instruments['violin'].events) == 4
-        # Piano should have 1 note
-        assert len(ast.instruments['piano'].events) == 1
+        # Violin should have 4 notes in V1
+        assert len(ast.instruments['violin'].voices[1]) == 4
+        # Piano should have 1 note in V1
+        assert len(ast.instruments['piano'].voices[1]) == 1
     
     def test_merged_instrument_sequential(self):
         """Test merged instrument events are sequential"""
         source = """
-        piano: c4/4 d4/4
-        piano: e4/4 f4/4
+        piano:
+          V1: c4/4 d4/4
+        piano:
+          V1: e4/4 f4/4
         """
         ast = parse_muslang(source)
         analyzer = SemanticAnalyzer()
         result = analyzer.analyze(ast)
         
         inst = result.instruments['piano']
-        notes = inst.events
+        notes = inst.voices[1]
         
         # Should have 4 notes total
         assert len(notes) == 4
@@ -199,8 +204,10 @@ class TestMIDIGeneration:
     def test_midi_single_track_for_instrument(self):
         """Test single merged instrument creates single MIDI track"""
         source = """
-        violin: c4/4 d4/4
-        violin: e4/4 f4/4
+        violin:
+          V1: c4/4 d4/4
+        violin:
+          V1: e4/4 f4/4
         """
         ast = parse_muslang(source)
         analyzer = SemanticAnalyzer()

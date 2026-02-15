@@ -37,6 +37,9 @@ class SemanticAnalyzer:
         # Phase 3: Expand repeats
         ast = self._expand_repeats(ast)
         
+        # Phase 3.5: Regroup events by voice (after repeat expansion)
+        ast = self._regroup_voices(ast)
+        
         # Phase 4: Apply key signatures
         ast = self._apply_key_signatures(ast)
         
@@ -124,6 +127,45 @@ class SemanticAnalyzer:
         elif isinstance(node, (Sequence, Instrument)):
             # Recursively process children
             return self._transform_children(node, self._expand_repeats)
+        
+        return node
+    
+    def _regroup_voices(self, node: ASTNode) -> ASTNode:
+        """
+        Regroup events by voice after repeat expansion.
+        
+        Since all notes must be in voices (enforced by parser), this method
+        just ensures Voice declarations are properly handled after repeat expansion.
+        """
+        if isinstance(node, Instrument):
+            # Keep directives at instrument level, regroup voice events
+            directives = list(node.events)
+            
+            # Preserve existing voice structure and expand any Voice nodes within repeats
+            new_voices = {}
+            for voice_num, voice_events in node.voices.items():
+                # Ensure voice number exists in new_voices
+                if voice_num not in new_voices:
+                    new_voices[voice_num] = []
+                
+                # Process events - handle case where a repeat expands to Voice declarations
+                for event in voice_events:
+                    if isinstance(event, Voice):
+                        # Voice declaration from expanded repeat - switch context
+                        expanded_voice_num = event.number
+                        if expanded_voice_num not in new_voices:
+                            new_voices[expanded_voice_num] = []
+                        # Add this voice's events
+                        new_voices[expanded_voice_num].extend(event.events)
+                    else:
+                        # Regular event - keep in current voice
+                        new_voices[voice_num].append(event)
+            
+            return replace(node, events=directives, voices=new_voices)
+        
+        elif isinstance(node, Sequence):
+            # Recursively process instruments
+            return self._transform_children(node, self._regroup_voices)
         
         return node
     
@@ -237,36 +279,25 @@ class SemanticAnalyzer:
     def _calculate_timing(self, node: ASTNode) -> ASTNode:
         """Calculate absolute timing for all events"""
         if isinstance(node, Instrument):
-            # Handle voices - each voice starts at time 0 independently
-            if node.voices:
-                updated_voices = {}
-                for voice_num, voice_events in node.voices.items():
-                    current_time = 0.0
-                    updated_events = []
-                    for event in voice_events:
-                        event_with_timing, duration = self._calculate_event_timing(event, current_time)
-                        updated_events.append(event_with_timing)
-                        current_time += duration
-                    updated_voices[voice_num] = updated_events
-                
-                # Also handle non-voice events (sequential from time 0)
+            # Process voices - each voice starts at time 0 independently
+            updated_voices = {}
+            for voice_num, voice_events in node.voices.items():
                 current_time = 0.0
                 updated_events = []
-                for event in node.events:
+                for event in voice_events:
                     event_with_timing, duration = self._calculate_event_timing(event, current_time)
                     updated_events.append(event_with_timing)
                     current_time += duration
-                
-                return replace(node, events=updated_events, voices=updated_voices)
-            else:
-                # No voices - calculate timing for events sequentially
-                current_time = 0.0
-                updated_events = []
-                for event in node.events:
-                    event_with_timing, duration = self._calculate_event_timing(event, current_time)
-                    updated_events.append(event_with_timing)
-                    current_time += duration
-                return replace(node, events=updated_events)
+                updated_voices[voice_num] = updated_events
+            
+            # Directives at instrument level don't need timing (they're meta-events)
+            # but process them anyway in case they have nested content
+            updated_directives = []
+            for event in node.events:
+                event_with_timing, _ = self._calculate_event_timing(event, 0.0)
+                updated_directives.append(event_with_timing)
+            
+            return replace(node, events=updated_directives, voices=updated_voices)
         
         elif isinstance(node, Sequence):
             # Handle instruments dict or events list
@@ -409,31 +440,19 @@ class SemanticAnalyzer:
     def _track_state(self, node: ASTNode) -> ASTNode:
         """Track articulation and dynamic state"""
         if isinstance(node, Instrument):
-            # Track state through the instrument's events
-            state = {
-                'articulation': 'natural',
-                'dynamic_level': 'mf',
-                'velocity': VELOCITY_MF,
-                'transition_active': None,  # 'crescendo' or 'diminuendo'
-                'transition_start_velocity': None,
-                'transition_target_velocity': None,
-            }
-            
-            # Process non-voice events
-            updated_events = []
-            for event in node.events:
-                updated_event = self._apply_state_to_event(event, state)
-                updated_events.append(updated_event)
+            # Directives at instrument level don't need state tracking
+            # (they're meta-events that don't have velocity/articulation)
+            updated_directives = list(node.events)
             
             # Process voice events - each voice has independent state
             updated_voices = {}
             for voice_num, voice_events in node.voices.items():
-                # Reset state for each voice
+                # Fresh state for each voice
                 voice_state = {
                     'articulation': 'natural',
                     'dynamic_level': 'mf',
                     'velocity': VELOCITY_MF,
-                    'transition_active': None,
+                    'transition_active': None,  # 'crescendo' or 'diminuendo'
                     'transition_start_velocity': None,
                     'transition_target_velocity': None,
                 }
@@ -443,7 +462,7 @@ class SemanticAnalyzer:
                     updated_voice_events.append(updated_event)
                 updated_voices[voice_num] = updated_voice_events
             
-            return replace(node, events=updated_events, voices=updated_voices)
+            return replace(node, events=updated_directives, voices=updated_voices)
         
         elif isinstance(node, Sequence):
             # Handle instruments dict or events list
@@ -674,7 +693,7 @@ class SemanticAnalyzer:
                         if isinstance(result, Sequence):
                             new_voice_events.extend(result.events)
                         else:
-                            new_voice_events.append(event)
+                            new_voice_events.append(result)
                 new_voices[voice_num] = new_voice_events
             
             return replace(node, events=new_events, voices=new_voices)
