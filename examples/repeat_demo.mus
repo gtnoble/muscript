@@ -5,34 +5,36 @@
 
 
 
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4 |
-  V2: c3/2 g3/2 |
+  V1: c4/4 d4/4 e4/4 f4/4;
+  V2: c3/2 g3/2;
 }
 
 drums {
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 |
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 |
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 |
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8;
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 
 flute {
-  V1: c5/4 d5/4 e5/4 f5/4 |
+  V1: c5/4 d5/4 e5/4 f5/4;
 }
 
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4 |
-  V2: c3/2 g3/2 |
+  V1: c4/4 d4/4 e4/4 f4/4;
+  V2: c3/2 g3/2;
 }
 
 drums {
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 |
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 |
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 |
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8;
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 
 flute {
-  V1: c5/4 d5/4 e5/4 f5/4 |
+  V1: c5/4 d5/4 e5/4 f5/4;
 }

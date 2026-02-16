@@ -15,7 +15,7 @@ def test_basic_notes():
     """Test parsing basic notes with scientific pitch notation."""
     source = """
     piano {
-      V1: c4/4 d4/4 e4/4 f4/4 |
+      V1: c4/4 d4/4 e4/4 f4/4;
     }
     """
     ast = parse_muslang(source)
@@ -42,7 +42,7 @@ def test_articulations():
     """Test articulation parsing with colon prefix."""
     source = """
     piano {
-      V1: :staccato c4/4 d4/4 :legato e4/4 f4/4 |
+      V1: :staccato c4/4 d4/4 :legato e4/4 f4/4;
     }
     """
     ast = parse_muslang(source)
@@ -64,7 +64,7 @@ def test_dynamics():
     """Test dynamic markings with @ prefix."""
     source = """
     piano {
-      V1: @p c4/4 @f d4/4 |
+      V1: @p c4/4 @f d4/4;
     }
     """
     ast = parse_muslang(source)
@@ -86,7 +86,7 @@ def test_chord():
     """Test chord parsing with comma separator."""
     source = """
     piano {
-      V1: c4/4,e4/4,g4/4 |
+      V1: c4/4,e4/4,g4/4;
     }
     """
     ast = parse_muslang(source)
@@ -108,7 +108,7 @@ def test_accidentals():
     """Test sharp and flat accidentals."""
     source = """
     piano {
-      V1: c4+/4 d4-/4 e4/4 |
+      V1: c4+/4 d4-/4 e4/4;
     }
     """
     ast = parse_muslang(source)
@@ -131,7 +131,7 @@ def test_dotted_and_tied():
     """Test dotted notes (ties removed - use legato instead)."""
     source = """
     piano {
-      V1: c4/4. d4/4 e4/4 |
+      V1: c4/4. d4/4 e4/4;
     }
     """
     ast = parse_muslang(source)
@@ -155,7 +155,7 @@ def test_rest_duration_parsing():
 
     source = """
     piano {
-      V1: r/16 c4/4 r/8 |
+      V1: r/16 c4/4 r/8;
     }
     """
     ast = parse_muslang(source)
@@ -177,7 +177,7 @@ def test_dotted_rest_parsing():
 
     source = """
     piano {
-      V1: c4/8 r/8. d4/8 |
+      V1: c4/8 r/8. d4/8;
     }
     """
     ast = parse_muslang(source)
@@ -194,24 +194,26 @@ def test_directives():
     from muslang.ast_nodes import Tempo, TimeSignature, KeySignature
     
     source = """
-    (tempo! 120) (time 4 4) (key c 'major)
+    (tempo! 120); (time 4 4); (key c 'major);
     piano {
-      V1: c4/4 |
+      V1: c4/4 d4/4 e4/4 f4/4;
     }
     """
     ast = parse_muslang(source)
 
-    # Check top-level directives in sequence events
-    assert isinstance(ast.events[0], Tempo)
-    assert ast.events[0].bpm == 120
+    # In multi-level scoping, composition-level directives are in composition_defaults
+    assert 'tempo' in ast.composition_defaults
+    assert ast.composition_defaults['tempo'] == 120
 
-    assert isinstance(ast.events[1], TimeSignature)
-    assert ast.events[1].numerator == 4
-    assert ast.events[1].denominator == 4
+    assert 'time_signature' in ast.composition_defaults
+    time_sig = ast.composition_defaults['time_signature']
+    assert time_sig.numerator == 4
+    assert time_sig.denominator == 4
 
-    assert isinstance(ast.events[2], KeySignature)
-    assert ast.events[2].root == 'c'
-    assert ast.events[2].mode == 'major'
+    assert 'key_signature' in ast.composition_defaults
+    key_sig = ast.composition_defaults['key_signature']
+    assert key_sig.root == 'c'
+    assert key_sig.mode == 'major'
     
     print("✓ Directives test passed")
 
@@ -219,7 +221,7 @@ def test_slur_syntax_rejected():
     """Test that deprecated {} slur syntax is rejected."""
     source = """
     piano {
-      V1: {c4/4 d4/4 e4/4} |
+      V1: {c4/4 d4/4 e4/4};
     }
     """
 
@@ -234,7 +236,7 @@ def test_slide():
     
     source = """
     piano {
-      V1: <c4/4 c5/4> |
+      V1: <c4/4 c5/4>;
     }
     """
     ast = parse_muslang(source)
@@ -256,10 +258,10 @@ def test_multiple_instruments():
     """Test multiple instruments."""
     source = """
     piano {
-      V1: c4/4 d4/4 |
+      V1: c4/4 d4/4;
     }
     guitar {
-      V1: e4/4 f4/4 |
+      V1: e4/4 f4/4;
     }
     """
     ast = parse_muslang(source)

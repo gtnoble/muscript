@@ -62,7 +62,7 @@ piano {
   V1: c4/1          # Whole note (4 beats)
       c4/2 c4/2     # Two half notes (2 + 2 = 4 beats)
       c4/4 c4/4 c4/4 c4/4  # Four quarter notes
-      c4/8 c4/8 c4/8 c4/8 c4/8 c4/8 c4/8 c4/8  # Eight eighths
+  c4/8 c4/8 c4/8 c4/8 c4/8 c4/8 c4/8 c4/8;  # Eight eighths
 }
 ```
 
@@ -73,7 +73,7 @@ If duration is omitted, the **previously specified duration** is used:
 ```muslang
 piano {
   V1: c4/4 d4 e4 f4    # All quarter notes
-      g4/8 a4 b4 c5    # All eighth notes
+  g4/8 a4 b4 c5;   # All eighth notes
 }
 ```
 
@@ -110,7 +110,7 @@ piano {
       # Total: 2 beats
       
       e4/2.    # Dotted half (3 beats)
-      f4/4     # Quarter (1 beat)
+      f4/4;    # Quarter (1 beat)
       # Total: 4 beats (one measure in 4/4)
 }
 ```
@@ -120,13 +120,13 @@ piano {
 ```muslang
 # Dotted eighth + sixteenth (swing feel)
 piano {
-  V1: c4/8. d4/16 e4/8. f4/16
+  V1: c4/8. d4/16 e4/8. f4/16;
 }
 
 # Dotted quarter + eighth (common in 6/8 time)
-(time 6 8)
+(time 6 8);
 piano {
-  V1: c4/4. d4/8 e4/4. f4/8
+  V1: c4/4. d4/8 e4/4. f4/8;
 }
 ```
 
@@ -153,7 +153,7 @@ Tuplets fit a group of notes into a different time division.
 ```muslang
 # Triplet of eighth notes (fits into one quarter note)
 piano {
-  V1: (c4/8 d4/8 e4/8):3
+  V1: (c4/8 d4/8 e4/8):3;
 }
 ```
 
@@ -165,7 +165,7 @@ piano {
 ```muslang
 # Triplet quarter notes (fits into one half note)
 piano {
-  V1: (c4/4 d4/4 e4/4):3
+  V1: (c4/4 d4/4 e4/4):3;
 }
 ```
 
@@ -174,7 +174,7 @@ piano {
 ```muslang
 # 5 sixteenth notes in space of 4
 piano {
-  V1: (c4/16 d4/16 e4/16 f4/16 g4/16):5
+  V1: (c4/16 d4/16 e4/16 f4/16 g4/16):5;
 }
 ```
 
@@ -183,7 +183,7 @@ piano {
 ```muslang
 # 7 notes in space of 4
 piano {
-  V1: (c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16):7
+  V1: (c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16):7;
 }
 ```
 
@@ -210,7 +210,7 @@ Example for triplet:
 piano {
   V1: (c4/8 d4/8 e4/8):3  # Triplet
       f4/4                 # Regular quarter
-      (g4/16 a4/16 b4/16 c5/16 d5/16):5  # Quintuplet
+  (g4/16 a4/16 b4/16 c5/16 d5/16):5;  # Quintuplet
 }
 ```
 
@@ -223,7 +223,7 @@ piano {
         c4/8 
         (d4/16 e4/16 f4/16):3  # Triplet of 16ths
         g4/8
-      ):3  # All in a triplet
+  ):3;  # All in a triplet
 }
 ```
 
@@ -246,17 +246,17 @@ Use tilde `~` before the grace note.
 ```muslang
 # Single grace note
 piano {
-  V1: ~c4/32 d4/4
+  V1: ~c4/32 d4/4;
 }
 
 # Multiple grace notes
 piano {
-  V1: ~c4/32 ~d4/32 e4/4
+  V1: ~c4/32 ~d4/32 e4/4;
 }
 
 # Grace note before chord
 piano {
-  V1: ~g4/32 c4/4,e4/4,g4/4
+  V1: ~g4/32 c4/4,e4/4,g4/4;
 }
 ```
 
@@ -347,14 +347,14 @@ piano {
 
 ```muslang
 piano {
-  (time 4 4)
-  V1: c4/4 d4/4 e4/4 f4/4 |
+  (time 4 4);
+  V1: c4/4 d4/4 e4/4 f4/4;
   
-  (time 3 4)
-  V1: g4/4 a4/4 b4/4 |
+  (time 3 4);
+  V1: g4/4 a4/4 b4/4;
   
-  (time 6 8)
-  V1: c5/4. b4/4. |
+  (time 6 8);
+  V1: c5/4. b4/4.;
 }
 ```
 
@@ -374,21 +374,21 @@ Tempo controls the speed of playback in **beats per minute (BPM)**.
 
 ```muslang
 # Slow tempo (60 BPM = 1 beat per second)
-(tempo! 60)
+(tempo! 60);
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4
+  V1: c4/4 d4/4 e4/4 f4/4;
 }
 
 # Moderate tempo
-(tempo! 120)  # Default
+(tempo! 120);  # Default
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4
+  V1: c4/4 d4/4 e4/4 f4/4;
 }
 
 # Fast tempo
-(tempo! 180)
+(tempo! 180);
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4
+  V1: c4/4 d4/4 e4/4 f4/4;
 }
 ```
 
@@ -407,14 +407,14 @@ piano {
 
 ```muslang
 piano {
-  (tempo! 120)
-  V1: c4/4 d4/4 e4/4 f4/4 |
+  (tempo! 120);
+  V1: c4/4 d4/4 e4/4 f4/4;
   
-  (tempo! 90)  # Slow down
-  V1: g4/4 a4/4 b4/4 c5/4 |
+  (tempo! 90);  # Slow down
+  V1: g4/4 a4/4 b4/4 c5/4;
   
-  (tempo! 160)  # Speed up
-  V1: c5/8 b4/8 a4/8 g4/8 f4/8 e4/8 d4/8 c4/8 |
+  (tempo! 160);  # Speed up
+  V1: c5/8 b4/8 a4/8 g4/8 f4/8 e4/8 d4/8 c4/8;
 }
 ```
 
@@ -471,10 +471,10 @@ piano {
 Notes emphasized on weak beats or off-beats:
 
 ```muslang
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 piano {
-  V1: r/8 c4/8 r/8 e4/8 r/8 g4/8 r/8 c5/8 |
-      r/8 c5/8 r/8 g4/8 r/8 e4/8 r/8 c4/8 |
+  V1: r/8 c4/8 r/8 e4/8 r/8 g4/8 r/8 c5/8 | r/8 c5/8 r/8 g4/8 r/8 e4/8 r/8 c4/8;
 }
 ```
 
@@ -484,10 +484,9 @@ Grouping that conflicts with the time signature:
 
 ```muslang
 # 6/8 time played with 3/4 feel
-(time 6 8)
+(time 6 8);
 piano {
-  V1: c4/4 d4/4 e4/4 |  # Feels like 3/4
-      f4/8 f4/8 f4/8 g4/8 g4/8 g4/8 |  # Back to 6/8 feel
+  V1: c4/4 d4/4 e4/4 | f4/8 f4/8 f4/8 g4/8 g4/8 g4/8;  # Back to 6/8 feel
 }
 ```
 
@@ -507,9 +506,9 @@ Unequal eighth notes (long-short pattern):
 
 ```muslang
 # Simulated swing using dotted 8th + 16th
-(tempo! 150)
+(tempo! 150);
 piano {
-  V1: c4/8. d4/16 e4/8. f4/16 g4/8. a4/16 b4/4 |
+  V1: c4/8. d4/16 e4/8. f4/16 g4/8. a4/16 b4/4;
 }
 ```
 
@@ -557,12 +556,13 @@ piano {
 
 ```muslang
 # Basic melody with varied durations
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4 |
+  V1: c4/4 d4/4 e4/4 f4/4;
       g4/2 g4/2 |
       a4/4 a4/4 a4/4 a4/4 |
-      g4/1 |
+  g4/1;
 }
 ```
 
@@ -570,10 +570,9 @@ piano {
 
 ```muslang
 # Fast sixteenth note runs
-(tempo! 120)
+(tempo! 120);
 piano {
-  V1: c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16 c5/16 |
-      c5/16 b4/16 a4/16 g4/16 f4/16 e4/16 d4/16 c4/16 |
+  V1: c4/16 d4/16 e4/16 f4/16 g4/16 a4/16 b4/16 c5/16 | c5/16 b4/16 a4/16 g4/16 f4/16 e4/16 d4/16 c4/16;
 }
 ```
 
@@ -581,10 +580,9 @@ piano {
 
 ```muslang
 # Triplet-based rhythm
-(tempo! 100)
+(tempo! 100);
 piano {
-  V1: c4/8 (d4/8 e4/8 f4/8):3 g4/8 (a4/8 b4/8 c5/8):3 |
-      c5/4 (b4/8 a4/8 g4/8):3 f4/4 r/4 |
+  V1: c4/8 (d4/8 e4/8 f4/8):3 g4/8 (a4/8 b4/8 c5/8):3 | c5/4 (b4/8 a4/8 g4/8):3 f4/4 r/4;
 }
 ```
 
@@ -592,12 +590,9 @@ piano {
 
 ```muslang
 # Melody with grace notes
-(tempo! 90)
+(tempo! 90);
 piano {
-  V1: ~c4/32 d4/4 ~e4/32 f4/4 |
-      ~g4/32 ~a4/32 b4/2 |
-      ~c5/32 c5/4. ~b4/32 b4/8 |
-      c5/1 |
+  V1: ~c4/32 d4/4 ~e4/32 f4/4 | ~g4/32 ~a4/32 b4/2 | ~c5/32 c5/4. ~b4/32 b4/8 | c5/1;
 }
 ```
 
@@ -605,10 +600,10 @@ piano {
 
 ```muslang
 # Famous 5/4 rhythm (Take Five style)
-(tempo! 170) (time 5 4)
+(tempo! 170);
+(time 5 4);
 piano {
-  V1: c4/4 c4/8 d4/8 e4-/8 f4/8 g4/4 g4/4 |
-      f4/4 f4/8 g4/8 a4-/8 b4-/8 c5/4 c5/4 |
+  V1: c4/4 c4/8 d4/8 e4-/8 f4/8 g4/4 g4/4 | f4/4 f4/8 g4/8 a4-/8 b4-/8 c5/4 c5/4;
 }
 ```
 
@@ -616,12 +611,10 @@ piano {
 
 ```muslang
 # Elegant waltz with embellishments
-(tempo! 160) (time 3 4)
+(tempo! 160);
+(time 3 4);
 piano {
-  V1: @mp ~b3/32 c4/4 e4/4 g4/4 |
-      c5/4. b4/8 a4/8 g4/8 |
-      ~f4/32 f4/4 a4/4 c5/4 |
-      f5/2 e5/4 |
+  V1: @mp ~b3/32 c4/4 e4/4 g4/4 | c5/4. b4/8 a4/8 g4/8 | ~f4/32 f4/4 a4/4 c5/4 | f5/2 e5/4;
 }
 ```
 
@@ -629,10 +622,10 @@ piano {
 
 ```muslang
 # Off-beat emphasis
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 piano {
-  V1: r/8 c4/8 r/8 e4/4 g4/8 r/4 |
-      r/8 c5/8 r/4 g4/8 e4/8 c4/4 |
+  V1: r/8 c4/8 r/8 e4/4 g4/8 r/4 | r/8 c5/8 r/4 g4/8 e4/8 c4/4;
 }
 ```
 
@@ -654,7 +647,7 @@ piano {
 # Flowing 6/8 melody
 (tempo! 80) (time 6 8)
 piano {
-  V1: c4/8 e4/8 g4/8 c5/4. |
+  V1: c4/8 e4/8 g4/8 c5/4.;
       b4/8 g4/8 e4/8 d4/4. |
       c4/8 d4/8 e4/8 f4/8 g4/8 a4/8 |
       g4/4. e4/4. |
@@ -702,7 +695,7 @@ Bar lines `|` are visual only but help readability:
 # Clear measure boundaries
 (time 4 4)
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4 |
+  V1: c4/4 d4/4 e4/4 f4/4;
       g4/4 a4/4 b4/4 c5/4 |
 }
 ```
@@ -795,7 +788,7 @@ Muslang v0.1.0 - February 2026
 ```muslang
 # Sustain C across bar line
 piano {
-  V1: :legato c4/2 c4/4 :reset d4/4 |
+  V1: :legato c4/2 c4/4 :reset d4/4;
 }
 ```
 

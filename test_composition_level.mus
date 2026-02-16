@@ -1,0 +1,11 @@
+# Test composition level
+@f;
+:legato;
+
+piano {
+    V1: c4/4 d4/4 e4/4 f4/4;
+}
+
+flute {
+    V1: g5/4 a5/4 b5/4 c6/4;
+}

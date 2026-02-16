@@ -622,7 +622,7 @@ class TestSlideIntegration:
         """Test that slide inherits dynamic level"""
         source = """
                 piano {
-                    V1: @p <c4/4 g4/4> r/2 |
+                    V1: @p <c4/4 g4/4> r/2;
                 }
         """
         ast = parse_muslang(source)
@@ -651,7 +651,7 @@ class TestSlideIntegration:
         """Test slide during crescendo"""
         source = """
                 piano {
-                    V1: @p @crescendo <c4/4 c5/4> <c5/4 c4/4> |
+                    V1: @p @crescendo <c4/4 c5/4> <c5/4 c4/4>;
                 }
         """
         ast = parse_muslang(source)
@@ -680,7 +680,7 @@ class TestSlideIntegration:
         """Test multiple slides in sequence"""
         source = """
                 piano {
-                    V1: <c4/4 e4/4> <e4/4 g4/4> |
+                    V1: <c4/4 e4/4> <e4/4 g4/4>;
                 }
         """
         ast = parse_muslang(source)
@@ -707,8 +707,8 @@ class TestSlideIntegration:
         """Test slides in different voices"""
         source = """
                 piano {
-                    V1: <c4/2 g4/2> |
-                    V2: <c3/2 g3/2> |
+                    V1: <c4/2 g4/2>;
+                    V2: <c3/2 g3/2>;
                 }
         """
         ast = parse_muslang(source)
@@ -736,7 +736,7 @@ class TestSlideIntegration:
         """Test stepped slide with forte dynamic"""
         source = """
                 piano {
-                    V1: @f <stepped: c4/4 e4/4> r/2 |
+                    V1: @f <stepped: c4/4 e4/4> r/2;
                 }
         """
         ast = parse_muslang(source)
@@ -774,7 +774,7 @@ class TestSlideParser:
         """Test parsing slide without explicit style (defaults to chromatic)"""
         source = """
                 piano {
-                    V1: <c4/4 g4/4> |
+                    V1: <c4/4 g4/4>;
                 }
         """
         ast = parse_muslang(source)
@@ -789,7 +789,7 @@ class TestSlideParser:
         """Test parsing stepped slide"""
         source = """
                 piano {
-                    V1: <stepped: c4/4 e4/4> |
+                    V1: <stepped: c4/4 e4/4>;
                 }
         """
         ast = parse_muslang(source)
@@ -802,7 +802,7 @@ class TestSlideParser:
         """Test parsing portamento slide"""
         source = """
                 piano {
-                    V1: <portamento: c4/2 g4/2> |
+                    V1: <portamento: c4/2 g4/2>;
                 }
         """
         ast = parse_muslang(source)
@@ -815,7 +815,7 @@ class TestSlideParser:
         """Test parsing slide with accidentals"""
         source = """
                 piano {
-                    V1: <c4+/4 g4-/4> |
+                    V1: <c4+/4 g4-/4>;
                 }
         """
         ast = parse_muslang(source)
@@ -833,7 +833,7 @@ class TestSlideParser:
         for dur in durations:
             source = f"""
                         piano {{
-                            V1: <c4/{dur} g4/{dur}> |
+                            V1: <c4/{dur} g4/{dur}>;
                         }}
             """
             ast = parse_muslang(source)
@@ -855,7 +855,7 @@ class TestSlideParser:
         for source_expr in variations:
             source = f"""
                         piano {{
-                            V1: {source_expr} |
+                            V1: {source_expr};
                         }}
             """
             ast = parse_muslang(source)
@@ -869,7 +869,7 @@ class TestSlideParser:
         """Test parsing multiple slides in sequence"""
         source = """
                 piano {
-                    V1: <c4/4 e4/4> <e4/4 g4/4> <g4/4 c5/4> |
+                    V1: <c4/4 e4/4> <e4/4 g4/4> <g4/4 c5/4>;
                 }
         """
         ast = parse_muslang(source)
@@ -947,7 +947,7 @@ class TestSlideSemantics:
         """Test slide timing in complete sequence with other elements"""
         source = """
                 piano {
-                    V1: c4/4 <d4/4 f4/4> e4/4 |
+                    V1: c4/4 <d4/4 f4/4> e4/4;
                 }
         """
         ast = parse_muslang(source)

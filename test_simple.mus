@@ -1,0 +1,6 @@
+# Minimal test - composition level only
+(tempo! 120);
+
+piano {
+    V1: c4/4 d4/4;
+}

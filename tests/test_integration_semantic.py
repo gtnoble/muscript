@@ -11,9 +11,9 @@ from muslang.semantics import SemanticAnalyzer
 def test_key_signature_application():
     """Test key signature application through full pipeline"""
     source = """
-    (key g 'major)
+    (key g 'major);
     piano {
-      V1: f4/4 c4/4 g4/4 r/4 |
+      V1: f4/4 c4/4 g4/4 r/4;
     }
     """
     
@@ -34,10 +34,10 @@ def test_key_signature_application():
 
 
 def test_ornament_expansion():
-    """Test ornament parsing survives full semantic pipeline"""
+    """Test trill ornament expands into explicit notes"""
     source = """
     piano {
-      V1: %trill c4/4 r/4 r/4 r/4 |
+      V1: %trill c4/4 r/4 r/4 r/4;
     }
     """
     
@@ -48,23 +48,40 @@ def test_ornament_expansion():
     analyzer = SemanticAnalyzer()
     result = analyzer.analyze(ast)
     
-    # Current behavior: ornament marker is preserved and principal note remains
     instrument = result.instruments['piano']
-    notes = [
-      event
-      for measure in instrument.voices[1]
-      for event in measure.events
-      if hasattr(event, 'pitch')
-    ]
-    
-    assert len(notes) == 1
+    events = [event for measure in instrument.voices[1] for event in measure.events]
+    notes = [event for event in events if hasattr(event, 'pitch')]
+
+    assert len(notes) == 8
+    assert all(event.__class__.__name__ not in ('Ornament', 'Tremolo') for event in events)
+
+
+def test_tremolo_expansion():
+    """Test tremolo marker expands into repeated notes"""
+    source = """
+    piano {
+      V1: %tremolo c4/4 r/4 r/4 r/4;
+    }
+    """
+
+    ast = parse_muslang(source)
+    analyzer = SemanticAnalyzer()
+    result = analyzer.analyze(ast)
+
+    instrument = result.instruments['piano']
+    events = [event for measure in instrument.voices[1] for event in measure.events]
+    notes = [event for event in events if hasattr(event, 'pitch')]
+
+    assert len(notes) == 4
+    assert all(note.pitch == 'c' for note in notes)
+    assert all(event.__class__.__name__ not in ('Ornament', 'Tremolo') for event in events)
 
 
 def test_repeat_syntax_rejected():
     """Repeat syntax is no longer supported in base language"""
     source = """
     piano {
-      V1: [c4/4 d4/4 e4/4] * 3 |
+      V1: [c4/4 d4/4 e4/4] * 3;
     }
     """
 
@@ -76,8 +93,8 @@ def test_variable_syntax_rejected():
     """Variable syntax is no longer supported in base language"""
     source = """
     piano {
-      V1: motif = [c4/4 e4/4 g4/4] |
-      V1: $motif $motif |
+      V1: motif = [c4/4 e4/4 g4/4];
+      V1: $motif $motif;
     }
     """
 
@@ -88,10 +105,10 @@ def test_variable_syntax_rejected():
 def test_complex_combination():
     """Test combination of features"""
     source = """
-    (time 5 4)
-    (key d 'major)
+    (time 4 4);
+    (key d 'major);
     piano {
-      V1: :staccato c4/4 d4/4 e4/4 @f %mordent f4/4 g4/4 |
+      V1: :staccato c4/4 d4/4 e4/4 %mordent f4/4;
     }
     """
     
@@ -116,7 +133,7 @@ def test_validation_error_detected():
     # Measure duration mismatch should trigger semantic validation error
     source = """
     piano {
-      V1: c4/4 |
+      V1: c4/4;
     }
     """
     

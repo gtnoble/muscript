@@ -154,6 +154,22 @@ def test_expand_trill_with_key():
     assert notes[1].accidental == 'sharp'
 
 
+def test_expand_trill_fills_note_duration():
+    """Trill expansion should preserve total duration of principal note"""
+    note = Note(pitch='c', octave=4, duration=2)  # half note
+    notes = expand_ornament('trill', note)
+
+    total_units = 0
+    for expanded_note in notes:
+        base_units = 128 // expanded_note.duration
+        if expanded_note.dotted:
+            base_units = (base_units * 3) // 2
+        total_units += base_units
+
+    # Half note = 64 1/128-note units
+    assert total_units == 64
+
+
 def test_expand_mordent():
     """Test mordent expansion"""
     note = Note(pitch='d', octave=4, duration=4)
@@ -163,7 +179,14 @@ def test_expand_mordent():
     assert notes[0].pitch == 'd'
     assert notes[1].pitch == 'c'  # Lower neighbor
     assert notes[2].pitch == 'd'
-    assert notes[2].duration == 4  # Last note keeps original duration
+
+    total_units = 0
+    for expanded_note in notes:
+        base_units = 128 // expanded_note.duration
+        if expanded_note.dotted:
+            base_units = (base_units * 3) // 2
+        total_units += base_units
+    assert total_units == 32  # Quarter note duration preserved
 
 
 def test_expand_turn():
@@ -176,7 +199,24 @@ def test_expand_turn():
     assert notes[1].pitch == 'd'  # Main
     assert notes[2].pitch == 'c'  # Lower neighbor
     assert notes[3].pitch == 'd'  # Main
-    assert notes[3].duration == 4  # Last note keeps original duration
+
+    total_units = 0
+    for expanded_note in notes:
+        base_units = 128 // expanded_note.duration
+        if expanded_note.dotted:
+            base_units = (base_units * 3) // 2
+        total_units += base_units
+    assert total_units == 32  # Quarter note duration preserved
+
+
+def test_expand_tremolo():
+    """Test tremolo expansion"""
+    note = Note(pitch='d', octave=4, duration=4)
+    notes = expand_ornament('tremolo', note)
+
+    assert len(notes) == 4  # 4 x 16th notes in a quarter note
+    assert all(n.pitch == 'd' for n in notes)
+    assert all(n.duration == 16 for n in notes)
 
 
 def test_apply_key_signature_to_note():

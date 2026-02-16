@@ -9,7 +9,13 @@ import tempfile
 
 
 def _voice_events(instrument, voice_number=1):
-    return [event for measure in instrument.voices[voice_number] for event in measure.events]
+  events = []
+  for item in instrument.voices[voice_number]:
+    if hasattr(item, 'events'):
+      events.extend(item.events)
+    else:
+      events.append(item)
+  return events
 
 
 class TestVoiceGrouping:
@@ -17,7 +23,7 @@ class TestVoiceGrouping:
     
     def test_single_voice(self):
         """Test single voice declaration"""
-        source = "piano { V1: c4/4 d4/4 e4/4 r/4 | }"
+        source = "piano { V1: c4/4 d4/4 e4/4 r/4; }"
         ast = parse_muslang(source)
         
         inst = ast.instruments['piano']
@@ -32,9 +38,9 @@ class TestVoiceGrouping:
         """Test multiple voice declarations"""
         source = """
         piano {
-          V1: c4/4 d4/4 r/2 |
-          V2: e3/2 r/2 |
-          V3: g4/4 a4/4 b4/4 r/4 |
+          V1: c4/4 d4/4 r/2;
+          V2: e3/2 r/2;
+          V3: g4/4 a4/4 b4/4 r/4;
         }
         """
         ast = parse_muslang(source)
@@ -49,8 +55,8 @@ class TestVoiceGrouping:
         """Test multiple declarations of same voice concatenate"""
         source = """
         piano {
-          V1: c4/4 d4/4 | f4/4 g4/4 |
-          V2: e3/2 r/2 |
+          V1: c4/4 d4/4 | f4/4 g4/4;
+          V2: e3/2 r/2;
         }
         """
         ast = parse_muslang(source)
@@ -67,6 +73,22 @@ class TestVoiceGrouping:
         voice2_notes = [e for e in _voice_events(inst, 2) if isinstance(e, Note)]
         assert len(voice2_notes) == 1
 
+    def test_repeated_voice_blocks_concatenate(self):
+        """Test repeated Vn blocks append instead of overwrite"""
+        source = """
+        piano {
+          V1: c4/4 d4/4 r/2;
+          V2: c3/1;
+          V1: e4/4 f4/4 g4/4 a4/4;
+        }
+        """
+        ast = parse_muslang(source)
+
+        inst = ast.instruments['piano']
+        voice1_notes = [e for e in _voice_events(inst, 1) if isinstance(e, Note)]
+        assert len(voice1_notes) == 6
+        assert [n.pitch for n in voice1_notes] == ['c', 'd', 'e', 'f', 'g', 'a']
+
 
 class TestVoiceTiming:
     """Test voice timing calculation"""
@@ -75,8 +97,8 @@ class TestVoiceTiming:
         """Test that all voices start at time 0"""
         source = """
         piano {
-          V1: c4/4 d4/4 r/2 |
-          V2: e3/2 r/2 |
+          V1: c4/4 d4/4 r/2;
+          V2: e3/2 r/2;
         }
         """
         ast = parse_muslang(source)
@@ -94,7 +116,7 @@ class TestVoiceTiming:
         """Test events within a voice are sequential"""
         source = """
         piano {
-          V1: c4/4 d4/4 e4/4 r/4 |
+          V1: c4/4 d4/4 e4/4 r/4;
         }
         """
         ast = parse_muslang(source)
@@ -119,13 +141,13 @@ class TestInstrumentMerging:
         """Test multiple declarations of same instrument merge"""
         source = """
         violin {
-          V1: c4/4 d4/4 r/2 |
+          V1: c4/4 d4/4 r/2;
         }
         piano {
-          V1: e4/4 r/2 r/4 r/4 |
+          V1: e4/4 r/2 r/4 r/4;
         }
         violin {
-          V1: f4/4 g4/4 r/2 |
+          V1: f4/4 g4/4 r/2;
         }
         """
         ast = parse_muslang(source)
@@ -144,10 +166,10 @@ class TestInstrumentMerging:
         """Test merged instrument events are sequential"""
         source = """
         piano {
-          V1: c4/4 d4/4 r/2 |
+          V1: c4/4 d4/4 r/2;
         }
         piano {
-          V1: e4/4 f4/4 r/2 |
+          V1: e4/4 f4/4 r/2;
         }
         """
         ast = parse_muslang(source)
@@ -169,12 +191,12 @@ class TestInstrumentMerging:
         """Test merging instruments with voices"""
         source = """
         piano {
-          V1: c4/4 d4/4 r/2 |
-          V2: e3/2 r/2 |
+          V1: c4/4 d4/4 r/2;
+          V2: e3/2 r/2;
         }
         piano {
-          V1: f4/4 g4/4 r/2 |
-          V3: a3/2 r/2 |
+          V1: f4/4 g4/4 r/2;
+          V3: a3/2 r/2;
         }
         """
         ast = parse_muslang(source)
@@ -197,8 +219,8 @@ class TestMIDIGeneration:
         """Test MIDI file is generated correctly with voices"""
         source = """
         piano {
-          V1: c4/4 d4/4 e4/4 r/4 |
-          V2: c3/2 g3/2 |
+          V1: c4/4 d4/4 e4/4 r/4;
+          V2: c3/2 g3/2;
         }
         """
         ast = parse_muslang(source)
@@ -223,10 +245,10 @@ class TestMIDIGeneration:
         """Test single merged instrument creates single MIDI track"""
         source = """
         violin {
-          V1: c4/4 d4/4 r/2 |
+          V1: c4/4 d4/4 r/2;
         }
         violin {
-          V1: e4/4 f4/4 r/2 |
+          V1: e4/4 f4/4 r/2;
         }
         """
         ast = parse_muslang(source)

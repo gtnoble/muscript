@@ -2,215 +2,225 @@
 # Demonstrates polyphonic writing with multiple voices
 # Shows how to create complex piano textures with independent melodic lines
 
-(tempo! 100) (time 4 4) (key c 'major)
+(tempo! 100);
+(time 4 4);
+(key c 'major);
 
 piano {
 
 # Section 1: Simple Two-Voice Counterpoint
 # Melody in right hand, bass in left hand
-@mf :legato
-V1: c5/4 d5/4 e5/4 f5/4 |
-V2: c3/2 g3/2 |
+@mf;
+:legato;
+V1: c5/4 d5/4 e5/4 f5/4 ;
+V2: c3/2 g3/2 ;
 
-V1: g5/4 f5/4 e5/4 d5/4 |
-V2: a3/2 f3/2 |
+V1: g5/4 f5/4 e5/4 d5/4 ;
+V2: a3/2 f3/2 ;
 
-V1: c5/1 |
-V2: c3/2 g2/2 |
+V1: c5/1 ;
+V2: c3/2 g2/2 ;
 
 # Section 2: Three-Voice Texture
 # Soprano, alto, bass
-@mp
-V1: e5/2 d5/2 |
-V2: g4/2 f4/2 |
-V3: c3/1 |
+@mp;
+V1: e5/2 d5/2 ;
+V2: g4/2 f4/2 ;
+V3: c3/1 ;
 
-V1: c5/2 b4/2 |
-V2: e4/2 d4/2 |
-V3: a2/1 |
+V1: c5/2 b4/2 ;
+V2: e4/2 d4/2 ;
+V3: a2/1 ;
 
-V1: c5/1 |
-V2: e4/2 g4/2 |
-V3: c3/1 |
+V1: c5/1 ;
+V2: e4/2 g4/2 ;
+V3: c3/1 ;
 
 # Section 3: Melody with Chord Accompaniment
 # Melody in right hand, chords in left (using V2 for bass, V3 for chords)
-@mf
-V1: c5/4 d5/4 e5/4 f5/4 |
-V2: c3/2 g3/2 |
-V3: e3/2 d3/2 |
+@mf;
+V1: c5/4 d5/4 e5/4 f5/4 ;
+V2: c3/2 g3/2 ;
+V3: e3/2 d3/2 ;
 
-V1: g5/4 a5/4 b5/4 c6/4 |
-V2: a3/2 f3/2 |
-V3: c3/2 a2/2 |
+V1: g5/4 a5/4 b5/4 c6/4 ;
+V2: a3/2 f3/2 ;
+V3: c3/2 a2/2 ;
 
 # Section 4: Independent Rhythms
 # Different rhythmic figures in each voice
-V1: c5/8 d5/8 e5/8 f5/8 g5/8 a5/8 b5/8 c6/8 |
-V2: c4/4 e4/4 g4/4 e4/4 |
-V3: c3/2 g3/2 |
+V1: c5/8 d5/8 e5/8 f5/8 g5/8 a5/8 b5/8 c6/8 ;
+V2: c4/4 e4/4 g4/4 e4/4 ;
+V3: c3/2 g3/2 ;
 
-V1: c6/8 b5/8 a5/8 g5/8 f5/8 e5/8 d5/8 c5/8 |
-V2: f4/4 d4/4 g4/4 e4/4 |
-V3: f3/2 g3/2 |
+V1: c6/8 b5/8 a5/8 g5/8 f5/8 e5/8 d5/8 c5/8 ;
+V2: f4/4 d4/4 g4/4 e4/4 ;
+V3: f3/2 g3/2 ;
 
 # Section 5: Bach-Style Invention
 # Two-part invention with imitation
-(key g 'major)
-@mf :legato
+(key g 'major);
+@mf;
+:legato;
 
 # Subject in upper voice
-V1: g4/8 a4/8 b4/8 c5/8 d5/8 e5/8 f5+/8 g5/8 |
-V2: r/2 r/2 |
+V1: g4/8 a4/8 b4/8 c5/8 d5/8 e5/8 f5+/8 g5/8 ;
+V2: r/2 r/2 ;
 
 # Answer in lower voice
-V1: a5/8 b5/8 c6/8 b5/8 a5/8 g5/8 f5+/8 e5/8 |
-V2: g3/8 a3/8 b3/8 c4/8 d4/8 e4/8 f4+/8 g4/8 |
+V1: a5/8 b5/8 c6/8 b5/8 a5/8 g5/8 f5+/8 e5/8 ;
+V2: g3/8 a3/8 b3/8 c4/8 d4/8 e4/8 f4+/8 g4/8 ;
 
 # Development
-V1: d5/4 g5/4 f5+/4 e5/4 |
-V2: b3/4 e4/4 d4/4 c4/4 |
+V1: d5/4 g5/4 f5+/4 e5/4 ;
+V2: b3/4 e4/4 d4/4 c4/4 ;
 
-V1: d5/2 g4/2 |
-V2: b3/2 g3/2 |
+V1: d5/2 g4/2 ;
+V2: b3/2 g3/2 ;
 
 # Section 6: Alberti Bass
 # Classic broken chord accompaniment
-(key c 'major)
-@mp
-V1: c5/2 d5/2 |
-V2: c3/8 e3/8 g3/8 e3/8 c3/8 e3/8 g3/8 e3/8 |
+(key c 'major);
+@mp;
+V1: c5/2 d5/2 ;
+V2: c3/8 e3/8 g3/8 e3/8 c3/8 e3/8 g3/8 e3/8 ;
 
-V1: e5/2 f5/2 |
-V2: c3/8 e3/8 g3/8 e3/8 c3/8 f3/8 a3/8 f3/8 |
+V1: e5/2 f5/2 ;
+V2: c3/8 e3/8 g3/8 e3/8 c3/8 f3/8 a3/8 f3/8 ;
 
-V1: g5/1 |
-V2: b2/8 d3/8 g3/8 d3/8 b2/8 d3/8 g3/8 d3/8 |
+V1: g5/1 ;
+V2: b2/8 d3/8 g3/8 d3/8 b2/8 d3/8 g3/8 d3/8 ;
 
 # Section 7: Waltz Accompaniment
 # 3/4 time with oom-pah-pah bass
-(time 3 4)
-@mf
-V1: c5/4 e5/4 g5/4 |
-V2: c3/4 g3/4 e3/4 |
+(time 3 4);
+@mf;
+V1: c5/4 e5/4 g5/4 ;
+V2: c3/4 g3/4 e3/4 ;
 
-V1: c6/4 b5/4 a5/4 |
-V2: f3/4 c4/4 a3/4 |
+V1: c6/4 b5/4 a5/4 ;
+V2: f3/4 c4/4 a3/4 ;
 
-V1: g5/2. |
-V2: g3/4 d4/4 b3/4 |
+V1: g5/2. ;
+V2: g3/4 d4/4 b3/4 ;
 
 # Section 8: Parallel Motion
 # Voices moving in parallel intervals
-(time 4 4)
-:legato @f
-V1: c5/4 d5/4 e5/4 f5/4 |
-V2: c4/4 d4/4 e4/4 f4/4 |
+(time 4 4);
+:legato;
+@f;
+V1: c5/4 d5/4 e5/4 f5/4 ;
+V2: c4/4 d4/4 e4/4 f4/4 ;
 
-V1: g5/4 a5/4 b5/4 c6/4 |
-V2: g4/4 a4/4 b4/4 c5/4 |
+V1: g5/4 a5/4 b5/4 c6/4 ;
+V2: g4/4 a4/4 b4/4 c5/4 ;
 
 # Section 9: Contrary Motion
 # Voices moving in opposite directions
-@mp
-V1: c5/4 b4/4 a4/4 g4/4 |
-V2: c3/4 d3/4 e3/4 f3/4 |
+@mp;
+V1: c5/4 b4/4 a4/4 g4/4 ;
+V2: c3/4 d3/4 e3/4 f3/4 ;
 
-V1: f4/4 e4/4 d4/4 c4/4 |
-V2: g3/4 a3/4 b3/4 c4/4 |
+V1: f4/4 e4/4 d4/4 c4/4 ;
+V2: g3/4 a3/4 b3/4 c4/4 ;
 
 # Section 10: Chorale Style
 # Four-part harmony (SATB)
-(key f 'major)
-@mf :legato
-V1: f5/2 g5/2 |
-V2: c5/2 e5/2 |
-V3: a4/2 c5/2 |
-V4: f3/1 |
+(key f 'major);
+@mf;
+:legato;
+V1: f5/2 g5/2 ;
+V2: c5/2 e5/2 ;
+V3: a4/2 c5/2 ;
+V4: f3/1 ;
 
-V1: a5/2 b5-/4 a5/4 |
-V2: f5/2 g5/4 f5/4 |
-V3: c5/2 d5/4 c5/4 |
-V4: f3/2 g3/4 f3/4 |
+V1: a5/2 b5-/4 a5/4 ;
+V2: f5/2 g5/4 f5/4 ;
+V3: c5/2 d5/4 c5/4 ;
+V4: f3/2 g3/4 f3/4 ;
 
-V1: g5/1 |
-V2: e5/2 d5/2 |
-V3: c5/2 b4-/2 |
-V4: c3/1 |
+V1: g5/1 ;
+V2: e5/2 d5/2 ;
+V3: c5/2 b4-/2 ;
+V4: c3/1 ;
 
-V1: f5/1 |
-V2: c5/2 d5/2 |
-V3: a4/2 b4-/2 |
-V4: f3/1 |
+V1: f5/1 ;
+V2: c5/2 d5/2 ;
+V3: a4/2 b4-/2 ;
+V4: f3/1 ;
 
 # Section 11: Arpeggiated Chords
 # Harp-like broken chords across voices
-@p :legato
-V1: c5/16 e5/16 g5/16 c6/16 e6/16 c6/16 g5/16 e5/16 c5/16 e5/16 g5/16 c6/16 e6/16 c6/16 g5/16 e5/16 |
-V2: r/4 c4/16 e4/16 g4/16 c5/16 e5/16 c5/16 g4/16 e4/16 c4/16 e4/16 g4/16 c5/16 |
-V3: c3/2 c3/2 |
+@p;
+:legato;
+V1: c5/16 e5/16 g5/16 c6/16 e6/16 c6/16 g5/16 e5/16 c5/16 e5/16 g5/16 c6/16 e6/16 c6/16 g5/16 e5/16 ;
+V2: r/4 c4/16 e4/16 g4/16 c5/16 e5/16 c5/16 g4/16 e4/16 c4/16 e4/16 g4/16 c5/16 ;
+V3: c3/2 c3/2 ;
 
-@crescendo
-V1: d5/16 f5/16 a5/16 d6/16 f6/16 d6/16 a5/16 f5/16 d5/16 f5/16 a5/16 d6/16 f6/16 d6/16 a5/16 f5/16 |
-V2: r/4 d4/16 f4/16 a4/16 d5/16 f5/16 d5/16 a4/16 f4/16 d4/16 f4/16 a4/16 d5/16 |
-V3: d3/2 d3/2 |
+@crescendo;
+V1: d5/16 f5/16 a5/16 d6/16 f6/16 d6/16 a5/16 f5/16 d5/16 f5/16 a5/16 d6/16 f6/16 d6/16 a5/16 f5/16 ;
+V2: r/4 d4/16 f4/16 a4/16 d5/16 f5/16 d5/16 a4/16 f4/16 d4/16 f4/16 a4/16 d5/16 ;
+V3: d3/2 d3/2 ;
 
-@mf
-V1: e5/16 g5/16 b5/16 e6/16 g6/16 e6/16 b5/16 g5/16 e5/16 g5/16 b5/16 e6/16 g6/16 e6/16 b5/16 g5/16 |
-V2: r/4 e4/16 g4/16 b4/16 e5/16 g5/16 e5/16 b4/16 g4/16 e4/16 g4/16 b4/16 e5/16 |
-V3: e3/2 e3/2 |
+@mf;
+V1: e5/16 g5/16 b5/16 e6/16 g6/16 e6/16 b5/16 g5/16 e5/16 g5/16 b5/16 e6/16 g6/16 e6/16 b5/16 g5/16 ;
+V2: r/4 e4/16 g4/16 b4/16 e5/16 g5/16 e5/16 b4/16 g4/16 e4/16 g4/16 b4/16 e5/16 ;
+V3: e3/2 e3/2 ;
 
 # Section 12: Syncopated Voices
 # Different rhythmic accents in each voice
-@f
-V1: c5/8 r/8 c5/8 r/8 c5/8 r/8 c5/8 r/8 |
-V2: r/8 e4/8 r/8 e4/8 r/8 e4/8 r/8 e4/8 |
-V3: c3/4 g3/4 c3/4 g3/4 |
+@f;
+V1: c5/8 r/8 c5/8 r/8 c5/8 r/8 c5/8 r/8 ;
+V2: r/8 e4/8 r/8 e4/8 r/8 e4/8 r/8 e4/8 ;
+V3: c3/4 g3/4 c3/4 g3/4 ;
 
-V1: d5/8 r/8 d5/8 r/8 d5/8 r/8 d5/8 r/8 |
-V2: r/8 f4/8 r/8 f4/8 r/8 f4/8 r/8 f4/8 |
-V3: d3/4 a3/4 d3/4 a3/4 |
+V1: d5/8 r/8 d5/8 r/8 d5/8 r/8 d5/8 r/8 ;
+V2: r/8 f4/8 r/8 f4/8 r/8 f4/8 r/8 f4/8 ;
+V3: d3/4 a3/4 d3/4 a3/4 ;
 
 # Section 13: Romantic Texture
 # Lush, overlapping voices with dynamics
-(key a- 'major)
-@p :legato @crescendo
-V1: e4-/2. f4/4 |
-V2: c4/2. d4-/4 |
-V3: a3-/1 |
+(key a- 'major);
+@p;
+:legato;
+@crescendo;
+V1: e4-/2. f4/4 ;
+V2: c4/2. d4-/4 ;
+V3: a3-/1 ;
 
-V1: @mf g4/2 f4/2 |
-V2: e4-/2 d4-/2 |
-V3: c4/2 d4-/2 |
-V4: c3/1 |
+V1: @mf g4/2 f4/2 ;
+V2: e4-/2 d4-/2 ;
+V3: c4/2 d4-/2 ;
+V4: c3/1 ;
 
-@f
-V1: :legato e4-/2 e4-/4 :reset d4-/4 |
-V2: :legato c4/2 c4/4 :reset b3-/4 |
-V3: :legato a3-/2 a3-/2 |
-V4: a2-/1 |
+@f;
+V1: :legato e4-/2 e4-/4 :reset d4-/4 ;
+V2: :legato c4/2 c4/4 :reset b3-/4 ;
+V3: :legato a3-/2 a3-/2 ;
+V4: a2-/1 ;
 
-@diminuendo @p
-V1: c4/1 |
-V2: a3-/2 g3/2 |
-V3: e3-/2 e3-/2 |
-V4: a2-/1 |
+@diminuendo;
+@p;
+V1: c4/1 ;
+V2: a3-/2 g3/2 ;
+V3: e3-/2 e3-/2 ;
+V4: a2-/1 ;
 
 # Final section: Grand cadence with all voices
-(key c 'major)
-@ff
-V1: g5/2 c6/2 |
-V2: e5/2 e5/2 |
-V3: c5/2 g4/2 |
-V4: c3/1 |
+(key c 'major);
+@ff;
+V1: g5/2 c6/2 ;
+V2: e5/2 e5/2 ;
+V3: c5/2 g4/2 ;
+V4: c3/1 ;
 
-V1: b5/1 |
-V2: d5/2 f5/2 |
-V3: g4/2 b4/2 |
-V4: g2/1 |
+V1: b5/1 ;
+V2: d5/2 f5/2 ;
+V3: g4/2 b4/2 ;
+V4: g2/1 ;
 
-V1: c6/1 |
-V2: e5/1 |
-V3: g4/1 |
-V4: c3/1 |
+V1: c6/1 ;
+V2: e5/1 ;
+V3: g4/1 ;
+V4: c3/1;
 }

@@ -422,7 +422,7 @@ class TestStateTracking:
         events = [
             Articulation(type='staccato'),
             Note(pitch='c', octave=4, duration=4),
-            Reset(type='natural'),
+            Reset(type='articulation'),
             Note(pitch='d', octave=4, duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
@@ -436,18 +436,19 @@ class TestStateTracking:
         # First note should be staccato
         assert processed_events[1].articulation == 'staccato'
         
-        # Second note should be natural (after reset)
+        # Second note should be natural (after reset pops staccato, back to system default)
         assert processed_events[3].articulation == 'natural'
     
     def test_reset_full(self):
-        """Test full reset (articulation and dynamics)"""
+        """Test separate reset for articulation and dynamics"""
         analyzer = SemanticAnalyzer()
         
         events = [
             Articulation(type='staccato'),
             DynamicLevel(level='ff'),
             Note(pitch='c', octave=4, duration=4),
-            Reset(type='full'),
+            Reset(type='articulation'),  # Only reset articulation
+            Reset(type='dynamic'),  # Only reset dynamics
             Note(pitch='d', octave=4, duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
@@ -462,10 +463,10 @@ class TestStateTracking:
         assert processed_events[2].articulation == 'staccato'
         assert processed_events[2].velocity == VELOCITY_FF
         
-        # Second note should be natural and mf (default)
-        assert processed_events[4].articulation == 'natural'
-        assert processed_events[4].dynamic_level == 'mf'
-        assert processed_events[4].velocity == VELOCITY_MF
+        # Second note should be natural and mf (after both resets)
+        assert processed_events[5].articulation == 'natural'
+        assert processed_events[5].dynamic_level == 'mf'
+        assert processed_events[5].velocity == VELOCITY_MF
     
     def test_chord_state_tracking(self):
         """Test state tracking for chords"""

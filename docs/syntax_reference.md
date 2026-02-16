@@ -39,11 +39,12 @@ Muslang is a music composition DSL that uses:
 A Muslang composition consists of **directives** (tempo, time signature, etc.) followed by one or more **instruments**, each containing **voices** with musical **events**:
 
 ```muslang
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 
 instrument_name {
-  V1: event1 event2 event3 ...
-  V2: event1 event2 event3 ...
+  V1: event1 event2 event3 ...;
+  V2: event1 event2 event3 ...;
 }
 ```
 
@@ -51,18 +52,21 @@ instrument_name {
 - All notes, rests, chords, and other musical events must be contained within a voice (V1:, V2:, etc.)
 - Directives like tempo and time signature must appear **before** instrument blocks (top-level)
 - Instruments are enclosed in curly braces `{...}`
+- Voice blocks terminate with a semicolon `;`
+- `|` is used only between measures within a voice
 - Instrument names use lowercase with optional underscores or hyphens
 
 Example:
 ```muslang
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4 |
+  V1: c4/4 d4/4 e4/4 f4/4;
 }
 
 violin {
-  V1: g5/2 a5/2 |
+  V1: g5/2 a5/2;
 }
 ```
 
@@ -95,7 +99,7 @@ a3    # A in octave 3
 ### Notes
 ```muslang
 piano {
-  V1: c4 d4 e4 f4 g4 a4 b4 c5
+  V1: c4 d4 e4 f4 g4 a4 b4 c5;
 }
 ```
 
@@ -104,7 +108,7 @@ piano {
 ### Rests
 ```muslang
 piano {
-  V1: c4/4 r/4 e4/4 r/4
+  V1: c4/4 r/4 e4/4 r/4;
 }
 ```
 
@@ -183,12 +187,12 @@ Multiple notes sounding simultaneously, separated by commas:
 ```muslang
 # C major triad
 piano {
-  V1: c4/4,e4/4,g4/4
+  V1: c4/4,e4/4,g4/4;
 }
 
 # D minor seventh
 piano {
-  V1: d4/2,f4/2,a4/2,c5/2
+  V1: d4/2,f4/2,a4/2,c5/2;
 }
 ```
 
@@ -208,38 +212,46 @@ Articulations control **how notes are played**. Use `:` prefix.
 | Legato       | `:legato`   | Smooth, connected (100%)        |
 | Tenuto       | `:tenuto`   | Full value, slightly emphasized |
 | Marcato      | `:marcato`  | Strongly accented (90%)         |
+| Reset        | `:reset`    | Pop articulation stack (undo)   |
 
 ### Syntax
 
 ```muslang
 # Apply articulation to following notes
 piano {
-  V1: :staccato c4/4 d4/4 e4/4 f4/4
+  V1: :staccato c4/4 d4/4 e4/4 f4/4;
 }
 
 # Change articulation mid-phrase
 piano {
-  V1: :staccato c4/4 d4/4 :legato e4/4 f4/4
+  V1: :staccato c4/4 d4/4 :legato e4/4 f4/4;
 }
 
-# Reset to natural (default)
+# Reset (undo last articulation change)
 piano {
-  V1: :staccato c4/4 d4/4 :reset e4/4 f4/4
+  V1: :staccato c4/4 d4/4 :reset e4/4 f4/4;
 }
 ```
 
-### State Behavior
+### Stack-Based Reset Behavior
 
-Articulations are **persistent** - they apply to all following notes until changed:
+Articulations use a **stack-based undo system**. Each articulation change pushes to the stack, and `:reset` pops the most recent change:
 
 ```muslang
 piano {
-  V1: c4/4 d4/4          # Natural
-      :staccato e4/4 f4/4 g4/4  # All staccato
-      :legato a4/4 b4/4   # All legato
-      :reset c5/4         # Back to natural
+  V1: c4/4 d4/4                    # Natural (system default)
+      :staccato e4/4 f4/4 g4/4     # All staccato (pushed to stack)
+      :legato a4/4 b4/4            # All legato (pushed to stack)
+      :reset c5/4                  # Pops legato → back to staccato
+      :reset d5/4                  # Pops staccato → back to natural
 }
 ```
+
+**Key points:**
+- Each articulation change (`:staccato`, `:legato`, etc.) **pushes** to the stack
+- `:reset` **pops** one level from the stack
+- Composition and instrument-level defaults are pre-loaded on the stack
+- The system default (natural) always remains at the bottom of the stack
 
 ---
 
@@ -257,6 +269,7 @@ Dynamics control **loudness/volume**. Use `@` prefix.
 | mf      | `@mf`  | 85       | mezzo-forte    |
 | f       | `@f`   | 100      | forte          |
 | ff      | `@ff`  | 115      | fortissimo     |
+| Reset    | `@reset` | (undo)   | Pop dynamic stack |
 
 ### Gradual Transitions
 
@@ -272,6 +285,25 @@ Dynamics control **loudness/volume**. Use `@` prefix.
 |-------------|-----------------|----------------------------------|
 | Sforzando   | `@sforzando`    | Sudden strong accent (+20 vel)   |
 | Forte-piano | `@forte-piano`  | Strong then immediately soft     |
+
+### Stack-Based Reset for Dynamics
+
+Like articulations, dynamics also use a **stack-based undo system**. Use `@reset` to undo the last dynamic change:
+
+```muslang
+piano {
+  V1: c4/4 d4/4                    # mf (system default)
+      @p e4/4 f4/4                 # piano (pushed to stack)
+      @f g4/4 a4/4                 # forte (pushed to stack)
+      @reset b4/4 c5/4             # Pops forte → back to piano
+      @reset d5/4                  # Pops piano → back to mf
+}
+```
+
+**Independent stacks:**
+- Articulation (`:reset`) and dynamic (`@reset`) stacks are **completely independent**
+- `:reset` only undoes articulations
+- `@reset` only undoes dynamics
 
 ### Examples
 
@@ -427,9 +459,9 @@ Directives set musical context. Use parentheses `()`:
 ### Tempo
 
 ```muslang
-(tempo! 120)
+(tempo! 120);
 piano {
-  V1: c4/4 d4/4 e4/4
+  V1: c4/4 d4/4 e4/4;
 }
 ```
 
@@ -438,9 +470,9 @@ piano {
 ### Time Signature
 
 ```muslang
-(time 3 4)
+(time 3 4);
 piano {
-  V1: c4/4 d4/4 e4/4
+  V1: c4/4 d4/4 e4/4;
 }
 ```
 
@@ -454,13 +486,13 @@ Common signatures:
 ### Key Signature
 
 ```muslang
-(key g 'major)
+(key g 'major);
 piano {
-  V1: g4/4 a4/4 b4/4 c5/4
+  V1: g4/4 a4/4 b4/4 c5/4;
 }
-(key d 'minor)
+(key d 'minor);
 piano {
-  V1: d4/4 e4/4 f4/4 g4/4
+  V1: d4/4 e4/4 f4/4 g4/4;
 }
 ```
 
@@ -470,13 +502,13 @@ piano {
 
 **Examples with accidentals**:
 ```muslang
-(key a- 'major)
+(key a- 'major);
 piano {
-  V1: e4-/4 f4/4 g4/4 a4-/4  # A♭ major
+  V1: e4-/4 f4/4 g4/4 a4-/4;  # A♭ major
 }
-(key f+ 'minor)
+(key f+ 'minor);
 piano {
-  V1: f4+/4 g4+/4 a4/4 b4/4  # F♯ minor
+  V1: f4+/4 g4+/4 a4/4 b4/4;  # F♯ minor
 }
 ```
 
@@ -509,13 +541,13 @@ piano {
 
 ```muslang
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4
+  V1: c4/4 d4/4 e4/4 f4/4;
 }
 violin {
-  V1: g5/2 a5/2
+  V1: g5/2 a5/2;
 }
 bass {
-  V1: c2/1
+  V1: c2/1;
 }
 ```
 
@@ -527,9 +559,9 @@ Multiple melodic lines within one instrument. Use `V1:`, `V2:`, etc.:
 
 ```muslang
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4
-  V2: e3/2 f3/2
-  V1: g4/4 a4/4 b4/4 c5/4
+  V1: c4/4 d4/4 e4/4 f4/4;
+  V2: e3/2 f3/2;
+  V1: g4/4 a4/4 b4/4 c5/4;
 }
 ```
 
@@ -537,13 +569,27 @@ piano {
 
 **Note**: Voices merge into a single MIDI track with interleaved events.
 
+### Sequential Instrument Defaults
+
+Instrument-level events can appear between voices and apply to subsequent voices:
+
+```muslang
+piano {
+  @f;
+  V1: c4/4 d4/4;
+  @p;
+  :staccato;
+  V2: e4/4 f4/4;
+}
+```
+
 ### Voice Patterns with External Macros
 
 For repeating polyphonic patterns, author with `m4` macros in a `.mus.m4` file and generate expanded `.mus` before compiling.
 
 ```m4
-define(`BAR_V1', `V1: c4/4 d4/4 e4/4 f4/4')
-define(`BAR_V2', `V2: e3/2 f3/2')
+define(`BAR_V1', `V1: c4/4 d4/4 e4/4 f4/4;')
+define(`BAR_V2', `V2: e3/2 f3/2;')
 
 piano {
 BAR_V1
@@ -577,7 +623,7 @@ python -m muslang.cli compile score.mus -o score.mid
 define(`MOTIF', `c4/4 d4/4 e4/4 f4/4')
 
 piano {
-  V1: MOTIF MOTIF g4/2
+  V1: MOTIF MOTIF g4/2;
 }
 ```
 
@@ -585,7 +631,7 @@ Generated `.mus`:
 
 ```muslang
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4 c4/4 d4/4 e4/4 f4/4 g4/2
+  V1: c4/4 d4/4 e4/4 f4/4 c4/4 d4/4 e4/4 f4/4 g4/2;
 }
 ```
 
@@ -598,7 +644,7 @@ define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')
 define(`PATTERN', `kick/8 r/8 snare/8 r/8')
 
 drums {
-  V1: REPEAT(4, `PATTERN ')
+  V1: REPEAT(4, `PATTERN ');
 }
 ```
 
@@ -606,7 +652,7 @@ Generated `.mus` (`V1` expanded 4 times):
 
 ```muslang
 drums {
-  V1: kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8
+  V1: kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8 kick/8 r/8 snare/8 r/8;
 }
 ```
 
@@ -638,23 +684,23 @@ Common drums:
 ```muslang
 # Percussion instrument
 drums {
-  V1: kick/4 snare/4 hat/8 hat/8 kick/4
+  V1: kick/4 snare/4 hat/8 hat/8 kick/4;
 }
 
 # Basic rock beat (expanded form)
 drums {
-  V1: kick/8 hat/8 snare/8 hat/8 kick/8 hat/8 snare/8 hat/8
+  V1: kick/8 hat/8 snare/8 hat/8 kick/8 hat/8 snare/8 hat/8;
 }
 ```
 
 ### Example Beat
 
 ```muslang
-(tempo! 120)
+(tempo! 120);
 drums {
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8;
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 ```
 
@@ -667,7 +713,7 @@ Use `#` for single-line comments:
 ```muslang
 # This is a comment
 piano {
-  V1: c4/4 d4/4  # Another comment
+  V1: c4/4 d4/4;  # Another comment
 }
 
 # Comments can span the full line
@@ -682,7 +728,9 @@ piano {
 # Twinkle Twinkle Little Star
 # Demonstrates multiple features
 
-(tempo! 120) (time 4 4) (key c 'major)
+(tempo! 120);
+(time 4 4);
+(key c 'major);
 piano {
   V1: # Main melody
       c4/4 c4/4 g4/4 g4/4 | a4/4 a4/4 g4/2 |
@@ -697,7 +745,7 @@ piano {
       :legato a4/4 a4/4 g4/2 |
   
       # Repeat ending
-      :reset f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2
+      :reset f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2;
 }
 ```
 
@@ -720,16 +768,16 @@ piano {
 
 ```muslang
 # Notes (must be in voices)
-V1: c4 d4 e4        # Pitches with octaves
+V1: c4 d4 e4;       # Pitches with octaves
     c4/4 d4/8       # With durations
     c4+ d4-         # With accidentals
     c4/4.           # Dotted
 
 # Chords
-V1: c4/4,e4/4,g4/4
+V1: c4/4,e4/4,g4/4;
 
 # Rests
-V1: r/4 r/2
+V1: r/4 r/2;
 
 # Articulations
 :staccato :legato :tenuto :marcato :reset
@@ -749,23 +797,23 @@ V1: r/4 r/2
 <c4/2 g4/2>         # Slide
 
 # Directives
-(tempo! 120)
-(time 4 4)
+(tempo! 120);
+(time 4 4);
 (key g 'major)
 (pan 64)
 
 # Structure
 instrument_name {
-  V1: events...
+  V1: events...;
 }
 
 # Macro preprocessing (m4, outside Muslang parser)
 # define(`MELODY', `c4/4 d4/4')
-# instrument { V1: MELODY MELODY }
+# instrument { V1: MELODY MELODY; }
 
 # Percussion
 drums {
-  V1: kick/4 snare/4 hat/8
+  V1: kick/4 snare/4 hat/8;
 }
 
 # Comments

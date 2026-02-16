@@ -17,6 +17,8 @@ import os
 from muslang.midi_gen import MIDIGenerator, INSTRUMENT_MAP
 from muslang.ast_nodes import *
 from muslang.config import *
+from muslang.parser import parse_muslang
+from muslang.semantics import SemanticAnalyzer
 import mido
 
 
@@ -296,6 +298,69 @@ class TestBasicMIDIGeneration:
 
 class TestArticulationMapping:
     """Test articulation and dynamic mapping to MIDI"""
+
+    def _first_note_duration_ticks(self, midi_path: str) -> int:
+        midi = mido.MidiFile(midi_path)
+        track = midi.tracks[1] if len(midi.tracks) > 1 else midi.tracks[0]
+
+        abs_time = 0
+        timed_msgs = []
+        for msg in track:
+            abs_time += msg.time
+            timed_msgs.append((abs_time, msg))
+
+        note_on_time = None
+        note_number = None
+        for timestamp, msg in timed_msgs:
+            if msg.type == 'note_on' and msg.velocity > 0:
+                note_on_time = timestamp
+                note_number = msg.note
+                break
+
+        assert note_on_time is not None
+
+        for timestamp, msg in timed_msgs:
+            is_off = msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0)
+            if is_off and msg.note == note_number and timestamp >= note_on_time:
+                return timestamp - note_on_time
+
+        raise AssertionError("Could not find note-off for first note")
+
+    def test_articulation_directive_changes_duration(self):
+        """Legato and staccato directives should produce different note lengths."""
+        staccato_events = [
+            Articulation(type='staccato'),
+            Note(pitch='c', octave=4, duration=4),
+        ]
+        legato_events = [
+            Articulation(type='legato'),
+            Note(pitch='c', octave=4, duration=4),
+        ]
+
+        staccato_ast = Sequence(instruments={'piano': Instrument(name='piano', events=[], voices={1: staccato_events})})
+        legato_ast = Sequence(instruments={'piano': Instrument(name='piano', events=[], voices={1: legato_events})})
+
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f1, \
+             tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f2:
+            staccato_path = f1.name
+            legato_path = f2.name
+
+        try:
+            gen.generate(staccato_ast, staccato_path)
+            gen.generate(legato_ast, legato_path)
+
+            staccato_ticks = self._first_note_duration_ticks(staccato_path)
+            legato_ticks = self._first_note_duration_ticks(legato_path)
+
+            assert staccato_ticks < legato_ticks
+
+            ratio = staccato_ticks / legato_ticks
+            expected_ratio = STACCATO_DURATION / LEGATO_DURATION
+            assert abs(ratio - expected_ratio) < 0.1
+        finally:
+            os.unlink(staccato_path)
+            os.unlink(legato_path)
     
     def test_staccato_duration(self):
         """Staccato should shorten note duration"""
@@ -395,6 +460,42 @@ class TestAdvancedFeatures:
 
             note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
             assert len(note_ons) == 3
+        finally:
+            os.unlink(temp_path)
+
+
+class TestOrnamentMIDI:
+    """Test ornament expansion yields audible MIDI note events"""
+
+    @pytest.mark.parametrize(
+        "marker,expected_count",
+        [
+            ("%trill", 8),
+            ("%mordent", 3),
+            ("%turn", 4),
+            ("%tremolo", 4),
+        ],
+    )
+    def test_ornament_generates_expected_note_count(self, marker, expected_count):
+        source = f"""
+        piano {{
+          V1: {marker} c4/4 r/4 r/4 r/4;
+        }}
+        """
+
+        analyzed = SemanticAnalyzer().analyze(parse_muslang(source))
+        gen = MIDIGenerator(ppq=480)
+
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+
+        try:
+            gen.generate(analyzed, temp_path)
+
+            midi = mido.MidiFile(temp_path)
+            messages = list(midi.tracks[1]) if len(midi.tracks) > 1 else list(midi.tracks[0])
+            note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
+            assert len(note_ons) == expected_count
         finally:
             os.unlink(temp_path)
     
@@ -509,6 +610,33 @@ class TestAdvancedFeatures:
 
 class TestMultiInstrument:
     """Test multi-instrument MIDI generation"""
+
+    def test_multiple_voices_use_distinct_channels(self):
+        """Voices in the same instrument should use separate channels."""
+        source = """
+        piano {
+          V1: c4/2 r/2;
+          V2: c4/2 r/2;
+        }
+        """
+        analyzed = SemanticAnalyzer().analyze(parse_muslang(source))
+
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+
+        try:
+            gen.generate(analyzed, temp_path)
+
+            midi = mido.MidiFile(temp_path)
+            messages = list(midi.tracks[1]) if len(midi.tracks) > 1 else list(midi.tracks[0])
+            note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
+
+            assert len(note_ons) == 2
+            channels = {m.channel for m in note_ons}
+            assert len(channels) == 2
+        finally:
+            os.unlink(temp_path)
     
     def test_two_instruments(self):
         """Generate MIDI with two instruments"""
@@ -701,6 +829,26 @@ class TestEdgeCases:
             assert len(note_ons) >= 1
         finally:
             os.unlink(temp_path)
+
+    def test_unexpanded_ornament_raises_error(self):
+        """MIDI generation should fail fast for unexpanded ornament nodes"""
+        events = [
+            Ornament(type='trill'),
+            Note(pitch='c', octave=4, duration=4),
+        ]
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        ast = Sequence(instruments={'piano': instrument})
+
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+
+        try:
+            with pytest.raises(ValueError, match="Unexpanded ornament"):
+                gen.generate(ast, temp_path)
+        finally:
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
 
 
 class TestMetaEventChanges:

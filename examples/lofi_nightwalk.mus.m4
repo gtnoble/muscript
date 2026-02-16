@@ -2,6 +2,7 @@
 # Generate: m4 examples/lofi_nightwalk.mus.m4 > examples/lofi_nightwalk.mus
 
 define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')dnl
+define(`REPEAT_MEASURE', `ifelse($1, `0', `', `ifelse($1, `1', `$2', `$2 | REPEAT_MEASURE(decr($1), `$2')')')')dnl
 
 define(`H1', `f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2')dnl
 define(`H2', `e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2')dnl
@@ -21,25 +22,32 @@ define(`L2', `r/2 b4-/8 d5/8 f5/8 d5/8')dnl
 define(`L3', `r/1')dnl
 define(`L4', `a4-/4 g4/8 f4/8 e4-/4 r/4')dnl
 
-(tempo! 84) (time 4 4) (key f 'minor)
+(tempo! 84);
+(time 4 4);
+(key f 'minor);
 electric_piano_1 {
-  V1: @mp :legato REPEAT(2, `H1 | H2 | H1 | H2 | ')
-  V1: @mf REPEAT(2, `H2 | H1 | H2 | H1 | ')
+  V1: @mp :legato REPEAT_MEASURE(2, `H1 | H2 | H1 | H2');
+  V1: @mf REPEAT_MEASURE(2, `H2 | H1 | H2 | H1');
 }
 
-(tempo! 84) (time 4 4) (key f 'minor)
+(tempo! 84);
+(time 4 4);
+(key f 'minor);
 bass {
-  V1: @mp REPEAT(4, `B1 | B2 | B3 | B4 | ')
+  V1: @mp REPEAT_MEASURE(4, `B1 | B2 | B3 | B4');
 }
 
-(tempo! 84) (time 4 4)
+(tempo! 84);
+(time 4 4);
 drums {
-  V1: @mp REPEAT(8, `K1 | ') REPEAT(8, `K2 | ')
-  V2: @mp REPEAT(16, `S1 | ')
-  V3: @p REPEAT(16, `HAT1 | ')
+  V1: @mp REPEAT_MEASURE(8, `K1') | REPEAT_MEASURE(8, `K2');
+  V2: @mp REPEAT_MEASURE(16, `S1');
+  V3: @p REPEAT_MEASURE(16, `HAT1');
 }
 
-(tempo! 84) (time 4 4) (key f 'minor)
+(tempo! 84);
+(time 4 4);
+(key f 'minor);
 lead_1_square {
-  V1: @p :legato REPEAT(2, `L3 | L3 | L1 | L2 | L3 | L4 | L1 | L2 | ')
+  V1: @p :legato REPEAT_MEASURE(2, `L3 | L3 | L1 | L2 | L3 | L4 | L1 | L2');
 }

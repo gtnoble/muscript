@@ -219,6 +219,7 @@ class MIDIGenerator:
         self.midi: Optional[MIDIFile] = None
         self.channel_counter = 0
         self.instrument_channels: Dict[str, int] = {}
+        self.composition_defaults: Dict[str, any] = {}
     
     def generate(self, ast: Sequence, output_path: str):
         """
@@ -228,6 +229,9 @@ class MIDIGenerator:
             ast: Analyzed AST (Sequence node with instruments dict)
             output_path: Path to output MIDI file
         """
+        # Store composition defaults for instrument processing
+        self.composition_defaults = ast.composition_defaults if ast.composition_defaults else {}
+        
         # Get instruments from dict
         if not ast.instruments:
             raise ValueError("No instruments found in composition")
@@ -260,27 +264,38 @@ class MIDIGenerator:
             track_num: MIDI track number
             instrument: Instrument AST node
         """
-        # Assign MIDI channel
+        # Assign MIDI channels.
+        # For pitched instruments, use one channel per voice so overlapping
+        # same-pitch notes from different voices do not cut each other off.
+        voice_channel_map: Dict[int, int] = {}
         if is_percussion_instrument(instrument.name):
-            channel = GM_DRUM_CHANNEL
+            for voice_num in instrument.voices.keys():
+                voice_channel_map[voice_num] = GM_DRUM_CHANNEL
+            self.instrument_channels[instrument.name] = GM_DRUM_CHANNEL
         else:
-            # Validate instrument name
             instrument_lower = instrument.name.lower()
             if instrument_lower not in INSTRUMENT_MAP:
                 raise ValueError(
                     f"Unknown instrument '{instrument.name}'. "
                     f"Valid instruments: {', '.join(sorted(INSTRUMENT_MAP.keys()))}"
                 )
-            
-            channel = self._get_next_channel()
-            # Set program (instrument sound)
+
             program = INSTRUMENT_MAP[instrument_lower]
-            self.midi.addProgramChange(track_num, channel, 0, program)
+            first_channel = None
+            for voice_num in instrument.voices.keys():
+                voice_channel = self._get_next_channel()
+                voice_channel_map[voice_num] = voice_channel
+                self.midi.addProgramChange(track_num, voice_channel, 0, program)
+                if first_channel is None:
+                    first_channel = voice_channel
+
+            self.instrument_channels[instrument.name] = first_channel
         
-        self.instrument_channels[instrument.name] = channel
-        
-        # Initialize state
-        mapper = ArticulationMapper()
+        # Build mapping of voice_num to instrument-level defaults
+        voice_defaults_map = {}
+        for voice_num, inst_defaults in instrument.defaults_sequence:
+            if voice_num not in voice_defaults_map:
+                voice_defaults_map[voice_num] = inst_defaults
         
         if not instrument.voices:
             raise ValueError(
@@ -288,7 +303,23 @@ class MIDIGenerator:
             )
         
         # Process voices (each voice starts at time 0, plays simultaneously)
+        # Each voice gets its own mapper initialized with inherited state
         for voice_num, voice_events in instrument.voices.items():
+            channel = voice_channel_map[voice_num]
+            # Get inherited defaults for this voice
+            composition_artic = self.composition_defaults.get('articulation', 'natural')
+            composition_dynamic = self.composition_defaults.get('dynamic_level', 'mf')
+            
+            instrument_defaults = voice_defaults_map.get(voice_num, {})
+            voice_artic = instrument_defaults.get('articulation', composition_artic)
+            voice_dynamic = instrument_defaults.get('dynamic_level', composition_dynamic)
+            
+            # Create mapper with inherited state for this voice
+            mapper = ArticulationMapper(
+                initial_articulation=voice_artic,
+                initial_dynamic_level=voice_dynamic
+            )
+            
             # Each voice starts at time 0 (simultaneous playback)
             time_ticks = 0
             for event in voice_events:
@@ -342,7 +373,7 @@ class MIDIGenerator:
             return time_ticks + max_duration
         
         elif isinstance(event, Articulation):
-            mapper.process_articulation(event)
+            mapper.process_articulation(event.type)
             return time_ticks
         
         elif isinstance(event, DynamicLevel):
@@ -358,6 +389,9 @@ class MIDIGenerator:
             return time_ticks
         
         elif isinstance(event, Reset):
+            # Note: This is likely unused since semantic analysis pre-resolves
+            # all articulation and velocity values into Note objects before
+            # MIDI generation. Kept for consistency.
             mapper.process_reset(event.type)
             return time_ticks
         
@@ -428,6 +462,13 @@ class MIDIGenerator:
                     track, channel, sub_event, time_ticks, mapper
                 )
             return time_ticks
+
+        elif isinstance(event, (Ornament, Tremolo)):
+            marker = f"%{event.type}" if isinstance(event, Ornament) else "%tremolo"
+            raise ValueError(
+                f"Unexpanded ornament '{marker}' reached MIDI generation. "
+                "Run semantic ornament expansion before MIDI export."
+            )
         
         # Unknown event type - skip
         return time_ticks

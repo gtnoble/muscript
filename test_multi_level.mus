@@ -1,0 +1,20 @@
+# Test multi-level scoping with semicolons
+# Composition-level defaults
+(tempo! 120);
+@f;
+:legato;
+
+piano {
+    # Instrument-level defaults (should merge with composition)
+    @mf;
+    
+    # Voice 1 - inherits @mf :legato
+    V1: c4/4 d4/4 e4/4 f4/4;
+    
+    # Change defaults between voices
+    @p;
+    :staccato;
+    
+    # Voice 2 - inherits @p :staccato
+    V2: c3/4 d3/4 e3/4 f3/4;
+}

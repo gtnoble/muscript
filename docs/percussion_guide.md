@@ -35,7 +35,7 @@ Muslang provides comprehensive percussion support using **General MIDI drum mapp
 
 ```muslang
 drums {
-  drum_name/duration ...
+  V1: drum_name/duration ...;
 }
 ```
 
@@ -43,7 +43,7 @@ or
 
 ```muslang
 percussion {
-  drum_name/duration ...
+  V1: drum_name/duration ...;
 }
 ```
 
@@ -51,7 +51,7 @@ percussion {
 
 ```muslang
 drums {
-  V1: kick/4 snare/4 hat/8 hat/8
+  V1: kick/4 snare/4 hat/8 hat/8;
 }
 ```
 
@@ -63,7 +63,7 @@ Drums use the same duration syntax as melodic notes:
 drums {
   V1: kick/4      # Quarter note kick
       snare/8     # Eighth note snare
-      hat/16      # Sixteenth note hi-hat
+  hat/16;     # Sixteenth note hi-hat
 }
 ```
 
@@ -73,9 +73,9 @@ To play drums at the same time, use multiple voices (not chords - drums don't fo
 
 ```muslang
 drums {
-  V1: kick/4 r/4 kick/4 r/4
-  V2: r/4 snare/4 r/4 snare/4
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+  V1: kick/4 r/4 kick/4 r/4;
+  V2: r/4 snare/4 r/4 snare/4;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 ```
 
@@ -132,10 +132,11 @@ The essential elements of a standard drum kit:
 The foundation of rock music - kick on 1 and 3, snare on 2 and 4, hi-hat eighths:
 
 ```muslang
-drums (tempo! 120) {
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+(tempo! 120);
+drums {
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8;
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 ```
 
@@ -147,10 +148,11 @@ define(`ROCK_KICK', `kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8')
 define(`ROCK_SNARE', `r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8')
 define(`ROCK_HAT', `hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8')
 
-drums (tempo! 120) {
-  V1: REPEAT(4, `ROCK_KICK ')
-  V2: REPEAT(4, `ROCK_SNARE ')
-  V3: REPEAT(4, `ROCK_HAT ')
+(tempo! 120);
+drums {
+  V1: REPEAT(4, `ROCK_KICK ');
+  V2: REPEAT(4, `ROCK_SNARE ');
+  V3: REPEAT(4, `ROCK_HAT ');
 }
 ```
 
@@ -161,9 +163,11 @@ drums (tempo! 120) {
 Classic 4/4 with kick and snare:
 
 ```muslang
-drums (time 4 4) (tempo! 120) {
-  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
-  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
+(time 4 4);
+(tempo! 120);
+drums {
+  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4;
+  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4;
 }
 ```
 
@@ -172,10 +176,11 @@ drums (time 4 4) (tempo! 120) {
 Famous four-on-the-floor with hi-hat eighths:
 
 ```muslang
-drums (tempo! 120) {
-  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
-  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+(tempo! 120);
+drums {
+  V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4;
+  V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 ```
 

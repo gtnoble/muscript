@@ -1,0 +1,10 @@
+# Test precedence: voice > instrument > composition
+@f;
+:legato;
+
+piano {
+    @mf;
+    :staccato;
+    
+    V1: c4/4 d4/4 @p e4/4 :reset f4/4;
+}

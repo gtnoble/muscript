@@ -18,15 +18,29 @@
 
 ?start: composition
 
-composition: (directive | instrument)+
+// Composition can interleave top-level events and instruments,
+// but must contain at least one instrument.
+composition: composition_item* instrument composition_item*
+
+composition_item: composition_event | instrument
+
+// Composition-level events: directives, dynamics, articulations (require semicolon)
+composition_event: (directive | articulation | dynamic_level | dynamic_transition) ";"
 
 ?directive: tempo | time_signature | key_signature | pan
 
-instrument: INSTRUMENT_NAME "{" voice_content+ "}"
+// Instrument body can have instrument-level events (with semicolons) and voice content
+instrument: INSTRUMENT_NAME "{" instrument_body "}"
 
-voice_content: VOICE ":" measures
+// Instrument body: instrument events and voices can be interleaved
+instrument_body: (instrument_event | voice_content)+
 
-measures: measure ("|" measure)* "|"
+// Instrument-level events: directives, dynamics, articulations (require semicolon)
+instrument_event: (directive | articulation | dynamic_level | dynamic_transition | dynamic_accent) ";"
+
+voice_content: VOICE ":" measures ";"
+
+measures: measure ("|" measure)*
 
 measure: measure_event+
 
@@ -128,8 +142,10 @@ ARTICULATION_TYPE: "legato" | "staccato" | "tenuto" | "marcato"
 
 // Reset articulation to natural
 // OLD: . or .natural - ambiguous with dotted!
-// NEW: :reset - explicit command
-reset: ":reset"
+// NEW: :reset - explicit command for articulation
+//      @reset - explicit command for dynamics
+reset: ":reset" -> reset_articulation
+    | "@reset" -> reset_dynamic
 
 // ============================================================================
 // DYNAMICS - At-Sign Prefix (@) - NO AMBIGUITY!

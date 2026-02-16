@@ -23,11 +23,15 @@ class SemanticAnalyzer:
         self.current_key_sig: Optional[KeySignature] = None
         self.current_tempo = DEFAULT_TEMPO
         self.current_instrument_name: Optional[str] = None
+        self.composition_defaults: Dict[str, Any] = {}  # Composition-level defaults
         self.errors: List[str] = []
         self.warnings: List[str] = []
         
     def analyze(self, ast: Sequence) -> Sequence:
         """Main entry point for semantic analysis"""
+        # Extract composition-level defaults
+        self.composition_defaults = ast.composition_defaults.copy() if ast.composition_defaults else {}
+        
         # Phase 1: Validate structure
         self._validate_ast(ast)
 
@@ -40,7 +44,7 @@ class SemanticAnalyzer:
         # Phase 4: Calculate timing
         ast = self._calculate_timing(ast)
 
-        # Phase 5: Track state
+        # Phase 5: Track state with scope chain
         ast = self._track_state(ast)
         
         if self.errors:
@@ -136,30 +140,14 @@ class SemanticAnalyzer:
     def _expand_ornaments(self, node: ASTNode) -> ASTNode:
         """Expand ornaments into note sequences"""
         if isinstance(node, Instrument):
+            previous_instrument_name = self.current_instrument_name
+            self.current_instrument_name = node.name
             # Process voice events
             expanded_voices = {}
             for voice_num, voice_events in node.voices.items():
-                expanded_voice = []
-                i = 0
-                while i < len(voice_events):
-                    event = voice_events[i]
-                    
-                    if isinstance(event, Ornament) and i + 1 < len(voice_events):
-                        next_event = voice_events[i + 1]
-                        if isinstance(next_event, Note):
-                            # Expand ornament
-                            notes = self._expand_single_ornament(event, next_event)
-                            expanded_voice.extend(notes)
-                            i += 2  # Skip both ornament and note
-                            continue
-                    
-                    # Recursively process event
-                    processed = self._expand_ornaments(event)
-                    expanded_voice.append(processed)
-                    i += 1
-                
-                expanded_voices[voice_num] = expanded_voice
-            
+                expanded_voices[voice_num] = self._expand_event_list_with_ornaments(voice_events)
+
+            self.current_instrument_name = previous_instrument_name
             return replace(node, voices=expanded_voices)
         
         elif isinstance(node, Sequence):
@@ -171,33 +159,55 @@ class SemanticAnalyzer:
                 return replace(node, instruments=expanded_instruments)
             else:
                 # Sub-sequence - process events list
-                expanded = []
-                i = 0
-                while i < len(node.events):
-                    event = node.events[i]
-                    
-                    if isinstance(event, Ornament) and i + 1 < len(node.events):
-                        next_event = node.events[i + 1]
-                        if isinstance(next_event, Note):
-                            # Expand ornament
-                            notes = self._expand_single_ornament(event, next_event)
-                            expanded.extend(notes)
-                            i += 2  # Skip both ornament and note
-                            continue
-                    
-                    # Recursively process event
-                    processed = self._expand_ornaments(event)
-                    expanded.append(processed)
-                    i += 1
-                
-                return replace(node, events=expanded)
+                return replace(node, events=self._expand_event_list_with_ornaments(node.events))
+
+        elif isinstance(node, Measure):
+            return replace(node, events=self._expand_event_list_with_ornaments(node.events))
         
         return node
+
+    def _expand_event_list_with_ornaments(self, events: List[ASTNode]) -> List[ASTNode]:
+        """Expand Ornament/Tremolo markers followed by note within an event list."""
+        expanded_events: List[ASTNode] = []
+        i = 0
+
+        while i < len(events):
+            event = events[i]
+
+            if isinstance(event, (Ornament, Tremolo)):
+                marker_name = 'tremolo' if isinstance(event, Tremolo) else event.type
+                if i + 1 >= len(events) or not isinstance(events[i + 1], Note):
+                    self._error(
+                        self._with_instrument_and_line(
+                            message=f"Ornament '%{marker_name}' must be immediately followed by a note",
+                            instrument_name=self.current_instrument_name,
+                            node=event,
+                        )
+                    )
+                    expanded_events.append(event)
+                    i += 1
+                    continue
+
+                next_note = events[i + 1]
+                expanded_events.extend(self._expand_single_ornament(event, next_note))
+                i += 2
+                continue
+
+            processed = self._expand_ornaments(event)
+            expanded_events.append(processed)
+            i += 1
+
+        return expanded_events
     
-    def _expand_single_ornament(self, ornament: Ornament, note: Note) -> List[Note]:
+    def _expand_single_ornament(self, ornament: ASTNode, note: Note) -> List[Note]:
         """Expand a single ornament into notes using theory module"""
-        # Use theory module to expand ornament
-        return theory.expand_ornament(ornament.type, note, self.current_key_sig)
+        if isinstance(ornament, Tremolo):
+            return theory.expand_ornament('tremolo', note, self.current_key_sig)
+
+        if isinstance(ornament, Ornament):
+            return theory.expand_ornament(ornament.type, note, self.current_key_sig)
+
+        return [note]
     
     def _calculate_timing(self, node: ASTNode) -> ASTNode:
         """Calculate absolute timing for all events"""
@@ -356,7 +366,7 @@ class SemanticAnalyzer:
             self.current_time_sig = event
             return event, 0.0
         
-        elif isinstance(event, (KeySignature, Pan, Articulation, DynamicLevel, DynamicTransition, DynamicAccent, Reset, Ornament, Expression)):
+        elif isinstance(event, (KeySignature, Pan, Articulation, DynamicLevel, DynamicTransition, DynamicAccent, Reset, Ornament, Tremolo, Expression)):
             # These directives don't consume time
             return event, 0.0
         
@@ -462,20 +472,61 @@ class SemanticAnalyzer:
         return None
     
     def _track_state(self, node: ASTNode) -> ASTNode:
-        """Track articulation and dynamic state"""
+        """Track articulation and dynamic state with scope chain"""
         if isinstance(node, Instrument):
+            # Build mapping of voice_num to instrument-level defaults
+            voice_defaults_map = {}
+            for voice_num, inst_defaults in node.defaults_sequence:
+                if voice_num not in voice_defaults_map:
+                    voice_defaults_map[voice_num] = inst_defaults
+            
             # Process voice events - each voice has independent state
             updated_voices = {}
             for voice_num, voice_events in node.voices.items():
-                # Fresh state for each voice
-                voice_state = {
+                # System defaults (fallback)
+                system_defaults = {
                     'articulation': 'natural',
                     'dynamic_level': 'mf',
                     'velocity': VELOCITY_MF,
-                    'transition_active': None,  # 'crescendo' or 'diminuendo'
-                    'transition_start_velocity': None,
-                    'transition_target_velocity': None,
                 }
+                
+                # Three-tier initialization: system < composition < instrument
+                voice_state = system_defaults.copy()
+                
+                # Initialize stacks with system defaults at base (never popped)
+                voice_state['articulation_stack'] = ['natural']
+                voice_state['dynamic_stack'] = [('mf', VELOCITY_MF)]
+                
+                # Apply composition defaults
+                if 'articulation' in self.composition_defaults:
+                    voice_state['articulation'] = self.composition_defaults['articulation']
+                    voice_state['articulation_stack'].append(self.composition_defaults['articulation'])
+                if 'dynamic_level' in self.composition_defaults:
+                    voice_state['dynamic_level'] = self.composition_defaults['dynamic_level']
+                    velocity = self._dynamic_level_to_velocity(self.composition_defaults['dynamic_level'])
+                    voice_state['velocity'] = velocity
+                    voice_state['dynamic_stack'].append((self.composition_defaults['dynamic_level'], velocity))
+                
+                # Apply instrument defaults for this voice
+                instrument_defaults = voice_defaults_map.get(voice_num, {})
+                if 'articulation' in instrument_defaults:
+                    voice_state['articulation'] = instrument_defaults['articulation']
+                    voice_state['articulation_stack'].append(instrument_defaults['articulation'])
+                if 'dynamic_level' in instrument_defaults:
+                    voice_state['dynamic_level'] = instrument_defaults['dynamic_level']
+                    velocity = self._dynamic_level_to_velocity(instrument_defaults['dynamic_level'])
+                    voice_state['velocity'] = velocity
+                    voice_state['dynamic_stack'].append((instrument_defaults['dynamic_level'], velocity))
+                
+                # Store parent defaults for reset
+                voice_state['instrument_defaults'] = instrument_defaults
+                voice_state['composition_defaults'] = self.composition_defaults
+                
+                # Initialize transition state
+                voice_state['transition_active'] = None
+                voice_state['transition_start_velocity'] = None
+                voice_state['transition_target_velocity'] = None
+                
                 updated_voice_events = []
                 for event in voice_events:
                     updated_event = self._apply_state_to_event(event, voice_state)
@@ -507,24 +558,39 @@ class SemanticAnalyzer:
         Updates state dict in place for subsequent events.
         """
         if isinstance(event, Articulation):
-            # Update articulation state
+            # Update articulation state and push to stack
             state['articulation'] = event.type
+            state['articulation_stack'].append(event.type)
             return event
         
         elif isinstance(event, Reset):
-            # Reset articulation to natural
-            if event.type in ('natural', 'full'):
-                state['articulation'] = 'natural'
-            if event.type == 'full':
-                state['dynamic_level'] = 'mf'
-                state['velocity'] = VELOCITY_MF
+            # Stack-based reset: pop from articulation or dynamic stack
+            if event.type == 'articulation':
+                # Pop from articulation stack (undo last articulation change)
+                if len(state['articulation_stack']) > 1:
+                    state['articulation_stack'].pop()
+                # Update current articulation from top of stack
+                state['articulation'] = state['articulation_stack'][-1]
+            
+            elif event.type == 'dynamic':
+                # Pop from dynamic stack (undo last dynamic change)
+                if len(state['dynamic_stack']) > 1:
+                    state['dynamic_stack'].pop()
+                # Update current dynamic level and velocity from top of stack
+                level, velocity = state['dynamic_stack'][-1]
+                state['dynamic_level'] = level
+                state['velocity'] = velocity
+                # Clear any active transition
                 state['transition_active'] = None
+            
             return event
         
         elif isinstance(event, DynamicLevel):
-            # Set new dynamic level
+            # Set new dynamic level and push to stack
             state['dynamic_level'] = event.level
-            state['velocity'] = self._dynamic_level_to_velocity(event.level)
+            velocity = self._dynamic_level_to_velocity(event.level)
+            state['velocity'] = velocity
+            state['dynamic_stack'].append((event.level, velocity))
             state['transition_active'] = None  # Clear any active transition
             return event
         

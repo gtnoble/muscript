@@ -103,7 +103,7 @@ class TestArticulationMapper:
         mapper.process_articulation('staccato')
         mapper.process_dynamic_level('ff')
         
-        mapper.process_reset('natural')
+        mapper.process_reset('articulation')
         
         # Articulation reset
         assert mapper.artic_state.type == 'natural'
@@ -117,10 +117,11 @@ class TestArticulationMapper:
         mapper.process_articulation('staccato')
         mapper.process_dynamic_level('ff')
         
-        mapper.process_reset('full')
+        mapper.process_reset('dynamic')
         
-        # Both reset
-        assert mapper.artic_state.type == 'natural'
+        # Articulation NOT reset
+        assert mapper.artic_state.type == 'staccato'
+        # Dynamics reset
         assert mapper.dynamic_state.level == 'mf'
 
 
@@ -456,10 +457,11 @@ class TestIntegrationScenarios:
         _ = mapper.get_note_velocity()
         _ = mapper.get_note_velocity()
         
-        # Reset
-        mapper.process_reset('full')
+        # Reset dynamics only
+        mapper.process_reset('dynamic')
         
-        # Should be back to default
+        # Dynamics should be reset, transition should be cleared
         assert not mapper.is_in_transition()
         assert mapper.get_current_dynamic_level() == 'mf'
+        # Articulation unchanged
         assert mapper.get_current_articulation() == 'natural'

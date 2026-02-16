@@ -3,7 +3,7 @@ Music Theory Support
 Handles key signatures, scales, and ornament expansion.
 """
 
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 from muslang.ast_nodes import Note, KeySignature
 
 
@@ -51,6 +51,14 @@ MINOR_SCALE_INTERVALS = [0, 2, 3, 5, 7, 8, 10]  # Natural minor
 PITCH_TO_SEMITONE = {
     'c': 0, 'd': 2, 'e': 4, 'f': 5, 'g': 7, 'a': 9, 'b': 11
 }
+
+ALLOWED_DURATIONS = [1, 2, 4, 8, 16, 32, 64]
+UNITS_TO_DURATION: Dict[int, Tuple[int, bool]] = {}
+for _duration in ALLOWED_DURATIONS:
+    base_units = 128 // _duration
+    UNITS_TO_DURATION[base_units] = (_duration, False)
+    dotted_units = (base_units * 3) // 2
+    UNITS_TO_DURATION[dotted_units] = (_duration, True)
 
 
 class KeySignatureInfo:
@@ -199,56 +207,159 @@ def expand_ornament(ornament_type: str, note: Note,
     Returns:
         List of notes representing the ornament
     """
+    total_units = _note_to_units(note)
+    if total_units <= 0:
+        return [note]
+
     if ornament_type == 'trill':
-        # Trill: alternating main note and upper neighbor
-        # Generate 8 fast notes (32nd notes)
         upper = get_upper_neighbor(note, key_sig)
-        trill_notes = []
-        
-        for i in range(8):
-            if i % 2 == 0:
-                # Main note
-                trill_notes.append(Note(
-                    pitch=note.pitch,
-                    octave=note.octave,
-                    duration=32,
-                    accidental=note.accidental
-                ))
-            else:
-                # Upper neighbor
-                trill_notes.append(upper)
-        
-        return trill_notes
-    
+        return _expand_trill(note, upper, total_units)
+
     elif ornament_type == 'mordent':
-        # Mordent: main note, lower neighbor, main note
         lower = get_lower_neighbor(note, key_sig)
-        
-        return [
-            Note(pitch=note.pitch, octave=note.octave, duration=32, 
-                 accidental=note.accidental),
-            lower,
-            Note(pitch=note.pitch, octave=note.octave, 
-                 duration=note.duration, accidental=note.accidental),
-        ]
-    
+        return _expand_mordent(note, lower, total_units)
+
     elif ornament_type == 'turn':
-        # Turn: upper neighbor, main note, lower neighbor, main note
         upper = get_upper_neighbor(note, key_sig)
         lower = get_lower_neighbor(note, key_sig)
-        
-        return [
-            upper,
-            Note(pitch=note.pitch, octave=note.octave, duration=32, 
-                 accidental=note.accidental),
-            lower,
-            Note(pitch=note.pitch, octave=note.octave, 
-                 duration=note.duration, accidental=note.accidental),
-        ]
+        return _expand_turn(note, upper, lower, total_units)
+
+    elif ornament_type == 'tremolo':
+        return _expand_tremolo(note, total_units)
     
     else:
         # Unknown ornament type, return original note
         return [note]
+
+
+def _note_to_units(note: Note) -> int:
+    """Convert note duration to 1/128-whole-note units."""
+    duration = note.duration if note.duration else 4
+    base_units = 128 // duration
+    if note.dotted:
+        return (base_units * 3) // 2
+    return base_units
+
+
+def _units_to_duration(units: int) -> Optional[Tuple[int, bool]]:
+    """Convert 1/128 units to (duration, dotted) if representable."""
+    return UNITS_TO_DURATION.get(units)
+
+
+def _build_note(base_note: Note, pitch: str, octave: int, accidental: Optional[str], units: int) -> Note:
+    """Create a note matching base properties with duration from units."""
+    duration_info = _units_to_duration(units)
+    if duration_info is None:
+        raise ValueError(f"Cannot represent note duration units={units}")
+    duration, dotted = duration_info
+    return Note(
+        pitch=pitch,
+        octave=octave,
+        duration=duration,
+        dotted=dotted,
+        accidental=accidental,
+    )
+
+
+def _principal_from_units(note: Note, units: int) -> List[Note]:
+    """Fallback to principal note with exact represented duration units."""
+    duration_info = _units_to_duration(units)
+    if duration_info is None:
+        return [note]
+    duration, dotted = duration_info
+    return [
+        Note(
+            pitch=note.pitch,
+            octave=note.octave,
+            duration=duration,
+            dotted=dotted,
+            accidental=note.accidental,
+        )
+    ]
+
+
+def _expand_trill(note: Note, upper: Note, total_units: int) -> List[Note]:
+    """Expand trill into alternating principal/upper notes across full duration."""
+    segment_units = 4 if total_units >= 4 else 2
+    if total_units < segment_units:
+        return _principal_from_units(note, total_units)
+
+    count = total_units // segment_units
+    remainder = total_units % segment_units
+    notes: List[Note] = []
+
+    for i in range(count):
+        if i % 2 == 0:
+            notes.append(_build_note(note, note.pitch, note.octave, note.accidental, segment_units))
+        else:
+            notes.append(_build_note(note, upper.pitch, upper.octave, upper.accidental, segment_units))
+
+    if remainder > 0:
+        if _units_to_duration(remainder) is None:
+            return _principal_from_units(note, total_units)
+        notes.append(_build_note(note, note.pitch, note.octave, note.accidental, remainder))
+
+    return notes if notes else _principal_from_units(note, total_units)
+
+
+def _expand_mordent(note: Note, lower: Note, total_units: int) -> List[Note]:
+    """Expand mordent as principal-lower-principal across full duration."""
+    for short_units in (4, 2):
+        remaining_units = total_units - (2 * short_units)
+        if remaining_units < 2:
+            continue
+        if _units_to_duration(remaining_units) is None:
+            continue
+
+        return [
+            _build_note(note, note.pitch, note.octave, note.accidental, short_units),
+            _build_note(note, lower.pitch, lower.octave, lower.accidental, short_units),
+            _build_note(note, note.pitch, note.octave, note.accidental, remaining_units),
+        ]
+
+    return _principal_from_units(note, total_units)
+
+
+def _expand_turn(note: Note, upper: Note, lower: Note, total_units: int) -> List[Note]:
+    """Expand turn as upper-principal-lower-principal across full duration."""
+    base = total_units // 4
+    remainder = total_units % 4
+    parts = [base, base, base, base]
+
+    # Keep later notes slightly longer when duration doesn't divide by 4 evenly.
+    for i in range(remainder):
+        parts[-(i + 1)] += 1
+
+    if any(part < 2 or _units_to_duration(part) is None for part in parts):
+        return _principal_from_units(note, total_units)
+
+    return [
+        _build_note(note, upper.pitch, upper.octave, upper.accidental, parts[0]),
+        _build_note(note, note.pitch, note.octave, note.accidental, parts[1]),
+        _build_note(note, lower.pitch, lower.octave, lower.accidental, parts[2]),
+        _build_note(note, note.pitch, note.octave, note.accidental, parts[3]),
+    ]
+
+
+def _expand_tremolo(note: Note, total_units: int) -> List[Note]:
+    """Expand tremolo as rapid principal-note repetitions across full duration."""
+    segment_units = 8 if total_units >= 8 else 4 if total_units >= 4 else 2
+    if total_units < segment_units:
+        return _principal_from_units(note, total_units)
+
+    count = total_units // segment_units
+    remainder = total_units % segment_units
+    notes = [
+        _build_note(note, note.pitch, note.octave, note.accidental, segment_units)
+        for _ in range(count)
+    ]
+
+    if remainder > 0:
+        if _units_to_duration(remainder) is None:
+            return _principal_from_units(note, total_units)
+        notes.append(_build_note(note, note.pitch, note.octave, note.accidental, remainder))
+
+    return notes if notes else _principal_from_units(note, total_units)
 
 
 def apply_key_signature_to_note(note: Note, key_sig: KeySignatureInfo) -> Note:

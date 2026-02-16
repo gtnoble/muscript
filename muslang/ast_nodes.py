@@ -214,6 +214,7 @@ class Articulation(ASTNode):
         type: Type of articulation (legato, staccato, tenuto, marcato)
         persistent: If True, applies to all following notes until changed
                    If False, applies only to the immediately following note
+        scope: Where this articulation was declared (composition, instrument, or voice)
     
     Examples:
         :legato   -> Smooth, connected notes
@@ -223,6 +224,7 @@ class Articulation(ASTNode):
     """
     type: Literal['legato', 'staccato', 'tenuto', 'marcato']
     persistent: bool = True
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     location: Optional[SourceLocation] = None
     
     def __repr__(self) -> str:
@@ -281,19 +283,22 @@ class Tremolo(ASTNode):
 @dataclass
 class Reset(ASTNode):
     """
-    Reset articulation to default (natural) state.
+    Reset articulation or dynamics by popping from their respective stacks.
     
-    Uses colon prefix in source: :reset
+    Uses colon prefix for articulation, at-sign for dynamics:
+      :reset -> Pop from articulation stack
+      @reset -> Pop from dynamics stack
     
     Attributes:
-        type: What to reset (currently only 'natural' supported)
-              'natural' - reset articulation to natural
-              'full' - reset both articulation and dynamics
+        type: What to reset
+              'articulation' - pop from articulation stack (undo last articulation change)
+              'dynamic' - pop from dynamics stack (undo last dynamic change)
     
-    Example:
-        :reset -> Return to natural articulation
+    Examples:
+        :reset -> Undo last articulation change
+        @reset -> Undo last dynamic change
     """
-    type: Literal['natural', 'full'] = 'full'
+    type: Literal['articulation', 'dynamic'] = 'articulation'
     
     def __repr__(self) -> str:
         reset_str = "" if self.type == 'full' else f".{self.type}"
@@ -316,6 +321,7 @@ class DynamicLevel(ASTNode):
     Attributes:
         level: Dynamic marking (pp=pianissimo, p=piano, mp=mezzo-piano,
                mf=mezzo-forte, f=forte, ff=fortissimo)
+        scope: Where this dynamic was declared (composition, instrument, or voice)
     
     Examples:
         @pp -> Very soft (pianissimo)
@@ -323,6 +329,7 @@ class DynamicLevel(ASTNode):
         @ff -> Very loud (fortissimo)
     """
     level: Literal['pp', 'p', 'mp', 'mf', 'f', 'ff']
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     
     def __repr__(self) -> str:
         loc_str = f" at {self.location}" if self.location else ""
@@ -340,6 +347,7 @@ class DynamicTransition(ASTNode):
     Attributes:
         type: Type of transition (crescendo or diminuendo)
         target_level: Optional target dynamic level to reach (if None, continues indefinitely)
+        scope: Where this transition was declared (composition, instrument, or voice)
     
     Examples:
         @crescendo -> Gradually get louder
@@ -347,6 +355,7 @@ class DynamicTransition(ASTNode):
     """
     type: Literal['crescendo', 'diminuendo']
     target_level: Optional[Literal['pp', 'p', 'mp', 'mf', 'f', 'ff']] = None
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     
     def __repr__(self) -> str:
         target_str = f" to {self.target_level}" if self.target_level else ""
@@ -367,12 +376,14 @@ class DynamicAccent(ASTNode):
               'sforzando' - sudden strong accent (sf, sfz)
               'marcato' - stressed, emphasized accent
               'forte-piano' - loud then immediately soft (fp)
+        scope: Where this accent was declared (composition, instrument, or voice)
     
     Examples:
         @sforzando -> Sudden strong accent
         @forte-piano -> Loud attack, immediately soft
     """
     type: Literal['sforzando', 'marcato', 'forte-piano']
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     
     def __repr__(self) -> str:
         loc_str = f" at {self.location}" if self.location else ""
@@ -538,10 +549,13 @@ class Instrument(ASTNode):
         events: List of musical events for this instrument
         voices: Dictionary mapping voice numbers to their event lists
                 (for polyphonic parts like piano left/right hand)
+        defaults_sequence: List of (voice_index, cumulative_defaults) tuples
+                          tracking instrument-level defaults before each voice
     """
     name: str
     events: List[ASTNode] = field(default_factory=list)
     voices: dict[int, List[ASTNode]] = field(default_factory=dict)
+    defaults_sequence: List[tuple[int, Dict[str, any]]] = field(default_factory=list)
     
     def __repr__(self) -> str:
         num_events = len(self.events)
@@ -583,10 +597,12 @@ class Sequence(ASTNode):
     Attributes:
         instruments: Dictionary mapping instrument names to Instrument nodes (top-level)
         events: List of events for sub-sequences
+        composition_defaults: Dictionary of composition-level default settings
         location: Optional source location
     """
     instruments: Dict[str, 'Instrument'] = field(default_factory=dict)
     events: List[ASTNode] = field(default_factory=list)
+    composition_defaults: Dict[str, any] = field(default_factory=dict)
     location: Optional[SourceLocation] = None
     
     def __repr__(self) -> str:
@@ -614,9 +630,11 @@ class TimeSignature(ASTNode):
     Attributes:
         numerator: Number of beats per measure (e.g., 4 in 4/4 time)
         denominator: Note value that gets one beat (e.g., 4 means quarter note)
+        scope: Where this time signature was declared (composition, instrument, or voice)
     """
     numerator: int
     denominator: int
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     location: Optional[SourceLocation] = None
     
     def __repr__(self) -> str:
@@ -635,10 +653,12 @@ class KeySignature(ASTNode):
         root: Root note of the key (c, d, e, f, g, a, or b)
         mode: Mode of the key ('major' or 'minor')
         accidental: Optional accidental for the root (sharp or flat)
+        scope: Where this key signature was declared (composition, instrument, or voice)
     """
     root: Literal['c', 'd', 'e', 'f', 'g', 'a', 'b']
     mode: Literal['major', 'minor']
     accidental: Optional[Literal['sharp', 'flat']] = None
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     
     def __repr__(self) -> str:
         acc_str = {'sharp': '#', 'flat': 'b'}.get(self.accidental, '')
@@ -655,8 +675,10 @@ class Tempo(ASTNode):
     
     Attributes:
         bpm: Beats per minute (typically 40-240)
+        scope: Where this tempo was declared (composition, instrument, or voice)
     """
     bpm: int
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     
     def __repr__(self) -> str:
         loc_str = f" at {self.location}" if self.location else ""
@@ -672,8 +694,10 @@ class Pan(ASTNode):
     
     Attributes:
         position: Pan position (0=full left, 64=center, 127=full right)
+        scope: Where this pan was declared (composition, instrument, or voice)
     """
     position: int
+    scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     
     def __repr__(self) -> str:
         loc_str = f" at {self.location}" if self.location else ""

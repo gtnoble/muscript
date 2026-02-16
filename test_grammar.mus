@@ -1,9 +1,9 @@
 (tempo! 120) (time 4 4)
 piano {
-  V1: c4/4 d4/4 e4/4 f4/4 |
+  V1: c4/4 d4/4 e4/4 f4/4;
 }
 
 (tempo! 110)
 piano {
-  V1: g4/4 a4/4 b4/4 c5/4 |
+  V1: g4/4 a4/4 b4/4 c5/4;
 }

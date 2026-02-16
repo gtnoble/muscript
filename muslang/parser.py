@@ -73,44 +73,121 @@ class MuslangTransformer(Transformer):
     # Top-Level Structure
     # ========================================================================
     
+    def composition_event(self, items):
+        """
+        Transform composition-level event (directive, articulation, or dynamic).
+        
+        Grammar: composition_event: (directive | articulation | dynamic_level | dynamic_transition) ";"
+        
+        Args:
+            items: [directive/articulation/dynamic node] (semicolon consumed by grammar)
+            
+        Returns:
+            The event node with scope='composition'
+        """
+        event = items[0]
+        # Tag with composition scope
+        if hasattr(event, 'scope'):
+            event.scope = 'composition'
+        return event
+
+    def composition_item(self, items):
+        """Unwrap composition_item to its contained event or instrument."""
+        return items[0]
+    
     def composition(self, items) -> Sequence:
         """
-        Transform composition into Sequence with instruments dict.
+        Transform composition into Sequence with instruments dict and composition defaults.
         
         Multiple declarations of the same instrument are merged by
         concatenating their events in order of appearance.
-        Time signatures between instrument blocks are inserted into the voice streams.
         
         Args:
-            items: List of directives and Instrument nodes
+            items: List of composition_events and Instrument nodes
             
         Returns:
-            Sequence node with instruments dict and directives in events
+            Sequence node with instruments dict and composition_defaults
         """
-        directives = []
+        composition_defaults = {}
         instruments = {}
-        pending_directives = []  # Directives to inject into next instrument
+        composition_scope = {
+            'tempo': None,
+            'time_signature': None,
+            'key_signature': None,
+            'pan': None,
+            'articulation': None,
+            'dynamic_level': None,
+            'dynamic_transition': None,
+        }
+        first_instrument_seen = False
+
+        def _scope_events() -> List[Any]:
+            """Return active composition-scope events in deterministic order."""
+            ordered_keys = [
+                'tempo',
+                'time_signature',
+                'key_signature',
+                'pan',
+                'articulation',
+                'dynamic_level',
+                'dynamic_transition',
+            ]
+            return [composition_scope[key] for key in ordered_keys if composition_scope[key] is not None]
         
         for item in items:
-            if isinstance(item, (Tempo, TimeSignature, KeySignature)):
-                directives.append(item)
-                # Time signatures should be inserted into instrument voices
-                if isinstance(item, TimeSignature):
-                    pending_directives.append(item)
+            # Check if this is a composition-level event
+            if hasattr(item, 'scope') and item.scope == 'composition':
+                # Update active composition scope
+                if isinstance(item, Tempo):
+                    composition_scope['tempo'] = item
+                elif isinstance(item, TimeSignature):
+                    composition_scope['time_signature'] = item
+                elif isinstance(item, KeySignature):
+                    composition_scope['key_signature'] = item
+                elif isinstance(item, Pan):
+                    composition_scope['pan'] = item
+                elif isinstance(item, Articulation):
+                    composition_scope['articulation'] = item
+                elif isinstance(item, DynamicLevel):
+                    composition_scope['dynamic_level'] = item
+                elif isinstance(item, DynamicTransition):
+                    composition_scope['dynamic_transition'] = item
                 continue
-            inst = item
             
-            # Inject pending directives into this instrument's voices
-            if pending_directives:
-                updated_voices = {}
+            # This is an instrument
+            inst = item
+
+            # Capture composition defaults from scope at first instrument only
+            if not first_instrument_seen:
+                if composition_scope['tempo'] is not None:
+                    composition_defaults['tempo'] = composition_scope['tempo'].bpm
+                if composition_scope['time_signature'] is not None:
+                    composition_defaults['time_signature'] = composition_scope['time_signature']
+                if composition_scope['key_signature'] is not None:
+                    composition_defaults['key_signature'] = composition_scope['key_signature']
+                if composition_scope['pan'] is not None:
+                    composition_defaults['pan'] = composition_scope['pan'].position
+                if composition_scope['articulation'] is not None:
+                    composition_defaults['articulation'] = composition_scope['articulation'].type
+                if composition_scope['dynamic_level'] is not None:
+                    composition_defaults['dynamic_level'] = composition_scope['dynamic_level'].level
+                if composition_scope['dynamic_transition'] is not None:
+                    composition_defaults['dynamic_transition'] = composition_scope['dynamic_transition']
+                first_instrument_seen = True
+
+            # Inject active composition-scope events into each voice so interleaved
+            # top-level directives/dynamics/articulations affect subsequent blocks.
+            active_scope_events = _scope_events()
+            if active_scope_events and inst.voices:
+                injected_voices = {}
                 for voice_num, voice_events in inst.voices.items():
-                    updated_voices[voice_num] = pending_directives + voice_events
+                    injected_voices[voice_num] = active_scope_events + voice_events
                 inst = Instrument(
                     name=inst.name,
                     events=inst.events,
-                    voices=updated_voices
+                    voices=injected_voices,
+                    defaults_sequence=inst.defaults_sequence,
                 )
-                # Don't clear - time signatures apply to all following instruments
             
             if inst.name in instruments:
                 # Merge: concatenate events to existing instrument
@@ -124,36 +201,149 @@ class MuslangTransformer(Transformer):
                         merged_voices[voice_num] = merged_voices[voice_num] + voice_events
                     else:
                         merged_voices[voice_num] = voice_events
+                # Merge defaults_sequence
+                merged_defaults_seq = existing.defaults_sequence + inst.defaults_sequence
                 instruments[inst.name] = Instrument(
                     name=inst.name,
                     events=merged_events,
-                    voices=merged_voices
+                    voices=merged_voices,
+                    defaults_sequence=merged_defaults_seq
                 )
             else:
                 instruments[inst.name] = inst
         
-        return Sequence(instruments=instruments, events=directives)
+        return Sequence(
+            instruments=instruments,
+            events=[],  # No longer used for directives
+            composition_defaults=composition_defaults
+        )
+    
+    def instrument_event(self, items):
+        """
+        Transform instrument-level event (directive, articulation, or dynamic).
+        
+        Grammar: instrument_event: (directive | articulation | dynamic_level | dynamic_transition | dynamic_accent) ";"
+        
+        Args:
+            items: [directive/articulation/dynamic node] (semicolon consumed by grammar)
+            
+        Returns:
+            The event node with scope='instrument'
+        """
+        event = items[0]
+        # Tag with instrument scope
+        if hasattr(event, 'scope'):
+            event.scope = 'instrument'
+        return event
+    
+    def instrument_body(self, items) -> dict:
+        """
+        Transform instrument body containing instrument events and voice content.
+        
+        Grammar: instrument_body: (instrument_event | voice_content)+
+        
+        Instrument events apply sequentially to voices that follow them.
+        
+        Args:
+            items: List of instrument_events and voice_content dicts (interleaved)
+            
+        Returns:
+            Dict with 'voices', 'defaults_sequence' keys
+        """
+        # Process items sequentially - track current defaults
+        voices = {}
+        defaults_sequence = []
+        current_defaults = {}
+        current_scope_events = {
+            'tempo': None,
+            'time_signature': None,
+            'key_signature': None,
+            'pan': None,
+            'articulation': None,
+            'dynamic_level': None,
+            'dynamic_transition': None,
+            'dynamic_accent': None,
+        }
+
+        def _scope_events() -> List[Any]:
+            ordered_keys = [
+                'tempo',
+                'time_signature',
+                'key_signature',
+                'pan',
+                'articulation',
+                'dynamic_level',
+                'dynamic_transition',
+                'dynamic_accent',
+            ]
+            return [current_scope_events[key] for key in ordered_keys if current_scope_events[key] is not None]
+        
+        for item in items:
+            if hasattr(item, 'scope') and item.scope == 'instrument':
+                # Update current defaults with this event
+                if isinstance(item, Tempo):
+                    current_defaults['tempo'] = item.bpm
+                    current_scope_events['tempo'] = item
+                elif isinstance(item, TimeSignature):
+                    current_defaults['time_signature'] = item
+                    current_scope_events['time_signature'] = item
+                elif isinstance(item, KeySignature):
+                    current_defaults['key_signature'] = item
+                    current_scope_events['key_signature'] = item
+                elif isinstance(item, Pan):
+                    current_defaults['pan'] = item.position
+                    current_scope_events['pan'] = item
+                elif isinstance(item, Articulation):
+                    current_defaults['articulation'] = item.type
+                    current_scope_events['articulation'] = item
+                elif isinstance(item, DynamicLevel):
+                    current_defaults['dynamic_level'] = item.level
+                    current_scope_events['dynamic_level'] = item
+                elif isinstance(item, DynamicTransition):
+                    current_defaults['dynamic_transition'] = item
+                    current_scope_events['dynamic_transition'] = item
+                elif isinstance(item, DynamicAccent):
+                    current_defaults['dynamic_accent'] = item
+                    current_scope_events['dynamic_accent'] = item
+                    
+            elif isinstance(item, dict):
+                # Voice content - apply current defaults
+                voice_num = list(item.keys())[0]
+                voice_events = item[voice_num]
+                segment_events = _scope_events() + voice_events
+                
+                # Associate this voice with current defaults
+                defaults_sequence.append((voice_num, current_defaults.copy()))
+                if voice_num in voices:
+                    voices[voice_num] = voices[voice_num] + segment_events
+                else:
+                    voices[voice_num] = segment_events
+        
+        return {
+            'voices': voices,
+            'defaults_sequence': defaults_sequence
+        }
     
     def instrument(self, items) -> Instrument:
         """
         Transform instrument declaration.
         
-        Grammar: instrument: INSTRUMENT_NAME ":" voice_content+
+        Grammar: instrument: INSTRUMENT_NAME "{" instrument_body "}"
         
         Args:
-            items: [Token(INSTRUMENT_NAME), voice_content_dict, ...]
+            items: [Token(INSTRUMENT_NAME), instrument_body_dict]
             
         Returns:
-            Instrument node with name and voices populated
+            Instrument node with name, voices, and defaults_sequence populated
         """
         name_token = items[0]
         instrument_name = str(name_token)
         
-        # Merge all voice_content dicts
-        voices = {}
-        for voice_dict in items[1:]:
-            if isinstance(voice_dict, dict):
-                voices.update(voice_dict)
+        # Extract instrument_body dict
+        body_dict = items[1] if len(items) > 1 else {'voices': {}, 'defaults_sequence': []}
+        
+        voices = body_dict.get('voices', {})
+        defaults_sequence = body_dict.get('defaults_sequence', [])
         
         # Reset state for each instrument
         self.current_duration = DEFAULT_NOTE_DURATION
@@ -168,8 +358,9 @@ class MuslangTransformer(Transformer):
         
         return Instrument(
             name=instrument_name,
-            events=[],  # No instrument-level events, all in voices
+            events=[],  # No longer used
             voices=voices,
+            defaults_sequence=defaults_sequence
         )
     
     def voice_content(self, items) -> dict:
@@ -493,19 +684,13 @@ class MuslangTransformer(Transformer):
         articulation_type = str(items[0])
         return Articulation(type=articulation_type, persistent=True)
     
-    def reset(self, items) -> Reset:
-        """
-        Transform reset directive.
-        
-        Grammar: reset: ":reset"
-        
-        Args:
-            items: []
-            
-        Returns:
-            Reset node
-        """
-        return Reset(type='full')
+    def reset_articulation(self, items) -> Reset:
+        """Transform :reset directive."""
+        return Reset(type='articulation')
+
+    def reset_dynamic(self, items) -> Reset:
+        """Transform @reset directive."""
+        return Reset(type='dynamic')
     
     def ornament(self, items) -> Ornament:
         """

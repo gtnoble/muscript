@@ -56,7 +56,7 @@ piano {
   V1: %trill c4/2      # Trill on C4
       %mordent d4/4    # Mordent on D4
       %turn e4/4       # Turn on E4
-      %tremolo g4/1    # Tremolo on G4
+  %tremolo g4/1;   # Tremolo on G4
 }
 ```
 
@@ -84,9 +84,9 @@ The alternation happens at **32nd note** speed (8 notes per quarter note).
 
 ```muslang
 # Simple trill
+(key c 'major);
 piano {
-  (key c 'major)
-  V1: %trill c4/2
+  V1: %trill c4/2;
 }
 ```
 
@@ -99,10 +99,10 @@ c4/32 d4/32 c4/32 d4/32 c4/32 d4/32 c4/32 d4/32  # (continues for half note dura
 
 ```muslang
 # Trill in a melody
+(key g 'major);
+(tempo! 120);
 piano {
-  (key g 'major) (tempo! 120)
-  V1: g4/4 a4/4 %trill b4/2 |
-      a4/4 g4/4 f4+/4 e4/4 |
+  V1: g4/4 a4/4 %trill b4/2 | a4/4 g4/4 f4+/4 e4/4;
 }
 ```
 
@@ -138,9 +138,9 @@ The first two notes are 32nd notes, the last gets the remaining duration.
 
 ```muslang
 # Simple mordent
+(key c 'major);
 piano {
-  (key c 'major)
-  V1: %mordent c4/4
+  V1: %mordent c4/4;
 }
 ```
 
@@ -155,10 +155,10 @@ c4/4   # Main note (minus time stolen by first two)
 
 ```muslang
 # Mordents in Bach-style melody
+(key d 'major);
+(tempo! 100);
 piano {
-  (key d 'major) (tempo! 100)
-  V1: @mf d4/4 %mordent e4/4 f4+/4 %mordent g4/4 |
-      a4/2 %mordent d5/2 |
+  V1: @mf d4/4 %mordent e4/4 f4+/4 %mordent g4/4 | a4/2 %mordent d5/2;
 }
 ```
 
@@ -192,9 +192,9 @@ All four notes are equal duration, fitting into the main note's time.
 
 ```muslang
 # Simple turn
+(key c 'major);
 piano {
-  (key c 'major)
-  V1: %turn c4/4
+  V1: %turn c4/4;
 }
 ```
 
@@ -210,11 +210,11 @@ c4/16   # Main note (C)
 
 ```muslang
 # Classical-style melody with turns
+(key f 'major);
+(tempo! 90);
 piano {
-  (key f 'major) (tempo! 90)
   V1: :legato @mp
-      f4/4 g4/4 %turn a4/2 |
-      b4-/4 a4/4 g4/4 %turn f4/2 |
+  f4/4 g4/4 %turn a4/2 | b4-/4 a4/4 g4/4 %turn f4/2;
 }
 ```
 

@@ -7,29 +7,30 @@
 
 # Section 1: Basic Rock Beat
 # Classic kick on 1 and 3, snare on 2 and 4, hi-hat eighths
-(tempo! 120) (time 4 4)
+(tempo! 120);
+(time 4 4);
 drums {
-  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 | kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 | kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 | kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 | 
-  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 | r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 | r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 | r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 | 
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | 
+  V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 | kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 | kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 | kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8;
+  V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 | r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 | r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 | r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 
 # Section 2: Four-on-the-Floor (Disco/House)
 drums {
-  V1: kick/4 kick/4 kick/4 kick/4 | kick/4 kick/4 kick/4 kick/4 | kick/4 kick/4 kick/4 kick/4 | kick/4 kick/4 kick/4 kick/4 | 
-  V2: r/4 snare/4 r/4 snare/4 | r/4 snare/4 r/4 snare/4 | r/4 snare/4 r/4 snare/4 | r/4 snare/4 r/4 snare/4 | 
-  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | 
+  V1: kick/4 kick/4 kick/4 kick/4 | kick/4 kick/4 kick/4 kick/4 | kick/4 kick/4 kick/4 kick/4 | kick/4 kick/4 kick/4 kick/4;
+  V2: r/4 snare/4 r/4 snare/4 | r/4 snare/4 r/4 snare/4 | r/4 snare/4 r/4 snare/4 | r/4 snare/4 r/4 snare/4;
+  V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 
 # Section 3: Funk Pattern with Ghost Notes
 drums {
-  V1: kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 | kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 | 
-  V2: @mf r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16 | r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16 | 
-  V3: :staccato hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16  |
+  V1: kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 | kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16;
+  V2: @mf r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16 | r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16;
+  V3: :staccato hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 ;
 }
 
 # Section 4: Drum Fill with Toms
 drums {
-  V1: @f tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8 |
-  V1: @ff crash/2 kick/4 snare/4 |
+  V1: @f tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8;
+  V1: @ff crash/2 kick/4 snare/4;
 }

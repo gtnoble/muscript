@@ -46,9 +46,41 @@ class DynamicState:
 class ArticulationMapper:
     """Maps articulations and dynamics to MIDI parameters"""
     
-    def __init__(self):
-        self.artic_state = ArticulationState()
-        self.dynamic_state = DynamicState()
+    def __init__(self, initial_articulation: str = 'natural', initial_dynamic_level: str = 'mf'):
+        """
+        Initialize with optional inherited state from parent scopes.
+        
+        Args:
+            initial_articulation: Inherited articulation (natural, staccato, legato, tenuto, marcato)
+            initial_dynamic_level: Inherited dynamic level (pp, p, mp, mf, f, ff)
+        """
+        # Initialize articulation state with inherited value
+        duration_map = {
+            'natural': NATURAL_DURATION_PERCENT,
+            'staccato': STACCATO_DURATION,
+            'legato': LEGATO_DURATION,
+            'tenuto': TENUTO_DURATION,
+            'marcato': MARCATO_DURATION,
+        }
+        self.artic_state = ArticulationState(
+            type=initial_articulation,
+            duration_percent=duration_map.get(initial_articulation, NATURAL_DURATION_PERCENT)
+        )
+        
+        # Initialize dynamic state with inherited value
+        velocity_map = {
+            'pp': VELOCITY_PP,
+            'p': VELOCITY_P,
+            'mp': VELOCITY_MP,
+            'mf': VELOCITY_MF,
+            'f': VELOCITY_F,
+            'ff': VELOCITY_FF,
+        }
+        initial_velocity = velocity_map.get(initial_dynamic_level, VELOCITY_MF)
+        self.dynamic_state = DynamicState(
+            level=initial_dynamic_level,
+            velocity=initial_velocity
+        )
     
     def process_articulation(self, artic_type: str):
         """Update articulation state"""
@@ -65,15 +97,27 @@ class ArticulationMapper:
             self.artic_state.type = 'marcato'
             self.artic_state.duration_percent = MARCATO_DURATION
     
-    def process_reset(self, reset_type: str = 'natural'):
-        """Reset articulation and/or dynamics"""
-        if reset_type == 'natural':
+    def process_reset(self, reset_type: str = 'articulation'):
+        """Reset articulation and/or dynamics.
+        
+        Note: This method is likely unused in practice since semantic analysis
+        pre-resolves all articulation and velocity values into Note objects
+        before MIDI generation. Kept for backward compatibility.
+        
+        Args:
+            reset_type: 'articulation' to reset articulation only,
+                       'dynamic' to reset dynamics only
+        """
+        if reset_type == 'articulation':
             # Reset articulation only
             self.artic_state = ArticulationState()
-        elif reset_type == 'full':
-            # Reset both
-            self.artic_state = ArticulationState()
+        elif reset_type == 'dynamic':
+            # Reset dynamics only
             self.dynamic_state = DynamicState()
+            # Clear any active transition
+            self.transition_active = None
+            self.transition_start_velocity = None
+            self.transition_target_velocity = None
     
     def process_dynamic_level(self, level: str):
         """Update dynamic level"""

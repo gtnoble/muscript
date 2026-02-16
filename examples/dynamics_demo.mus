@@ -1,6 +1,6 @@
 # Dynamic markings and transitions
 # Uses @ prefix for dynamics
-(tempo! 120)
+(tempo! 120);
 
 piano {
   V1: # Piano to forte
@@ -13,5 +13,5 @@ piano {
   @f @diminuendo c5/4 b4/4 a4/4 g4/4 | f4/4 e4/4 d4/4 @p c4/4 |
   
   # Sforzando accents
-  @sforzando c4/4 @sforzando e4/4 @sforzando g4/4 @sforzando c5/4 |
+  @sforzando c4/4 @sforzando e4/4 @sforzando g4/4 @sforzando c5/4;
 }

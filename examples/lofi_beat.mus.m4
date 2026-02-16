@@ -3,6 +3,7 @@
 # Generate: m4 examples/lofi_beat.mus.m4 > examples/lofi_beat.mus
 
 define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')dnl
+define(`REPEAT_MEASURE', `ifelse($1, `0', `', `ifelse($1, `1', `$2', `$2 | REPEAT_MEASURE(decr($1), `$2')')')')dnl
 
 # ==============================
 # Electric Piano/Rhodes Chords (lush, jazzy)
@@ -70,78 +71,87 @@ define(`MELODY_D', `c5/4. r/16 d5/8 e5/8 g5/2 r/4')dnl
 # ==============================
 # Intro Section (4 bars)
 # ==============================
-(tempo! 70) (time 4 4) (key c 'major)
+(tempo! 70);
+(time 4 4);
+(key c 'major);
 electric_piano_1 {
-  V1: @mp :legato CHORD_A1 | CHORD_A2 | CHORD_B1 | CHORD_B2 |
+  V1: @mp :legato CHORD_A1 | CHORD_A2 | CHORD_B1 | CHORD_B2;
 }
 
 # ==============================
 # Piano Lead - 52 bars
 # Intro 4 + A 16 + B 16 + C 8 + Outro 8
 # ==============================
-(tempo! 70) (time 4 4) (key c 'major)
+(tempo! 70);
+(time 4 4);
+(key c 'major);
 electric_piano_2 {
-  V1: @mp :legato REPEAT(4, `CHORD_A1 | CHORD_A2 | CHORD_B1 | CHORD_B2 | ')
+  V1: @mp :legato REPEAT_MEASURE(4, `CHORD_A1 | CHORD_A2 | CHORD_B1 | CHORD_B2');
   
-  V1: @mf REPEAT(4, `CHORD_C1 | CHORD_C2 | CHORD_D1 | CHORD_D2 | ')
+  V1: @mf REPEAT_MEASURE(4, `CHORD_C1 | CHORD_C2 | CHORD_D1 | CHORD_D2');
   
-  V1: @mp CHORD_E1 | CHORD_E2 | CHORD_F1 | CHORD_F2 |
-  V1: @mf CHORD_E1 | CHORD_E2 | CHORD_F1 | CHORD_F2 |
+  V1: @mp CHORD_E1 | CHORD_E2 | CHORD_F1 | CHORD_F2;
+  V1: @mf CHORD_E1 | CHORD_E2 | CHORD_F1 | CHORD_F2;
   
-  V1: @diminuendo REPEAT(2, `CHORD_A1 | CHORD_A2 | CHORD_B1 | CHORD_B2 | ')
+  V1: @diminuendo REPEAT_MEASURE(2, `CHORD_A1 | CHORD_A2 | CHORD_B1 | CHORD_B2');
 }
 
 # ==============================
 # Bass
 # ==============================
-(tempo! 70) (time 4 4) (key c 'major)
+(tempo! 70);
+(time 4 4);
+(key c 'major);
 bass {
-  V1: @mp r/1 | r/1 |
+  V1: @mp r/1 | r/1;
   
-  V1: @mp REPEAT(4, `BASS_C | BASS_D | BASS_E | BASS_F | ')
+  V1: @mp REPEAT_MEASURE(4, `BASS_C | BASS_D | BASS_E | BASS_F');
   
-  V1: @mf REPEAT(4, `BASS_G | BASS_A | BASS_D | BASS_G | ')
+  V1: @mf REPEAT_MEASURE(4, `BASS_G | BASS_A | BASS_D | BASS_G');
   
-  V1: @mp BASS_E | BASS_GS | BASS_D | BASS_GL |
-  V1: @mf BASS_E | BASS_GS | BASS_D | BASS_GL |
+  V1: @mp BASS_E | BASS_GS | BASS_D | BASS_GL;
+  V1: @mf BASS_E | BASS_GS | BASS_D | BASS_GL;
   
-  V1: @diminuendo REPEAT(2, `BASS_C | BASS_D | BASS_E | BASS_F | ')
+  V1: @diminuendo REPEAT_MEASURE(2, `BASS_C | BASS_D | BASS_E | BASS_F');
 }
 
 # ==============================
 # Drums
 # ==============================
-(tempo! 70) (time 4 4)
+(tempo! 70);
+(time 4 4);
 drums {
-  V1: @mp r/1 | r/1 | r/2 KICK_A | KICK_A |
-  V2: @p r/1 | r/1 | r/2 SNARE_A | SNARE_A |
-  V3: r/1 | r/1 | r/2 HAT_A | HAT_A |
+  V1: @mp r/1 | r/1 | r/2 kick/8 r/8 kick/8 r/8 | KICK_A;
+  V2: @p r/1 | r/1 | r/2 r/4 snare/8 r/8 | SNARE_A;
+  V3: r/1 | r/1 | r/2 hat/16 r/16 hat/16 r/16 hat/16 r/16 hat/16 r/16 | HAT_A;
   
-  V1: @mp REPEAT(2, `KICK_A | KICK_A | KICK_B | KICK_A | ') REPEAT(2, `KICK_B | KICK_A | KICK_C | KICK_A | ')
-  V2: REPEAT(16, `SNARE_A | ')
-  V3: REPEAT(8, `HAT_A | ') REPEAT(8, `HAT_B | ')
+  V1: @mp REPEAT_MEASURE(2, `KICK_A | KICK_A | KICK_B | KICK_A') | REPEAT_MEASURE(2, `KICK_B | KICK_A | KICK_C | KICK_A');
+  V2: REPEAT_MEASURE(16, `SNARE_A');
+  V3: REPEAT_MEASURE(8, `HAT_A') | REPEAT_MEASURE(8, `HAT_B');
   
-  V1: @mf REPEAT(4, `KICK_B | KICK_A | KICK_B | KICK_A | ')
-  V2: REPEAT(4, `SNARE_A | SNARE_A | SNARE_B | SNARE_A | ')
-  V3: REPEAT(8, `HAT_B | ') REPEAT(8, `HAT_O | ')
+  V1: @mf REPEAT_MEASURE(4, `KICK_B | KICK_A | KICK_B | KICK_A');
+  V2: REPEAT_MEASURE(4, `SNARE_A | SNARE_A | SNARE_B | SNARE_A');
+  V3: REPEAT_MEASURE(8, `HAT_B') | REPEAT_MEASURE(8, `HAT_O');
   
-  V1: @mp REPEAT(2, `KICK_C | KICK_B | KICK_C | KICK_B | ')
-  V2: REPEAT(8, `SNARE_A | ')
-  V3: REPEAT(8, `HAT_B | ')
+  V1: @mp REPEAT_MEASURE(2, `KICK_C | KICK_B | KICK_C | KICK_B');
+  V2: REPEAT_MEASURE(8, `SNARE_A');
+  V3: REPEAT_MEASURE(8, `HAT_B');
   
-  V1: REPEAT(2, `KICK_A | KICK_A | KICK_A | KICK_A | ')
-  V1: @diminuendo KICK_A | KICK_A | KICK_C | FILL_END |
-  V2: REPEAT(6, `SNARE_A | ') r/2 r/4 snare/8 hat/16 kick/16 r/8 r/2 r/4 snare/8 hat/16 kick/16 r/8 |
-  V2: @diminuendo SNARE_A | SNARE_A | r/1 |
-  V3: REPEAT(8, `HAT_A | ')
+  V1: REPEAT_MEASURE(2, `KICK_A | KICK_A | KICK_A | KICK_A');
+  V1: @diminuendo KICK_A | KICK_A | KICK_C | FILL_END;
+  V2: REPEAT_MEASURE(6, `SNARE_A') | r/2 r/4 snare/8 hat/16 kick/16 | r/2 r/4 snare/8 hat/16 kick/16;
+  V2: @diminuendo SNARE_A | SNARE_A | r/1;
+  V3: REPEAT_MEASURE(8, `HAT_A');
 }
 
 # ==============================
 # Melody - Soft, spacey synth lead
 # ==============================
-(tempo! 70) (time 4 4) (key c 'major)
+(tempo! 70);
+(time 4 4);
+(key c 'major);
 lead_1_square {
-  V1: @p REPEAT(24, `r/1 | ')
-  V1: @mp REPEAT(8, `c5/8 r/8 d5/8 r/8 e5/8 r/8 g5/8 r/8 | ')
-  V1: @diminuendo REPEAT(20, `r/1 | ')
+  V1: @p REPEAT_MEASURE(24, `r/1');
+  V1: @mp REPEAT_MEASURE(8, `c5/8 r/8 d5/8 r/8 e5/8 r/8 g5/8 r/8');
+  V1: @diminuendo REPEAT_MEASURE(20, `r/1');
 }

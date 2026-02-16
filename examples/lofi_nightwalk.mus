@@ -6,25 +6,32 @@
 
 
 
-(tempo! 84) (time 4 4) (key f 'minor)
+(tempo! 84);
+(time 4 4);
+(key f 'minor);
 electric_piano_1 {
-  V1: @mp :legato f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | 
-  V1: @mf e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | 
+  V1: @mp :legato f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2;
+  V1: @mf e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2 | e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2 | f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2;
 }
 
-(tempo! 84) (time 4 4) (key f 'minor)
+(tempo! 84);
+(time 4 4);
+(key f 'minor);
 bass {
-  V1: @mp f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2 | f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2 | f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2 | f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2 | 
+  V1: @mp f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2 | f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2 | f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2 | f1/2 c2/2 | g1/2 d2/2 | e1-/2 b1-/2 | a1-/2 e2-/2;
 }
 
-(tempo! 84) (time 4 4)
+(tempo! 84);
+(time 4 4);
 drums {
-  V1: @mp kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 |  kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | 
-  V2: @mp r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | 
-  V3: @p hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | 
+  V1: @mp kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 r/8 kick/8 r/8 kick/8 r/8 r/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8 | kick/8 r/8 kick/8 r/8 r/8 kick/8 r/8 kick/8;
+  V2: @mp r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8 | r/4 snare/8 r/8 r/4 snare/8 r/8;
+  V3: @p hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 | hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8;
 }
 
-(tempo! 84) (time 4 4) (key f 'minor)
+(tempo! 84);
+(time 4 4);
+(key f 'minor);
 lead_1_square {
-  V1: @p :legato r/1 | r/1 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8 | r/1 | a4-/4 g4/8 f4/8 e4-/4 r/4 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8 | r/1 | r/1 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8 | r/1 | a4-/4 g4/8 f4/8 e4-/4 r/4 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8 | 
+  V1: @p :legato r/1 | r/1 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8 | r/1 | a4-/4 g4/8 f4/8 e4-/4 r/4 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8 | r/1 | r/1 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8 | r/1 | a4-/4 g4/8 f4/8 e4-/4 r/4 | r/2 c5/8 e5-/8 g5/8 e5-/8 | r/2 b4-/8 d5/8 f5/8 d5/8;
 }

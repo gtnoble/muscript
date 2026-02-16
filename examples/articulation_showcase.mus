@@ -1,6 +1,6 @@
 # Showcase all articulation types
 # Uses : prefix for articulations
-(tempo! 100)
+(tempo! 100);
 
 piano {
   V1: # Natural (default)
@@ -19,5 +19,5 @@ piano {
   :tenuto c4/4 e4/4 g4/4 c5/4 |
   
   # Slides (chromatic)
-  <c4/4 c5/4> <c6/4 c7/4> |
+  <c4/4 c5/4> <c6/4 c7/4>;
 }
