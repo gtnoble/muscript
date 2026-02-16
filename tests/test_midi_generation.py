@@ -340,6 +340,11 @@ class TestArticulationMapping:
         staccato_ast = Sequence(instruments={'piano': Instrument(name='piano', events=[], voices={1: staccato_events})})
         legato_ast = Sequence(instruments={'piano': Instrument(name='piano', events=[], voices={1: legato_events})})
 
+        # Run semantic analysis to apply articulation to notes
+        analyzer = SemanticAnalyzer()
+        staccato_ast = analyzer.analyze(staccato_ast)
+        legato_ast = analyzer.analyze(legato_ast)
+
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f1, \
              tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f2:
@@ -410,6 +415,10 @@ class TestArticulationMapping:
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
+        
+        # Run semantic analysis to apply dynamics to notes
+        analyzer = SemanticAnalyzer()
+        ast = analyzer.analyze(ast)
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:

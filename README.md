@@ -250,8 +250,7 @@ muslang/
 │   ├── ast_nodes.py   # AST node definitions
 │   ├── grammar.lark   # Lark grammar
 │   ├── parser.py      # Parser & transformer
-│   ├── semantics.py   # Semantic analysis
-│   ├── articulations.py  # Articulation mapping
+│   ├── semantics.py   # Semantic analysis (includes state tracking)
 │   ├── midi_gen.py    # MIDI generation
 │   ├── cli.py         # Command-line interface
 │   └── config.py      # Configuration & constants

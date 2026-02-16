@@ -11,7 +11,6 @@ Generates MIDI files from analyzed AST. Handles:
 
 from midiutil import MIDIFile
 from muslang.ast_nodes import *
-from muslang.articulations import ArticulationMapper
 from muslang.drums import get_drum_midi_note, is_percussion_instrument
 from muslang.config import *
 from typing import Dict, List, Tuple, Optional
@@ -291,40 +290,20 @@ class MIDIGenerator:
 
             self.instrument_channels[instrument.name] = first_channel
         
-        # Build mapping of voice_num to instrument-level defaults
-        voice_defaults_map = {}
-        for voice_num, inst_defaults in instrument.defaults_sequence:
-            if voice_num not in voice_defaults_map:
-                voice_defaults_map[voice_num] = inst_defaults
-        
         if not instrument.voices:
             raise ValueError(
                 f"Instrument '{instrument.name}' must contain at least one explicit voice"
             )
         
         # Process voices (each voice starts at time 0, plays simultaneously)
-        # Each voice gets its own mapper initialized with inherited state
         for voice_num, voice_events in instrument.voices.items():
             channel = voice_channel_map[voice_num]
-            # Get inherited defaults for this voice
-            composition_artic = self.composition_defaults.get('articulation', 'natural')
-            composition_dynamic = self.composition_defaults.get('dynamic_level', 'mf')
-            
-            instrument_defaults = voice_defaults_map.get(voice_num, {})
-            voice_artic = instrument_defaults.get('articulation', composition_artic)
-            voice_dynamic = instrument_defaults.get('dynamic_level', composition_dynamic)
-            
-            # Create mapper with inherited state for this voice
-            mapper = ArticulationMapper(
-                initial_articulation=voice_artic,
-                initial_dynamic_level=voice_dynamic
-            )
             
             # Each voice starts at time 0 (simultaneous playback)
             time_ticks = 0
             for event in voice_events:
                 time_ticks = self._process_event(
-                    track_num, channel, event, time_ticks, mapper
+                    track_num, channel, event, time_ticks
                 )
     
     def _process_event(
@@ -332,8 +311,7 @@ class MIDIGenerator:
         track: int, 
         channel: int, 
         event: ASTNode, 
-        time_ticks: int, 
-        mapper: ArticulationMapper
+        time_ticks: int
     ) -> int:
         """
         Process a single event and return new time in ticks.
@@ -343,14 +321,13 @@ class MIDIGenerator:
             channel: MIDI channel number
             event: AST event node
             time_ticks: Current time in MIDI ticks
-            mapper: Articulation/dynamic state tracker
         
         Returns:
             New time in ticks after processing event
         """
         
         if isinstance(event, Note):
-            return self._generate_note(track, channel, event, time_ticks, mapper)
+            return self._generate_note(track, channel, event, time_ticks)
         
         elif isinstance(event, Rest):
             # Advance time without generating note
@@ -364,7 +341,7 @@ class MIDIGenerator:
             # Generate all notes at same time
             max_duration = 0
             for note in event.notes:
-                self._generate_note(track, channel, note, time_ticks, mapper)
+                self._generate_note(track, channel, note, time_ticks)
                 duration_ticks = self._duration_to_ticks(
                     note.duration or DEFAULT_NOTE_DURATION, 
                     note.dotted
@@ -373,26 +350,23 @@ class MIDIGenerator:
             return time_ticks + max_duration
         
         elif isinstance(event, Articulation):
-            mapper.process_articulation(event.type)
+            # Articulation state already applied to notes during semantic analysis
             return time_ticks
         
         elif isinstance(event, DynamicLevel):
-            mapper.process_dynamic_level(event.level)
+            # Dynamic level already applied to notes during semantic analysis
             return time_ticks
         
         elif isinstance(event, DynamicTransition):
-            mapper.process_dynamic_transition(event.type)
+            # Dynamic transitions already applied to notes during semantic analysis
             return time_ticks
         
         elif isinstance(event, DynamicAccent):
-            # Accents are handled per-note, just track for next note
+            # Accents already applied to notes during semantic analysis
             return time_ticks
         
         elif isinstance(event, Reset):
-            # Note: This is likely unused since semantic analysis pre-resolves
-            # all articulation and velocity values into Note objects before
-            # MIDI generation. Kept for consistency.
-            mapper.process_reset(event.type)
+            # Reset already handled during semantic analysis
             return time_ticks
         
         elif isinstance(event, Tempo):
@@ -422,14 +396,14 @@ class MIDIGenerator:
             return time_ticks
         
         elif isinstance(event, Slide):
-            return self._generate_slide(track, channel, event, time_ticks, mapper)
+            return self._generate_slide(track, channel, event, time_ticks)
         
         elif isinstance(event, Measure):
             # Process all events in measure sequentially
             current_time = time_ticks
             for measure_event in event.events:
                 current_time = self._process_event(
-                    track, channel, measure_event, current_time, mapper
+                    track, channel, measure_event, current_time
                 )
             return current_time
         
@@ -439,7 +413,8 @@ class MIDIGenerator:
                 event.duration or DEFAULT_NOTE_DURATION, 
                 event.dotted
             )
-            velocity = mapper.get_note_velocity()
+            # Use pre-computed velocity from semantic analysis
+            velocity = event.velocity if event.velocity is not None else DEFAULT_VELOCITY
             
             time_beats = time_ticks / self.ppq
             duration_beats = duration_ticks / self.ppq
@@ -459,7 +434,7 @@ class MIDIGenerator:
             # Process nested sequences
             for sub_event in event.events:
                 time_ticks = self._process_event(
-                    track, channel, sub_event, time_ticks, mapper
+                    track, channel, sub_event, time_ticks
                 )
             return time_ticks
 
@@ -478,8 +453,7 @@ class MIDIGenerator:
         track: int, 
         channel: int, 
         note: Note, 
-        time_ticks: int, 
-        mapper: ArticulationMapper,
+        time_ticks: int,
         overlap: bool = False,
         accent: Optional[str] = None
     ) -> int:
@@ -491,7 +465,6 @@ class MIDIGenerator:
             channel: MIDI channel number
             note: Note AST node
             time_ticks: Current time in MIDI ticks
-            mapper: Articulation/dynamic state tracker
             overlap: Whether to overlap note with next (for legato)
             accent: Optional accent type (sforzando, forte-piano)
         
@@ -501,15 +474,26 @@ class MIDIGenerator:
         # Calculate MIDI note number
         midi_note = self._note_to_midi(note)
         
-        # Calculate duration
+        # Calculate duration based on articulation (already computed in semantic analysis)
         base_duration_ticks = self._duration_to_ticks(
             note.duration or DEFAULT_NOTE_DURATION, 
             note.dotted
         )
-        actual_duration_ticks = mapper.get_note_duration(base_duration_ticks)
         
-        # Calculate velocity
-        velocity = mapper.get_note_velocity(accent)
+        # Apply articulation duration modifier
+        articulation = note.articulation or 'natural'
+        duration_map = {
+            'staccato': STACCATO_DURATION,
+            'legato': LEGATO_DURATION,
+            'tenuto': TENUTO_DURATION,
+            'marcato': MARCATO_DURATION,
+            'natural': NATURAL_DURATION_PERCENT
+        }
+        duration_percent = duration_map.get(articulation, NATURAL_DURATION_PERCENT)
+        actual_duration_ticks = int(base_duration_ticks * duration_percent / 100)
+        
+        # Use pre-computed velocity from semantic analysis
+        velocity = note.velocity if note.velocity is not None else DEFAULT_VELOCITY
         
         # Convert to beats for MIDI
         time_beats = time_ticks / self.ppq
@@ -522,7 +506,7 @@ class MIDIGenerator:
         )
         
         # Add legato CC if needed
-        if mapper.should_add_legato_cc():
+        if articulation == 'legato':
             self.midi.addControllerEvent(track, channel, time_beats, CC_LEGATO, 127)
         
         # Advance time
@@ -538,8 +522,7 @@ class MIDIGenerator:
         track: int, 
         channel: int, 
         slide: Slide, 
-        time_ticks: int, 
-        mapper: ArticulationMapper
+        time_ticks: int
     ) -> int:
         """
         Generate pitch bend events for slide/glissando.
@@ -549,7 +532,6 @@ class MIDIGenerator:
             channel: MIDI channel number
             slide: Slide AST node
             time_ticks: Current time in MIDI ticks
-            mapper: Articulation/dynamic state tracker
         
         Returns:
             New time in ticks after slide
@@ -565,7 +547,8 @@ class MIDIGenerator:
             slide.to_note.duration or DEFAULT_NOTE_DURATION,
             slide.to_note.dotted
         )
-        velocity = mapper.get_note_velocity()
+        # Use pre-computed velocity from semantic analysis
+        velocity = slide.from_note.velocity if slide.from_note.velocity is not None else DEFAULT_VELOCITY
         
         if slide.style == 'chromatic':
             # Generate pitch bend events

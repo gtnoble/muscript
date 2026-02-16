@@ -626,7 +626,8 @@ class TestSlideIntegration:
                 }
         """
         ast = parse_muslang(source)
-        analyzed_ast = ast
+        analyzer = SemanticAnalyzer()
+        analyzed_ast = analyzer.analyze(ast)
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
@@ -655,7 +656,8 @@ class TestSlideIntegration:
                 }
         """
         ast = parse_muslang(source)
-        analyzed_ast = ast
+        analyzer = SemanticAnalyzer()
+        analyzed_ast = analyzer.analyze(ast)
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
@@ -684,7 +686,8 @@ class TestSlideIntegration:
                 }
         """
         ast = parse_muslang(source)
-        analyzed_ast = ast
+        analyzer = SemanticAnalyzer()
+        analyzed_ast = analyzer.analyze(ast)
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
@@ -740,7 +743,8 @@ class TestSlideIntegration:
                 }
         """
         ast = parse_muslang(source)
-        analyzed_ast = ast
+        analyzer = SemanticAnalyzer()
+        analyzed_ast = analyzer.analyze(ast)
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
