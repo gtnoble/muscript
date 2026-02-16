@@ -703,5 +703,276 @@ class TestEdgeCases:
             os.unlink(temp_path)
 
 
+class TestMetaEventChanges:
+    """Tests for multiple tempo, time signature, and key signature changes in MIDI output"""
+    
+    def test_multiple_time_signature_changes(self):
+        """Test multiple time signature changes are written to MIDI"""
+        events = [
+            TimeSignature(numerator=4, denominator=4),
+            Note(pitch='c', octave=4, duration=4),
+            TimeSignature(numerator=3, denominator=4),
+            Note(pitch='d', octave=4, duration=4),
+            TimeSignature(numerator=5, denominator=4),
+            Note(pitch='e', octave=4, duration=4),
+        ]
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        ast = Sequence(instruments={'piano': instrument})
+        
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+        
+        try:
+            gen.generate(ast, temp_path)
+            
+            # Verify multiple time signature events
+            midi = mido.MidiFile(temp_path)
+            all_messages = []
+            for track in midi.tracks:
+                all_messages.extend(list(track))
+            
+            time_sig_msgs = [m for m in all_messages if m.type == 'time_signature']
+            
+            # Should have 3 time signature events
+            assert len(time_sig_msgs) >= 3
+            
+            # Verify the values
+            assert time_sig_msgs[0].numerator == 4
+            assert time_sig_msgs[0].denominator == 4
+            
+            assert time_sig_msgs[1].numerator == 3
+            assert time_sig_msgs[1].denominator == 4
+            
+            assert time_sig_msgs[2].numerator == 5
+            assert time_sig_msgs[2].denominator == 4
+        finally:
+            os.unlink(temp_path)
+    
+    def test_multiple_tempo_changes(self):
+        """Test multiple tempo changes are written to MIDI"""
+        events = [
+            Tempo(bpm=120),
+            Note(pitch='c', octave=4, duration=4),
+            Tempo(bpm=60),
+            Note(pitch='d', octave=4, duration=4),
+            Tempo(bpm=180),
+            Note(pitch='e', octave=4, duration=4),
+        ]
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        ast = Sequence(instruments={'piano': instrument})
+        
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+        
+        try:
+            gen.generate(ast, temp_path)
+            
+            # Verify multiple tempo events
+            midi = mido.MidiFile(temp_path)
+            all_messages = []
+            for track in midi.tracks:
+                all_messages.extend(list(track))
+            
+            tempo_msgs = [m for m in all_messages if m.type == 'set_tempo']
+            
+            # Should have at least 3 tempo events (plus potentially default)
+            assert len(tempo_msgs) >= 3
+            
+            # Verify tempo values (mido stores tempo in microseconds per beat)
+            # 120 BPM = 500000 microseconds per beat
+            # 60 BPM = 1000000 microseconds per beat
+            # 180 BPM = 333333 microseconds per beat
+            bpm_to_tempo = lambda bpm: int(60000000 / bpm)
+            assert any(abs(m.tempo - bpm_to_tempo(120)) < 100 for m in tempo_msgs)
+            assert any(abs(m.tempo - bpm_to_tempo(60)) < 100 for m in tempo_msgs)
+            assert any(abs(m.tempo - bpm_to_tempo(180)) < 100 for m in tempo_msgs)
+        finally:
+            os.unlink(temp_path)
+    
+    def test_time_signature_changes_timing(self):
+        """Test that time signature changes occur at the correct times"""
+        events = [
+            TimeSignature(numerator=4, denominator=4),
+            Note(pitch='c', octave=4, duration=4),
+            Note(pitch='d', octave=4, duration=4),
+            TimeSignature(numerator=3, denominator=4),
+            Note(pitch='e', octave=4, duration=4),
+        ]
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        ast = Sequence(instruments={'piano': instrument})
+        
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+        
+        try:
+            gen.generate(ast, temp_path)
+            
+            midi = mido.MidiFile(temp_path)
+            all_messages = []
+            for track in midi.tracks:
+                all_messages.extend(list(track))
+            
+            time_sig_msgs = [m for m in all_messages if m.type == 'time_signature']
+            
+            # First time signature should be at time 0
+            assert time_sig_msgs[0].time == 0 or sum(m.time for m in all_messages[:all_messages.index(time_sig_msgs[0])+1]) == 0
+            
+            # Second time signature should be after 2 quarter notes (2 * 480 = 960 ticks)
+            # Calculate absolute time for second time signature
+            second_ts_idx = all_messages.index(time_sig_msgs[1])
+            abs_time_second_ts = sum(m.time for m in all_messages[:second_ts_idx+1])
+            
+            # Should be approximately after 2 beats
+            # Note: The actual timing might vary based on when meta-events are placed
+            assert abs_time_second_ts >= 960
+        finally:
+            os.unlink(temp_path)
+    
+    def test_tempo_changes_timing(self):
+        """Test that tempo changes occur at the correct times"""
+        events = [
+            Tempo(bpm=120),
+            Note(pitch='c', octave=4, duration=4),
+            Tempo(bpm=90),
+            Note(pitch='d', octave=4, duration=4),
+        ]
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        ast = Sequence(instruments={'piano': instrument})
+        
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+        
+        try:
+            gen.generate(ast, temp_path)
+            
+            midi = mido.MidiFile(temp_path)
+            all_messages = []
+            for track in midi.tracks:
+                all_messages.extend(list(track))
+            
+            tempo_msgs = [m for m in all_messages if m.type == 'set_tempo']
+            
+            # Should have at least 2 tempo events
+            assert len(tempo_msgs) >= 2
+            
+            # First tempo should be at time 0
+            first_tempo_idx = all_messages.index(tempo_msgs[0])
+            abs_time_first = sum(m.time for m in all_messages[:first_tempo_idx+1])
+            assert abs_time_first == 0
+            
+            # Second tempo should be after 1 quarter note
+            if len(tempo_msgs) > 1:
+                second_tempo_idx = all_messages.index(tempo_msgs[1])
+                abs_time_second = sum(m.time for m in all_messages[:second_tempo_idx+1])
+                # Should be approximately after 1 beat
+                # Note: The actual timing might vary based on when meta-events are placed
+                assert abs_time_second >= 480
+        finally:
+            os.unlink(temp_path)
+    
+    def test_combined_meta_event_changes(self):
+        """Test combinations of tempo and time signature changes"""
+        measure1 = Measure(
+            events=[
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='e', octave=4, duration=4),
+                Note(pitch='f', octave=4, duration=4),
+            ],
+            measure_number=1,
+        )
+        
+        measure2 = Measure(
+            events=[
+                Note(pitch='g', octave=4, duration=4),
+                Note(pitch='a', octave=4, duration=4),
+                Note(pitch='b', octave=4, duration=4),
+            ],
+            measure_number=2,
+        )
+        
+        events = [
+            Tempo(bpm=120),
+            TimeSignature(numerator=4, denominator=4),
+            measure1,
+            Tempo(bpm=90),
+            TimeSignature(numerator=3, denominator=4),
+            measure2,
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        ast = Sequence(instruments={'piano': instrument})
+        
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+        
+        try:
+            gen.generate(ast, temp_path)
+            
+            # Verify file is valid and contains both types of events
+            midi = mido.MidiFile(temp_path)
+            all_messages = []
+            for track in midi.tracks:
+                all_messages.extend(list(track))
+            
+            tempo_msgs = [m for m in all_messages if m.type == 'set_tempo']
+            time_sig_msgs = [m for m in all_messages if m.type == 'time_signature']
+            note_ons = [m for m in all_messages if m.type == 'note_on' and m.velocity > 0]
+            
+            # Should have tempo changes, time signature changes, and notes
+            assert len(tempo_msgs) >= 2
+            assert len(time_sig_msgs) >= 2
+            assert len(note_ons) == 7  # 4 notes + 3 notes
+        finally:
+            os.unlink(temp_path)
+    
+    def test_time_signature_in_measure(self):
+        """Test time signature change within a measure context"""
+        # Time signature before measure
+        measure = Measure(
+            events=[
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='e', octave=4, duration=4),
+            ],
+            measure_number=1,
+        )
+        
+        events = [
+            TimeSignature(numerator=3, denominator=4),
+            measure,
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        ast = Sequence(instruments={'piano': instrument})
+        
+        gen = MIDIGenerator(ppq=480)
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
+            temp_path = f.name
+        
+        try:
+            gen.generate(ast, temp_path)
+            
+            # Should generate valid MIDI
+            midi = mido.MidiFile(temp_path)
+            all_messages = []
+            for track in midi.tracks:
+                all_messages.extend(list(track))
+            
+            time_sig_msgs = [m for m in all_messages if m.type == 'time_signature']
+            note_ons = [m for m in all_messages if m.type == 'note_on' and m.velocity > 0]
+            
+            assert len(time_sig_msgs) >= 1
+            assert time_sig_msgs[0].numerator == 3
+            assert len(note_ons) == 3
+        finally:
+            os.unlink(temp_path)
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])

@@ -222,6 +222,8 @@ class SemanticAnalyzer:
             # Process instruments
             updated_instruments = {}
             if node.instruments:
+                # Process instruments in order (dict maintains insertion order in Python 3.7+)
+                # Time signatures are already injected into voice streams by parser
                 for name, inst in node.instruments.items():
                     updated_instruments[name] = self._calculate_timing(inst)
                 return replace(node, instruments=updated_instruments, events=node.events)
@@ -667,12 +669,21 @@ class SemanticAnalyzer:
         if isinstance(node, Sequence):
             if node.instruments:
                 # Top-level sequence with instruments dict
+                # Process global directives first to maintain state across instruments
+                new_events = []
+                for event in node.events:
+                    result = transform_func(event)
+                    if result is not None:
+                        new_events.append(result)
+                
+                # Then process instruments (order preserved by dict in Python 3.7+)
+                # Time signatures are already injected into voice streams by parser
                 new_instruments = {}
                 for name, inst in node.instruments.items():
                     result = transform_func(inst)
                     if result is not None:
                         new_instruments[name] = result
-                return replace(node, instruments=new_instruments)
+                return replace(node, instruments=new_instruments, events=new_events)
             else:
                 # Sub-sequence with events list
                 new_events = []

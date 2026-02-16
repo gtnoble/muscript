@@ -613,5 +613,312 @@ class TestIntegratedTimingAndState:
         assert violin_notes[0].articulation == 'legato'
 
 
+class TestMetaEventChanges:
+    """Tests for time signature, tempo, and key signature changes"""
+    
+    def test_time_signature_change_timing(self):
+        """Test that time signature changes don't affect timing calculation"""
+        analyzer = SemanticAnalyzer()
+        
+        # Start in 4/4, switch to 3/4, then 5/4
+        events = [
+            TimeSignature(numerator=4, denominator=4),
+            Note(pitch='c', octave=4, duration=4),  # 1 beat
+            TimeSignature(numerator=3, denominator=4),
+            Note(pitch='d', octave=4, duration=4),  # 1 beat
+            TimeSignature(numerator=5, denominator=4),
+            Note(pitch='e', octave=4, duration=2),  # 2 beats
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        seq = Sequence(events=[instrument])
+        
+        result = analyzer._calculate_timing(seq)
+        
+        notes = [e for e in result.events[0].voices[1] if isinstance(e, Note)]
+        
+        # Notes should follow sequentially regardless of time signature changes
+        assert notes[0].start_time == 0.0
+        assert notes[0].end_time == DEFAULT_MIDI_PPQ
+        
+        assert notes[1].start_time == DEFAULT_MIDI_PPQ
+        assert notes[1].end_time == 2 * DEFAULT_MIDI_PPQ
+        
+        assert notes[2].start_time == 2 * DEFAULT_MIDI_PPQ
+        assert notes[2].end_time == 4 * DEFAULT_MIDI_PPQ
+    
+    def test_time_signature_change_measure_validation(self):
+        """Test that measure validation uses the current time signature"""
+        analyzer = SemanticAnalyzer()
+        
+        # First measure in 4/4 (expects 4 quarter notes)
+        measure1 = Measure(
+            events=[
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='e', octave=4, duration=4),
+                Note(pitch='f', octave=4, duration=4),
+            ],
+            measure_number=1,
+        )
+        
+        # Second measure in 3/4 (expects 3 quarter notes)
+        measure2 = Measure(
+            events=[
+                Note(pitch='g', octave=4, duration=4),
+                Note(pitch='a', octave=4, duration=4),
+                Note(pitch='b', octave=4, duration=4),
+            ],
+            measure_number=2,
+        )
+        
+        events = [
+            TimeSignature(numerator=4, denominator=4),
+            measure1,
+            TimeSignature(numerator=3, denominator=4),
+            measure2,
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        seq = Sequence(events=[instrument])
+        
+        # Should pass validation with correct measure durations
+        result = analyzer.analyze(seq)
+        assert len(analyzer.errors) == 0
+    
+    def test_time_signature_change_invalid_measure(self):
+        """Test that measure validation fails when duration doesn't match new time signature"""
+        analyzer = SemanticAnalyzer()
+        
+        # First measure in 4/4 (correct: 4 quarter notes)
+        measure1 = Measure(
+            events=[
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='e', octave=4, duration=4),
+                Note(pitch='f', octave=4, duration=4),
+            ],
+            measure_number=1,
+        )
+        
+        # Second measure should be in 3/4 but has 4 quarter notes (invalid)
+        measure2 = Measure(
+            events=[
+                Note(pitch='g', octave=4, duration=4),
+                Note(pitch='a', octave=4, duration=4),
+                Note(pitch='b', octave=4, duration=4),
+                Note(pitch='c', octave=5, duration=4),
+            ],
+            measure_number=2,
+            location=SourceLocation(line=10, column=1),
+        )
+        
+        events = [
+            TimeSignature(numerator=4, denominator=4),
+            measure1,
+            TimeSignature(numerator=3, denominator=4),
+            measure2,
+        ]
+        
+        instrument = Instrument(name='violin', events=[], voices={1: events})
+        seq = Sequence(events=[instrument])
+        
+        # Should fail validation
+        with pytest.raises(SemanticError) as exc_info:
+            analyzer.analyze(seq)
+        
+        error_msg = str(exc_info.value)
+        assert "Measure 2 duration mismatch" in error_msg
+        assert "3/4" in error_msg
+        assert "violin" in error_msg.lower()
+    
+    def test_multiple_time_signature_changes(self):
+        """Test multiple time signature changes in sequence"""
+        analyzer = SemanticAnalyzer()
+        
+        # Cycle through different time signatures
+        measure_4_4 = Measure(
+            events=[
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='c', octave=4, duration=4),
+            ],
+            measure_number=1,
+        )
+        
+        measure_3_4 = Measure(
+            events=[
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+            ],
+            measure_number=2,
+        )
+        
+        measure_5_8 = Measure(
+            events=[
+                Note(pitch='e', octave=4, duration=8),
+                Note(pitch='e', octave=4, duration=8),
+                Note(pitch='e', octave=4, duration=8),
+                Note(pitch='e', octave=4, duration=8),
+                Note(pitch='e', octave=4, duration=8),
+            ],
+            measure_number=3,
+        )
+        
+        measure_6_8 = Measure(
+            events=[
+                Note(pitch='f', octave=4, duration=8),
+                Note(pitch='f', octave=4, duration=8),
+                Note(pitch='f', octave=4, duration=8),
+                Note(pitch='f', octave=4, duration=8),
+                Note(pitch='f', octave=4, duration=8),
+                Note(pitch='f', octave=4, duration=8),
+            ],
+            measure_number=4,
+        )
+        
+        events = [
+            TimeSignature(numerator=4, denominator=4),
+            measure_4_4,
+            TimeSignature(numerator=3, denominator=4),
+            measure_3_4,
+            TimeSignature(numerator=5, denominator=8),
+            measure_5_8,
+            TimeSignature(numerator=6, denominator=8),
+            measure_6_8,
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        seq = Sequence(events=[instrument])
+        
+        # All measures should validate correctly
+        result = analyzer.analyze(seq)
+        assert len(analyzer.errors) == 0
+    
+    def test_tempo_change_timing(self):
+        """Test that tempo changes don't affect tick timing (only playback speed)"""
+        analyzer = SemanticAnalyzer()
+        
+        events = [
+            Tempo(bpm=120),
+            Note(pitch='c', octave=4, duration=4),
+            Tempo(bpm=60),  # Half speed
+            Note(pitch='d', octave=4, duration=4),
+            Tempo(bpm=240),  # Double speed
+            Note(pitch='e', octave=4, duration=4),
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        seq = Sequence(events=[instrument])
+        
+        result = analyzer._calculate_timing(seq)
+        
+        notes = [e for e in result.events[0].voices[1] if isinstance(e, Note)]
+        
+        # Tempo changes don't affect tick timing, only playback speed
+        # All quarter notes should still be PPQ ticks apart
+        assert notes[0].start_time == 0.0
+        assert notes[0].end_time == DEFAULT_MIDI_PPQ
+        
+        assert notes[1].start_time == DEFAULT_MIDI_PPQ
+        assert notes[1].end_time == 2 * DEFAULT_MIDI_PPQ
+        
+        assert notes[2].start_time == 2 * DEFAULT_MIDI_PPQ
+        assert notes[2].end_time == 3 * DEFAULT_MIDI_PPQ
+    
+    def test_key_signature_change_application(self):
+        """Test that key signature changes are tracked and applied"""
+        analyzer = SemanticAnalyzer()
+        
+        # C major (no sharps/flats) -> G major (F#) -> D major (F#, C#)
+        events = [
+            KeySignature(root='c', mode='major'),
+            Note(pitch='f', octave=4, duration=4),  # Natural F in C major
+            KeySignature(root='g', mode='major'),
+            Note(pitch='f', octave=4, duration=4),  # Should become F# in G major
+            KeySignature(root='d', mode='major'),
+            Note(pitch='c', octave=4, duration=4),  # Should become C# in D major
+            Note(pitch='f', octave=4, duration=4),  # Should become F# in D major
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        seq = Sequence(events=[instrument])
+        
+        result = analyzer._apply_key_signatures(seq)
+        
+        notes = [e for e in result.events[0].voices[1] if isinstance(e, Note)]
+        
+        # First F note in C major should have no accidental (or natural)
+        assert notes[0].pitch == 'f'
+        assert notes[0].accidental in [None, 'natural']
+        
+        # Second F note in G major should have sharp
+        assert notes[1].pitch == 'f'
+        assert notes[1].accidental == 'sharp'
+        
+        # C note in D major should have sharp
+        assert notes[2].pitch == 'c'
+        assert notes[2].accidental == 'sharp'
+        
+        # F note in D major should have sharp
+        assert notes[3].pitch == 'f'
+        assert notes[3].accidental == 'sharp'
+    
+    def test_combined_meta_event_changes(self):
+        """Test that tempo, time signature, and key signature changes work together"""
+        analyzer = SemanticAnalyzer()
+        
+        # Complex scenario with all three types of changes
+        measure1 = Measure(
+            events=[
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='e', octave=4, duration=4),
+                Note(pitch='f', octave=4, duration=4),
+            ],
+            measure_number=1,
+        )
+        
+        measure2 = Measure(
+            events=[
+                Note(pitch='f', octave=4, duration=4),
+                Note(pitch='g', octave=4, duration=4),
+                Note(pitch='a', octave=4, duration=4),
+            ],
+            measure_number=2,
+        )
+        
+        events = [
+            Tempo(bpm=120),
+            TimeSignature(numerator=4, denominator=4),
+            KeySignature(root='c', mode='major'),
+            measure1,
+            # Change everything
+            Tempo(bpm=90),
+            TimeSignature(numerator=3, denominator=4),
+            KeySignature(root='g', mode='major'),
+            measure2,
+        ]
+        
+        instrument = Instrument(name='piano', events=[], voices={1: events})
+        seq = Sequence(events=[instrument])
+        
+        # Should complete full analysis without errors
+        result = analyzer.analyze(seq)
+        assert len(analyzer.errors) == 0
+        
+        # Verify that we have both measures in the result
+        measure_events = [e for e in result.events[0].voices[1] if isinstance(e, Measure)]
+        assert len(measure_events) == 2
+        
+        # First measure should have 4 notes, second should have 3
+        notes_m1 = [e for e in measure_events[0].events if isinstance(e, Note)]
+        notes_m2 = [e for e in measure_events[1].events if isinstance(e, Note)]
+        assert len(notes_m1) == 4
+        assert len(notes_m2) == 3
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])

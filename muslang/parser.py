@@ -110,7 +110,7 @@ class MuslangTransformer(Transformer):
                     events=inst.events,
                     voices=updated_voices
                 )
-                pending_directives = []  # Clear after injecting
+                # Don't clear - time signatures apply to all following instruments
             
             if inst.name in instruments:
                 # Merge: concatenate events to existing instrument
