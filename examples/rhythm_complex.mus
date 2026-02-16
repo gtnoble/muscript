@@ -92,7 +92,7 @@ V1:
 
   # Final cadence with dotted rhythm
   c5/4. b4/8 a4/4 g4/4 |
-  f4/2~ f4/4 e4/4 |
+  :legato f4/2 f4/4 :reset e4/4 |
   d4/1 |
   c4/1 |
 }

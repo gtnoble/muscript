@@ -48,7 +48,7 @@ measure: measure_event+
 // ============================================================================
 // NOTES - Scientific Pitch Notation (NO AMBIGUITY!)
 // ============================================================================
-// Examples: c4/4 (C4 quarter note), d5/8. (D5 dotted eighth), e4~ (E4 tied)
+// Examples: c4/4 (C4 quarter note), d5/8. (D5 dotted eighth)
 // 
 // Key changes from old grammar:
 // - Octave is ALWAYS specified (c4 not just c)
@@ -59,14 +59,13 @@ measure: measure_event+
 // Now: c4 = C octave 4 (uses default duration)
 //      c4/4 = C octave 4, quarter note (explicit duration)
 
-note: NOTE_NAME ACCIDENTAL? ("/" DURATION DOTTED?)? TIE?
+note: NOTE_NAME ACCIDENTAL? ("/" DURATION DOTTED?)?
 
 // NOTE_NAME matches pitch+octave as a single token (e.g., c4, d5, a3)
 NOTE_NAME.2: /[cdefgab][0-9]/
 ACCIDENTAL: "+" | "-"  // + for sharp, - for flat  
 DURATION: "1" | "2" | "4" | "8" | "16" | "32" | "64"  // Whole to 64th
 DOTTED: "."  // Dotted note (only valid AFTER duration - no ambiguity!)
-TIE: "~"  // Tie to next note
 
 // Rest: r/4 (quarter rest), r/8. (dotted eighth rest)
 rest: "r" ("/" DURATION DOTTED?)?
@@ -87,8 +86,7 @@ chord: note ("," note)+
 // GRACE NOTES - Tilde Prefix
 // ============================================================================
 // Example: ~c4/16 (grace note C4 sixteenth)
-// Tilde is both prefix (grace note) and suffix (tie)
-// Context makes it unambiguous: prefix = grace, suffix = tie
+// The tilde prefix indicates a grace note (quick ornamental note)
 
 grace_note: "~" note
 

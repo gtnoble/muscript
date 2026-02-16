@@ -14,7 +14,7 @@ Key features:
 - Default duration inheritance
 - Voice context tracking for polyphonic instruments
 - Source location preservation for error reporting
-- Graceful handling of optional elements (accidentals, durations, dots, ties)
+- Graceful handling of optional elements (accidentals, durations, dots)
 - Operator prefixes: : (articulation), @ (dynamics), % (ornaments)
 """
 
@@ -79,6 +79,7 @@ class MuslangTransformer(Transformer):
         
         Multiple declarations of the same instrument are merged by
         concatenating their events in order of appearance.
+        Time signatures between instrument blocks are inserted into the voice streams.
         
         Args:
             items: List of directives and Instrument nodes
@@ -88,11 +89,29 @@ class MuslangTransformer(Transformer):
         """
         directives = []
         instruments = {}
+        pending_directives = []  # Directives to inject into next instrument
+        
         for item in items:
             if isinstance(item, (Tempo, TimeSignature, KeySignature)):
                 directives.append(item)
+                # Time signatures should be inserted into instrument voices
+                if isinstance(item, TimeSignature):
+                    pending_directives.append(item)
                 continue
             inst = item
+            
+            # Inject pending directives into this instrument's voices
+            if pending_directives:
+                updated_voices = {}
+                for voice_num, voice_events in inst.voices.items():
+                    updated_voices[voice_num] = pending_directives + voice_events
+                inst = Instrument(
+                    name=inst.name,
+                    events=inst.events,
+                    voices=updated_voices
+                )
+                pending_directives = []  # Clear after injecting
+            
             if inst.name in instruments:
                 # Merge: concatenate events to existing instrument
                 existing = instruments[inst.name]
@@ -218,11 +237,11 @@ class MuslangTransformer(Transformer):
         """
         Transform note with scientific pitch notation.
         
-        Grammar: note: NOTE_NAME accidental? ("/" duration dotted?)? tie?
+        Grammar: note: NOTE_NAME accidental? ("/" duration dotted?)?
         NOTE_NAME format: pitch+octave (e.g., c4, d5, a3)
         
         Args:
-            items: [Token(NOTE_NAME), accidental?, duration?, dotted?, tie?]
+            items: [Token(NOTE_NAME), accidental?, duration?, dotted?]
             
         Returns:
             Note node
@@ -245,7 +264,6 @@ class MuslangTransformer(Transformer):
         accidental = None
         duration = None
         dotted = False
-        tied = False
         
         for item in items[1:]:
             if isinstance(item, Tree):
@@ -256,8 +274,6 @@ class MuslangTransformer(Transformer):
                     duration = int(str(duration_token))
                 elif item.data == 'dotted':
                     dotted = True
-                elif item.data == 'tie':
-                    tied = True
                 elif item.data == 'accidental' and item.children:
                     acc_token = str(item.children[0])
                     accidental = {'+': 'sharp', '-': 'flat'}[acc_token]
@@ -272,16 +288,11 @@ class MuslangTransformer(Transformer):
                 # Check if it's a dot
                 elif item_str == '.':
                     dotted = True
-                # Check if it's a tie
-                elif item_str == '~':
-                    tied = True
             elif isinstance(item, str):
                 if item in ['+', '-']:
                     accidental = {'+': 'sharp', '-': 'flat'}[item]
                 elif item == '.':
                     dotted = True
-                elif item == '~':
-                    tied = True
             elif isinstance(item, int):
                 duration = item
         
@@ -298,7 +309,6 @@ class MuslangTransformer(Transformer):
             duration=duration,
             dotted=dotted,
             accidental=accidental,
-            tied=tied,
         )
     
     def rest(self, items) -> Rest:
@@ -386,18 +396,42 @@ class MuslangTransformer(Transformer):
         Grammar: tuplet: "(" event+ ")" ":" INT
         
         Args:
-            items: [event1, event2, ..., ratio(int)]
+            items: [event1, event2, ..., ratio(Token)]
             
         Returns:
             Tuplet node
         """
-        # Last item is the ratio (int), everything else is events
-        ratio = items[-1] if items and isinstance(items[-1], int) else 3
+        # Last item is the ratio (Token or int), everything else is events
+        ratio_item = items[-1]
+        if isinstance(ratio_item, Token):
+            ratio = int(ratio_item.value)
+        elif isinstance(ratio_item, int):
+            ratio = ratio_item
+        else:
+            ratio = 3  # Default triplet
+        
         notes = [item for item in items[:-1] if isinstance(item, (Note, Chord, Rest))]
         
-        # Calculate actual duration from the notes
-        # For now, default to space of 2 notes
-        actual_duration = 2
+        # Calculate actual duration based on tuplet convention:
+        # - Triplet (3): fit into space of 2
+        # - Quintuplet (5): fit into space of 4
+        # - Septuplet (7): fit into space of 4
+        # General rule: fit N notes into space of largest power of 2 < N
+        
+        if notes:
+            # Get duration from first note
+            first_note_duration = notes[0].duration if notes[0].duration else 4
+            
+            # Find space_ratio: largest power of 2 less than ratio
+            space_ratio = 1
+            while space_ratio * 2 < ratio:
+                space_ratio *= 2
+            
+            # actual_duration = first_note_duration / space_ratio
+            # E.g., triplet of eighth notes: 8 / 2 = 4 (quarter note)
+            actual_duration = first_note_duration // space_ratio
+        else:
+            actual_duration = 2  # Fallback
         
         return Tuplet(notes=notes, ratio=ratio, actual_duration=actual_duration)
     

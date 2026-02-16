@@ -219,13 +219,12 @@ class SemanticAnalyzer:
             return replace(node, voices=updated_voices)
         
         elif isinstance(node, Sequence):
-            # Handle instruments dict or events list
+            # Process instruments
+            updated_instruments = {}
             if node.instruments:
-                # Top-level sequence - process each instrument
-                updated_instruments = {}
                 for name, inst in node.instruments.items():
                     updated_instruments[name] = self._calculate_timing(inst)
-                return replace(node, instruments=updated_instruments)
+                return replace(node, instruments=updated_instruments, events=node.events)
             else:
                 # Sub-sequence - process events
                 updated_events = []
@@ -293,10 +292,11 @@ class SemanticAnalyzer:
         
         elif isinstance(event, GraceNote):
             # Grace note steals time from beginning (small fixed duration)
+            # Grace notes don't count toward measure duration per musical convention
             grace_duration = DEFAULT_MIDI_PPQ * GRACE_NOTE_DURATION_RATIO
             end_time = start_time + grace_duration
             updated_grace_note = replace(event.note, start_time=start_time, end_time=end_time)
-            return replace(event, note=updated_grace_note), grace_duration
+            return replace(event, note=updated_grace_note), 0  # Return 0 - grace notes don't count toward bar
         
         elif isinstance(event, Slide):
             # Slide consumes both note durations:
@@ -317,16 +317,24 @@ class SemanticAnalyzer:
             # Process all events in measure and validate duration
             current_measure_time = start_time
             updated_events = []
+            grace_note_duration_total = 0.0
             
             for measure_event in event.events:
                 updated_event, duration = self._calculate_event_timing(measure_event, current_measure_time)
                 updated_events.append(updated_event)
                 current_measure_time += duration
+                
+                # Track grace notes separately - they don't count toward measure duration
+                if isinstance(measure_event, GraceNote):
+                    grace_note_duration_total += duration
             
             total_duration = current_measure_time - start_time
             
+            # Subtract grace note durations from total - they don't count toward time signature
+            counted_duration = total_duration - grace_note_duration_total
+            
             # Validate measure duration against current time signature
-            self._validate_measure(event, total_duration)
+            self._validate_measure(event, counted_duration)
             
             return replace(
                 event,
@@ -342,6 +350,7 @@ class SemanticAnalyzer:
         
         elif isinstance(event, TimeSignature):
             # Time signature changes affect beat calculation but don't consume time
+            # Update the current time signature for subsequent measures
             self.current_time_sig = event
             return event, 0.0
         

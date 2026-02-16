@@ -91,7 +91,7 @@ def test_complex_combination():
     (time 5 4)
     (key d 'major)
     piano {
-      V1: :staccato c4/4 d4/4 e4/4 @f %mordent f4/4 |
+      V1: :staccato c4/4 d4/4 e4/4 @f %mordent f4/4 g4/4 |
     }
     """
     

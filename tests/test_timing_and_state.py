@@ -167,13 +167,14 @@ class TestTimingCalculation:
         processed_grace = result.events[0].voices[1][0]
         processed_main = result.events[0].voices[1][1]
         
-        # Grace note should have small duration
+        # Grace note should have small duration for MIDI playback
         grace_duration = DEFAULT_MIDI_PPQ * GRACE_NOTE_DURATION_RATIO
         assert processed_grace.note.start_time == 0.0
         assert abs(processed_grace.note.end_time - grace_duration) < 0.01
         
-        # Main note should start after grace note
-        assert abs(processed_main.start_time - grace_duration) < 0.01
+        # Main note should start at same time (grace notes don't advance timeline)
+        # Grace notes don't count toward measure duration per musical convention
+        assert processed_main.start_time == 0.0
     
     def test_legato_note_sequence_timing(self):
         """Test timing for a legato-marked note sequence"""

@@ -174,13 +174,6 @@ piano {
 }
 ```
 
-### Ties: `~` (after note)
-```muslang
-piano {
-  V1: c4/4~ c4/4  # Tie two quarter notes
-}
-```
-
 ---
 
 ## Chords
@@ -434,8 +427,8 @@ Directives set musical context. Use parentheses `()`:
 ### Tempo
 
 ```muslang
+(tempo! 120)
 piano {
-  (tempo! 120)
   V1: c4/4 d4/4 e4/4
 }
 ```
@@ -445,8 +438,8 @@ piano {
 ### Time Signature
 
 ```muslang
+(time 3 4)
 piano {
-  (time 3 4)
   V1: c4/4 d4/4 e4/4
 }
 ```
@@ -461,12 +454,12 @@ Common signatures:
 ### Key Signature
 
 ```muslang
+(key g 'major)
 piano {
-  (key g 'major)
   V1: g4/4 a4/4 b4/4 c5/4
 }
+(key d 'minor)
 piano {
-  (key d 'minor)
   V1: d4/4 e4/4 f4/4 g4/4
 }
 ```
@@ -477,12 +470,12 @@ piano {
 
 **Examples with accidentals**:
 ```muslang
+(key a- 'major)
 piano {
-  (key a- 'major)
   V1: e4-/4 f4/4 g4/4 a4-/4  # A♭ major
 }
+(key f+ 'minor)
 piano {
-  (key f+ 'minor)
   V1: f4+/4 g4+/4 a4/4 b4/4  # F♯ minor
 }
 ```
@@ -657,8 +650,8 @@ drums {
 ### Example Beat
 
 ```muslang
+(tempo! 120)
 drums {
-  (tempo! 120)
   V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
   V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
@@ -689,8 +682,8 @@ piano {
 # Twinkle Twinkle Little Star
 # Demonstrates multiple features
 
+(tempo! 120) (time 4 4) (key c 'major)
 piano {
-  (tempo! 120) (time 4 4) (key c 'major)
   V1: # Main melody
       c4/4 c4/4 g4/4 g4/4 | a4/4 a4/4 g4/2 |
       f4/4 f4/4 e4/4 e4/4 | d4/4 d4/4 c4/2 |
@@ -720,7 +713,6 @@ piano {
 | `~`    | Grace notes  | `~c4/32`                                    |
 | `/`    | Duration     | `/4`, `/8`, `/16`                           |
 | `.`    | Dotted       | `/4.`, `/8.`                                |
-| `~`    | Tie          | `c4/4~` (suffix)                            |
 
 ---
 
@@ -732,7 +724,6 @@ V1: c4 d4 e4        # Pitches with octaves
     c4/4 d4/8       # With durations
     c4+ d4-         # With accidentals
     c4/4.           # Dotted
-    c4/4~ c4/4      # Tied
 
 # Chords
 V1: c4/4,e4/4,g4/4

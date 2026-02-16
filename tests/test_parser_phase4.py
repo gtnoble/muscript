@@ -128,10 +128,10 @@ def test_accidentals():
     print("✓ Accidentals test passed")
 
 def test_dotted_and_tied():
-    """Test dotted notes and ties."""
+    """Test dotted notes (ties removed - use legato instead)."""
     source = """
     piano {
-      V1: c4/4. d4/4~ e4/4 |
+      V1: c4/4. d4/4 e4/4 |
     }
     """
     ast = parse_muslang(source)
@@ -140,17 +140,14 @@ def test_dotted_and_tied():
     
     # C dotted quarter
     assert voice_events[0].dotted == True
-    assert voice_events[0].tied == False
     
-    # D quarter tied
+    # D quarter (normal)
     assert voice_events[1].dotted == False
-    assert voice_events[1].tied == True
     
     # E quarter (normal)
     assert voice_events[2].dotted == False
-    assert voice_events[2].tied == False
     
-    print("✓ Dotted and tied notes test passed")
+    print("✓ Dotted notes test passed")
 
 def test_rest_duration_parsing():
     """Test explicit rest durations are parsed correctly."""

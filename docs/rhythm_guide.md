@@ -11,11 +11,10 @@ Complete guide to rhythm, timing, and time manipulation in Muslang.
 5. [Grace Notes](#grace-notes)
 6. [Time Signatures](#time-signatures)
 7. [Tempo](#tempo)
-8. [Ties](#ties)
-9. [Rests](#rests)
-10. [Complex Rhythms](#complex-rhythms)
-11. [Polyrhythms](#polyrhythms)
-12. [Musical Examples](#musical-examples)
+8. [Rests](#rests)
+9. [Complex Rhythms](#complex-rhythms)
+10. [Polyrhythms](#polyrhythms)
+11. [Musical Examples](#musical-examples)
 
 ---
 
@@ -25,10 +24,12 @@ Rhythm is the temporal organization of music. Muslang provides precise control o
 
 - **Duration**: How long notes last
 - **Grouping**: Tuplets and irregular divisions
-- **Timing**: Grace notes, ties, tempo changes
+- **Timing**: Grace notes, tempo changes
 - **Meter**: Time signatures that define rhythmic structure
 
 All timing in Muslang is based on **480 ticks per quarter note (PPQ)**, providing high precision for MIDI generation.
+
+**Note on Ties**: Muslang does not have explicit tie syntax. To sustain notes across measures or create extended durations, use legato articulation on consecutive notes of the same pitch.
 
 ---
 
@@ -263,10 +264,10 @@ piano {
 
 Grace notes occupy **5% of a quarter note** (24 ticks at 480 PPQ), regardless of their written duration.
 
+```(grace notes don't advance timeline)
 ```
-grace_duration = 480 × 0.05 = 24 ticks
-main_note starts: grace_note_start + 24 ticks
-```
+
+**Important**: Per musical convention, grace notes **do not count toward measure duration**. They are ornamental and do not affect time signature validation. However, they do have timing information for MIDI playback, starting at the current position and playing before the following note
 
 The grace note doesn't add to total duration - it "steals" from the preceding space or from the main note's attack.
 
@@ -415,74 +416,6 @@ piano {
   (tempo! 160)  # Speed up
   V1: c5/8 b4/8 a4/8 g4/8 f4/8 e4/8 d4/8 c4/8 |
 }
-```
-
----
-
-## Ties
-
-Ties connect two notes of the same pitch, creating a single sustained note.
-
-### Syntax
-
-```muslang
-note1~ note2
-```
-
-Add tilde `~` **after** the first note.
-
-### Examples
-
-```muslang
-# Tie two quarter notes (= half note)
-piano {
-  V1: c4/4~ c4/4
-}
-
-# Tie across measures
-(time 4 4)
-piano {
-  V1: c4/2 d4/4 e4/4~ |
-      e4/4 f4/4 g4/2 |
-}
-
-# Multiple ties
-piano {
-  V1: c4/4~ c4/4~ c4/4~ c4/4  # = whole note
-}
-```
-
-### Use Cases
-
-#### Sustain Across Bar Lines
-
-```muslang
-(time 4 4)
-piano {
-  V1: c4/4 d4/4 e4/4 f4/4~ |
-      f4/4 e4/4 d4/4 c4/4 |
-}
-```
-
-#### Non-Standard Durations
-
-```muslang
-# 5 eighths = dotted quarter + quarter tied
-piano {
-  V1: c4/8~ c4/4~ c4/8
-}
-
-# 7 sixteenths
-piano {
-  V1: c4/16~ c4/8~ c4/4
-}
-```
-
-### MIDI Implementation
-
-Tied notes generate a single MIDI note-on/off pair with combined duration:
-```
-c4/4~ c4/4  →  MIDI: note_on(C4, 960 ticks)
 ```
 
 ---
@@ -856,3 +789,13 @@ piano {
 ## Version
 
 Muslang v0.1.0 - February 2026
+### Problem: Need to sustain notes across measures
+
+**Solution**: Use legato articulation on consecutive notes of the same pitch
+```muslang
+# Sustain C across bar line
+piano {
+  V1: :legato c4/2 c4/4 :reset d4/4 |
+}
+```
+

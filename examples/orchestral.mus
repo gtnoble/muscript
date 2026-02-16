@@ -12,7 +12,7 @@ violin {
   V1: @p :legato @crescendo
       d5/2 f5+/2 |
       a5/2 d6/2 |
-      @f c6+/2~ c6+/4 b5/4 |
+      @f :legato c6+/2 c6+/4 :reset b5/4 |
       a5/1 |
 }
 
@@ -20,7 +20,7 @@ viola {
   V1: @p :legato @crescendo
       f4+/2 a4/2 |
       d5/2 f5+/2 |
-      @f e5/2~ e5/4 d5/4 |
+      @f :legato e5/2 e5/4 :reset d5/4 |
       c5+/1 |
 }
 
@@ -337,23 +337,23 @@ flute {
 
 # Final chord - pianissimo
 violin {
-  V1: @pp d6/1
+  V1: @pp d6/1 |
 }
 viola {
-  V1: @pp f5+/1
+  V1: @pp f5+/1 |
 }
 cello {
-  V1: @pp a4/1
+  V1: @pp a4/1 |
 }
 flute {
-  V1: @pp a5/1
+  V1: @pp a5/1 |
 }
 clarinet {
-  V1: @pp f5+/1
+  V1: @pp f5+/1 |
 }
 trumpet {
-  V1: @pp d5/1
+  V1: @pp d5/1 |
 }
 trombone {
-  V1: @pp d4/1
+  V1: @pp d4/1 |
 }

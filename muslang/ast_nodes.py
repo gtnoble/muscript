@@ -81,7 +81,6 @@ class Note(ASTNode):
                   None means use default duration from context
         dotted: Whether the note is dotted (1.5x duration)
         accidental: Sharp (+), flat (-), or natural (=) accidental modifier
-        tied: Whether this note is tied to the next note (~)
         start_time: Absolute start time in MIDI ticks (populated during semantic analysis)
         end_time: Absolute end time in MIDI ticks (populated during semantic analysis)
         velocity: MIDI velocity (0-127, populated during state tracking)
@@ -91,14 +90,12 @@ class Note(ASTNode):
     Examples:
         c4/4   -> C4 quarter note (pitch=c, octave=4, duration=4)
         d5+/8. -> D#5 dotted eighth (pitch=d, octave=5, duration=8, dotted=True, accidental=sharp)
-        e4~    -> E4 tied (pitch=e, octave=4, tied=True)
     """
     pitch: Literal['c', 'd', 'e', 'f', 'g', 'a', 'b']
     octave: int
     duration: Optional[int] = None
     dotted: bool = False
     accidental: Optional[Literal['sharp', 'flat', 'natural']] = None
-    tied: bool = False
     location: Optional[SourceLocation] = None
     # Timing information (populated during semantic analysis)
     start_time: Optional[float] = None  # In MIDI ticks
@@ -117,10 +114,9 @@ class Note(ASTNode):
         
         dur_str = str(self.duration) if self.duration else ''
         dot_str = '.' if self.dotted else ''
-        tie_str = '~' if self.tied else ''
         loc_str = f" at {self.location}" if self.location else ""
         
-        return f"Note({self.pitch}{acc_str}{self.octave}{dur_str}{dot_str}{tie_str}){loc_str}"
+        return f"Note({self.pitch}{acc_str}{self.octave}{dur_str}{dot_str}){loc_str}"
 
 
 @dataclass
@@ -450,6 +446,7 @@ class Tuplet(ASTNode):
     notes: List[Note] = field(default_factory=list)
     ratio: int = 3
     actual_duration: int = 2
+    location: Optional[SourceLocation] = None
     
     def __repr__(self) -> str:
         num_notes = len(self.notes)

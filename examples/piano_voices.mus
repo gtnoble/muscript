@@ -185,9 +185,9 @@ V3: c4/2 d4-/2 |
 V4: c3/1 |
 
 @f
-V1: e4-/2~ e4-/4 d4-/4 |
-V2: c4/2~ c4/4 b3-/4 |
-V3: a3-/2~ a3-/2 |
+V1: :legato e4-/2 e4-/4 :reset d4-/4 |
+V2: :legato c4/2 c4/4 :reset b3-/4 |
+V3: :legato a3-/2 a3-/2 |
 V4: a2-/1 |
 
 @diminuendo @p

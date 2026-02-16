@@ -36,20 +36,26 @@ piano {
       %tremolo g4/2 %tremolo c5/2 |
       @ff %tremolo c5/1 |
             c5/4 g4/4 e4/4 c4/4 |
-      
-      # Section 5: Mixed Ornaments in Melody
-      # Baroque-style ornamented melody
-      (key g 'major)
-      @mf :legato
+}
+
+# Section 5: Mixed Ornaments in Melody
+# Baroque-style ornamented melody
+(key g 'major)
+
+piano {
+  V1: @mf :legato
       g4/4 a4/4 %trill b4/2 |
       %mordent a4/4 g4/4 %turn f4+/2 |
       e4/4 d4/4 %trill e4/4 f4+/4 |
       %turn g4/2 g4/2 |
-      
-      # Section 6: Ornaments with Dynamics
-      # Expressive phrasing
-      (key f 'major)
-      @p :legato
+}
+
+# Section 6: Ornaments with Dynamics
+# Expressive phrasing
+(key f 'major)
+
+piano {
+  V1: @p :legato
       f4/4 %turn a4/4 c5/4 %trill f5/4 |
       
       @mp
@@ -61,20 +67,26 @@ piano {
       @p @diminuendo
       f4/4 e4/4 d4/4 %turn c4/4 |
       @pp f4/1 |
-      
-      # Section 7: Classical Ornaments
-      # Mozart-style embellishments
-      (key d 'major)
-      @mf :legato
-      d4/8 f4+/8 %trill a4/4. g4/8 |
-      %mordent f4+/8 e4/8 %turn d4/2 |
-      c4+/8 d4/8 e4/8 f4+/8 %trill g4/4 |
+}
+
+# Section 7: Classical Ornaments
+# Mozart-style embellishments
+(key d 'major)
+
+piano {
+  V1: @mf :legato
+      d4/8 f4+/8 %trill a4/4. g4/8 f4+/8 e4/8 |
+      %mordent f4+/8 e4/8 d4/8 c4+/8 %turn d4/2 |
+      c4+/8 d4/8 e4/8 f4+/8 %trill g4/4 a4/4 |
       f4+/4 e4/4 %trill d4/2 |
-      
-      # Section 8: Romantic Expression
-      # Chopin-style ornaments with rubato feel
-      (key a- 'major) (tempo! 70)
-      @p :legato
+}
+
+# Section 8: Romantic Expression
+# Chopin-style ornaments with rubato feel
+(key a- 'major) (tempo! 70)
+
+piano {
+  V1: @p :legato
       e4-/4 %turn a4-/4 c5/4. b4-/8 |
       
       @crescendo
@@ -86,11 +98,14 @@ piano {
       @diminuendo
       f4/4 %turn e4-/4 d4-/4 c4/4 |
       @pp a3-/1 |
-      
-      # Section 9: Tremolo Buildup
-      # Tense, dramatic crescendo
-      (key c 'minor) (tempo! 120)
-      @pp @crescendo
+}
+
+# Section 9: Tremolo Buildup
+# Tense, dramatic crescendo
+(key c 'minor) (tempo! 120)
+
+piano {
+  V1: @pp @crescendo
       %tremolo c4/2 %tremolo e4-/2 |
       %tremolo g4/2 %tremolo c5/2 |
       @f %tremolo e5-/1 |
@@ -115,6 +130,6 @@ piano {
       g2/1 |
   
   # Final cadence
-  V1: %turn e4-/1
-  V2: c3/1
+  V1: %turn e4-/1 |
+  V2: c3/1 |
 }
