@@ -34,20 +34,25 @@ Muslang provides comprehensive percussion support using **General MIDI drum mapp
 ### Syntax
 
 ```muslang
-drums: drum_name/duration ...
+drums {
+  drum_name/duration ...
+}
 ```
 
 or
 
 ```muslang
-percussion: drum_name/duration ...
+percussion {
+  drum_name/duration ...
+}
 ```
 
 ### Simple Example
 
 ```muslang
-drums:
+drums {
   V1: kick/4 snare/4 hat/8 hat/8
+}
 ```
 
 ### Duration
@@ -55,10 +60,11 @@ drums:
 Drums use the same duration syntax as melodic notes:
 
 ```muslang
-drums:
+drums {
   V1: kick/4      # Quarter note kick
       snare/8     # Eighth note snare
       hat/16      # Sixteenth note hi-hat
+}
 ```
 
 ### Multiple Drums Simultaneously
@@ -66,10 +72,11 @@ drums:
 To play drums at the same time, use multiple voices (not chords - drums don't form chords):
 
 ```muslang
-drums:
+drums {
   V1: kick/4 r/4 kick/4 r/4
   V2: r/4 snare/4 r/4 snare/4
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+}
 ```
 
 ---
@@ -125,10 +132,11 @@ The essential elements of a standard drum kit:
 The foundation of rock music - kick on 1 and 3, snare on 2 and 4, hi-hat eighths:
 
 ```muslang
-drums: (tempo! 120)
+drums (tempo! 120) {
   V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
   V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+}
 ```
 
 Or more compactly with recursive `m4` preprocessing:
@@ -139,10 +147,11 @@ define(`ROCK_KICK', `kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8')
 define(`ROCK_SNARE', `r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8')
 define(`ROCK_HAT', `hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8')
 
-drums: (tempo! 120)
+drums (tempo! 120) {
   V1: REPEAT(4, `ROCK_KICK ')
   V2: REPEAT(4, `ROCK_SNARE ')
   V3: REPEAT(4, `ROCK_HAT ')
+}
 ```
 
 **Note**: Use `m4` to generate plain `.mus` before compiling with Muslang.
@@ -152,9 +161,10 @@ drums: (tempo! 120)
 Classic 4/4 with kick and snare:
 
 ```muslang
-drums: (time 4 4) (tempo! 120)
+drums (time 4 4) (tempo! 120) {
   V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
   V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
+}
 ```
 
 ### Disco Beat
@@ -162,10 +172,11 @@ drums: (time 4 4) (tempo! 120)
 Famous four-on-the-floor with hi-hat eighths:
 
 ```muslang
-drums: (tempo! 120)
+drums (tempo! 120) {
   V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
   V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+}
 ```
 
 ### Funk Pattern
@@ -173,10 +184,11 @@ drums: (tempo! 120)
 Syncopated 16th notes with ghost notes:
 
 ```muslang
-drums: (tempo! 110)
+drums (tempo! 110) {
   V1: kick/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 kick/16 r/16 r/16 r/16 r/16 r/16 kick/16 r/16
   V2: r/16 r/16 r/16 r/16 @p snare/16 @mf snare/16 r/16 r/16 r/16 r/16 r/16 r/16 snare/16 r/16 r/16 @p snare/16
   V3: hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+}
 ```
 
 ### Jazz Swing
@@ -184,10 +196,11 @@ drums: (tempo! 110)
 Ride cymbal pattern with cross-stick:
 
 ```muslang
-drums: (tempo! 140)
+drums (tempo! 140) {
   V1: kick/4. kick/8 kick/4 kick/4
   V2: r/4 rimshot/4 r/4 rimshot/4
   V3: ride/8. ride/16 ride/8 ride/8. ride/16 ride/8 ride/8. ride/16 ride/8 ride/8. ride/16 ride/8
+}
 ```
 
 ### Latin Pattern
@@ -195,11 +208,12 @@ drums: (tempo! 140)
 Clave-based rhythm:
 
 ```muslang
-drums: (tempo! 100)
+drums (tempo! 100) {
   V1: kick/8 r/8 kick/8 r/8 kick/8 r/8 r/8 r/8
   V2: r/8 r/8 snare/8 r/8 r/8 snare/8 r/8 snare/8
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
   V4: cowbell/4 r/8 cowbell/8 r/4 cowbell/8 r/8
+}
 ```
 
 ### Drum Fill
@@ -207,8 +221,9 @@ drums: (tempo! 100)
 Tom-based fill leading to crash:
 
 ```muslang
-drums:
+drums {
   tom1/16 tom1/16 tom2/16 tom2/16 tom3/16 tom3/16 tom4/16 tom4/16 crash/2
+}
 ```
 
 ---
@@ -220,8 +235,9 @@ drums:
 Very quiet snare hits (common in funk):
 
 ```muslang
-drums:
+drums {
   @mf snare/16 @pp snare/16 @p snare/16 @mf snare/16
+}
 ```
 
 ### Flams
@@ -229,8 +245,9 @@ drums:
 Two very close hits (grace note + main note):
 
 ```muslang
-drums:
+drums {
   ~snare/32 snare/4
+}
 ```
 
 ### Rim Click vs Full Snare
@@ -238,8 +255,9 @@ drums:
 Use `rimshot` for side stick, `snare` for full hit:
 
 ```muslang
-drums:
+drums {
   kick/4 rimshot/4 kick/4 snare/4
+}
 ```
 
 ### Open/Closed Hi-Hat
@@ -247,8 +265,9 @@ drums:
 Alternate between `hat` (closed) and `openhat` (open):
 
 ```muslang
-drums:
+drums {
   hat/8 hat/8 openhat/8 hat/8 hat/8 hat/8 openhat/8 hat/8
+}
 ```
 
 ### Cymbal Crashes
@@ -256,11 +275,12 @@ drums:
 Use crashes for emphasis:
 
 ```muslang
-drums:
+drums {
   # Build-up
   tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
   # Crash!
   crash/2 kick/4 snare/4
+}
 ```
 
 ### Rolls
@@ -268,11 +288,12 @@ drums:
 Fast repeated hits (snare roll):
 
 ```muslang
-drums:
+drums {
   # Snare roll (32nd notes)
   snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32
   snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32 snare/32
   crash/2
+}
 ```
 
 ---
@@ -284,7 +305,7 @@ drums:
 Drums respond to dynamics like melodic instruments:
 
 ```muslang
-drums:
+drums {
   # Soft kick
   @p kick/4 kick/4
   
@@ -293,17 +314,19 @@ drums:
   
   # Crescendo on hi-hat
   @pp @crescendo hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 @f hat/8 hat/8
+}
 ```
 
 ### Articulation Effects
 
 ```muslang
-drums:
+drums {
   # Staccato hi-hat (short, tight)
   :staccato hat/8 hat/8 hat/8 hat/8
   
   # Tenuto kick (full sustained)
   :tenuto kick/4 kick/4
+}
 ```
 
 ### Accents
@@ -311,8 +334,9 @@ drums:
 Use sforzando for accented hits:
 
 ```muslang
-drums:
+drums {
   hat/8 hat/8 @sforzando hat/8 hat/8 hat/8 hat/8 @sforzando hat/8 hat/8
+}
 ```
 
 ---
@@ -322,19 +346,20 @@ drums:
 ### Example 1: Basic Rock Groove
 
 ```muslang
-drums: (tempo! 120) (time 4 4)
+drums (tempo! 120) (time 4 4) {
   V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
       kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
   V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
       r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
       hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+}
 ```
 
 ### Example 2: Buildup with Dynamics
 
 ```muslang
-drums: (tempo! 130)
+drums (tempo! 130) {
   # Start quiet
   @pp
   kick/4 snare/4 kick/4 snare/4 kick/4 snare/4 kick/4 snare/4
@@ -346,23 +371,25 @@ drums: (tempo! 130)
   # Climax
   @ff
   kick/4 snare/4 kick/4 crash/4
+}
 ```
 
 ### Example 3: Complex 16th Pattern
 
 ```muslang
-drums: (tempo! 110)
+drums (tempo! 110) {
   V1: kick/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 
       kick/16 r/16 r/16 r/16 r/16 kick/16 r/16 r/16
   V2: r/16 r/16 r/16 r/16 snare/16 r/16 @p snare/16 r/16 
       r/16 r/16 r/16 r/16 @mf snare/16 r/16 @p snare/16 @mf snare/16
   V3: hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+}
 ```
 
 ### Example 4: Drum Fill with Toms
 
 ```muslang
-drums: (tempo! 140)
+drums (tempo! 140) {
   # Regular beat
   V1: kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8 kick/8 r/8 r/8 r/8
   V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
@@ -371,70 +398,77 @@ drums: (tempo! 140)
   # Fill
   @f tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
   crash/4 kick/4 snare/4 kick/4
+}
 ```
 
 ### Example 5: Funky Ghost Notes
 
 ```muslang
-drums: (tempo! 100)
+drums (tempo! 100) {
   V1: kick/16 r/16 kick/16 r/16 r/16 r/16 kick/16 r/16 
       kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16
   V2: r/16 r/16 r/16 r/16 @f snare/16 @pp snare/16 @p snare/16 @pp snare/16 
       r/16 r/16 r/16 r/16 @f snare/16 @pp snare/16 @p snare/16 @f snare/16
   V3: :staccato hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+}
 ```
 
 ### Example 6: Jazz Ride Pattern
 
 ```muslang
-drums: (tempo! 160)
+drums (tempo! 160) {
   V1: kick/4. r/8 r/2
   V2: r/4 rimshot/4 r/4 rimshot/4
   V3: ride/8. ride/16 ride/8 ride/8. ride/16 ride/8 
       ride/8. ride/16 ride/8 ride/8. ride/16 ride/8
+}
 ```
 
 ### Example 7: Latin Percussion
 
 ```muslang
-drums: (tempo! 110)
+drums (tempo! 110) {
   V1: kick/8 r/8 kick/8 kick/8 r/8 r/8 kick/8 r/8
   V2: r/8 r/8 snare/8 r/8 r/8 snare/8 r/8 snare/8
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
   V4: cowbell/4 r/8 cowbell/8 r/4 cowbell/8 cowbell/8
   V5: tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16
       tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16 tambourine/16 r/16
+}
 ```
 
 ### Example 8: Metal Double Bass
 
 ```muslang
-drums: (tempo! 180)
+drums (tempo! 180) {
   V1: kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16
       kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16 kick/16  # Fast double kick
   V2: r/8 r/8 r/8 snare/8 r/8 r/8 r/8 snare/8
   V3: hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
   V4: r/2 r/4 crash/4  # Occasional crash
+}
 ```
 
 ### Example 9: Breakbeat Pattern
 
 ```muslang
-drums: (tempo! 140)
+drums (tempo! 140) {
   V1: kick/16 r/16 r/16 kick/16 r/16 r/16 r/16 r/16 
       kick/16 r/16 r/16 r/16 kick/16 r/16 r/16 r/16
   V2: r/16 r/16 r/16 r/16 snare/16 r/16 snare/16 r/16 
       r/16 snare/16 r/16 r/16 snare/16 r/16 snare/16 snare/16
   V3: hat/8 hat/8 openhat/8 hat/8 hat/8 hat/8 openhat/8 hat/8
+}
 ```
 
 ### Example 10: Progressive Time (7/8)
 
 ```muslang
-drums: (tempo! 130) (time 7 8)
+drums (tempo! 130) (time 7 8) {
   V1: kick/8 r/8 kick/8 r/8 kick/8 r/8 r/8
   V2: r/8 r/8 snare/8 r/8 r/8 snare/8 r/8
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+}
 ```
 
 ---
@@ -476,19 +510,21 @@ Don't try to use chords - drums don't form chords:
 
 ```muslang
 # Good - separate voices
-drums:
+drums {
   V1: kick/4 kick/4 kick/4 kick/4
   V2: r/4 snare/4 r/4 snare/4
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+}
 
 # Even better - voices in repeating pattern
-drums: (generated from m4)
+drums (generated from m4) {
   V1: kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4 kick/4
   V2: r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4 r/4 snare/4
   V3: hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8
+}
 
 # Won't work - drums can't be chorded like pitched notes
-drums: kick/4,snare/4,hat/8  # ✗ Invalid
+drums { kick/4,snare/4,hat/8 }  # ✗ Invalid
 ```
 
 ### 2. Use Recursive m4 Macros for Patterns
@@ -499,8 +535,9 @@ Drum patterns repeat - define them once in `.mus.m4` and expand with `m4`:
 define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')
 define(`BACKBEAT', `kick/4 snare/4 kick/4 snare/4')
 
-drums:
+drums {
   V1: REPEAT(8, `BACKBEAT ')
+}
 ```
 
 ### 3. Layer Dynamics
@@ -508,13 +545,14 @@ drums:
 Use dynamics for ghost notes and accents:
 
 ```muslang
-drums:
+drums {
   # Main snare hits loud
   @f snare/16 r/16 r/16 r/16
   # Ghost notes quiet
   @pp snare/16 @p snare/16 r/16 r/16
   # Accent again
   @ff snare/16 r/16 r/16 r/16
+}
 ```
 
 ### 4. Tempo Matters
@@ -523,12 +561,14 @@ Fast patterns need appropriate tempo:
 
 ```muslang
 # 16th notes at slow tempo = groovy
-drums: (tempo! 90)
+drums (tempo! 90) {
   hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+}
 
 # 16th notes at fast tempo = intense
-drums: (tempo! 160)
+drums (tempo! 160) {
   hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+}
 ```
 
 ### 5. Name Instrument "drums" or "percussion"
@@ -536,11 +576,11 @@ drums: (tempo! 160)
 These names tell the compiler to use MIDI Channel 10:
 
 ```muslang
-drums: kick/4 snare/4     # ✓ Uses channel 10
-percussion: kick/4 snare/4  # ✓ Also works
-kit: kick/4 snare/4       # ✓ "kit" also detected
+drums { kick/4 snare/4 }     # ✓ Uses channel 10
+percussion { kick/4 snare/4 }  # ✓ Also works
+kit { kick/4 snare/4 }       # ✓ "kit" also detected
 
-piano: kick/4 snare/4     # ✗ Won't work - not percussion
+piano { kick/4 snare/4 }     # ✗ Won't work - not percussion
 ```
 
 ---
@@ -552,9 +592,10 @@ piano: kick/4 snare/4     # ✗ Won't work - not percussion
 Different time divisions in each voice:
 
 ```muslang
-drums:
+drums {
   V1: kick/4 kick/4 kick/4 kick/4
   V2: (snare/8 r/8 snare/8):3 (snare/8 r/8 snare/8):3 (snare/8 r/8 snare/8):3  # Triplets against quarters
+}
 ```
 
 ### Changing Patterns
@@ -562,7 +603,7 @@ drums:
 Vary the beat throughout:
 
 ```muslang
-drums: (tempo! 120)
+drums (tempo! 120) {
   # Verse - simple
   kick/4 snare/4 kick/4 snare/4 kick/4 snare/4 kick/4 snare/4
   
@@ -579,6 +620,7 @@ drums: (tempo! 120)
       hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
       hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
       hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16 hat/16
+}
 ```
 
 ### Drum Solo
@@ -586,7 +628,7 @@ drums: (tempo! 120)
 Extended fill with all drums:
 
 ```muslang
-drums: (tempo! 140) @ff
+drums (tempo! 140) @ff {
   # Build with toms
   tom1/16 tom1/16 tom1/16 tom1/16 
   tom2/16 tom2/16 tom2/16 tom2/16
@@ -594,6 +636,7 @@ drums: (tempo! 140) @ff
   tom4/16 tom4/16 tom4/16 tom4/16
   # Finish with crash
   crash/2 kick/4 snare/4
+}
 ```
 
 ---
@@ -604,34 +647,35 @@ drums: (tempo! 140) @ff
 
 **Check**: Instrument name must be `drums`, `percussion`, or `kit`:
 ```muslang
-drums: kick/4 snare/4  # ✓ Works
-drumset: kick/4 snare/4  # ✗ Won't be detected
+drums { kick/4 snare/4 }  # ✓ Works
+drumset { kick/4 snare/4 }  # ✗ Won't be detected
 ```
 
 ### Problem: Multiple drums not sounding together
 
 **Solution**: Use voices (V1, V2, etc.):
 ```muslang
-drums:
+drums {
   V1: kick/4
   V2: snare/4
   V3: hat/8 hat/8
+}
 ```
 
 ### Problem: Drums too loud/soft
 
 **Solution**: Use dynamics:
 ```muslang
-drums: @ff kick/4  # Loud
-drums: @pp hat/8   # Quiet
+drums @ff { kick/4 }  # Loud
+drums @pp { hat/8 }   # Quiet
 ```
 
 ### Problem: Unknown drum name error
 
 **Check**: Use valid drum names from the reference table:
 ```muslang
-drums: kick/4     # ✓ Valid
-drums: bassdrum/4  # ✗ Invalid name
+drums { kick/4 }     # ✓ Valid
+drums { bassdrum/4 }  # ✗ Invalid name
 ```
 
 ---

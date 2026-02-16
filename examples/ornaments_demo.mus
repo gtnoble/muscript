@@ -2,7 +2,9 @@
 # Demonstrates all ornament types in Muslang
 # Including trills, mordents, turns, and tremolo
 
-piano: (tempo! 100) (time 4 4) (key c 'major)
+(tempo! 100) (time 4 4) (key c 'major)
+
+piano {
   V1: # Section 1: Trills
       # Rapid alternation between note and upper neighbor
       @mf :legato
@@ -93,10 +95,13 @@ piano: (tempo! 100) (time 4 4) (key c 'major)
       %tremolo g4/2 %tremolo c5/2 |
       @f %tremolo e5-/1 |
       @ff c5/4 g4/4 e4-/4 c4/4 |
+}
 
 # Section 10: Bach-style Ornamentation
 # Contrapuntal ornaments
-piano: (key e- 'major) (tempo! 100)
+(key e- 'major)
+
+piano {
   V1: @mf :legato
       %mordent g4/4 f4/8 e4-/8 %turn d4/4 c4/8 b3-/8 |
       %trill a3-/2. g3/4 |
@@ -112,3 +117,4 @@ piano: (key e- 'major) (tempo! 100)
   # Final cadence
   V1: %turn e4-/1
   V2: c3/1
+}

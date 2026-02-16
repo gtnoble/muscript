@@ -9,7 +9,7 @@ Node Hierarchy:
     ASTNode (base)
     ├── Note, Rest, Chord, PercussionNote
     ├── GraceNote, Tuplet
-    ├── Slur, Slide
+    ├── Slide
     ├── Articulation, Ornament, Tremolo, Reset
     ├── DynamicLevel, DynamicTransition, DynamicAccent, Expression
     ├── TimeSignature, KeySignature, Tempo, Pan
@@ -462,25 +462,6 @@ class Tuplet(ASTNode):
 # ============================================================================
 
 @dataclass
-class Slur(ASTNode):
-    """
-    Slurred phrase grouping.
-    
-    Notes under a slur are played smoothly connected (legato) with minimal
-    separation between notes. In MIDI, this uses CC#68 (legato) and note overlap.
-    
-    Attributes:
-        notes: List of notes to slur together (minimum 2 notes)
-    """
-    notes: List[Note] = field(default_factory=list)
-    
-    def __repr__(self) -> str:
-        num_notes = len(self.notes)
-        loc_str = f" at {self.location}" if self.location else ""
-        return f"Slur({{{num_notes} notes}}){loc_str}"
-
-
-@dataclass
 class Slide(ASTNode):
     """
     Slide/glissando between two notes.
@@ -510,6 +491,37 @@ class Slide(ASTNode):
         style_str = f".{self.style} " if self.style != 'chromatic' else ""
         loc_str = f" at {self.location}" if self.location else ""
         return f"Slide(<{style_str}{self.from_note} -> {self.to_note}>){loc_str}"
+
+
+@dataclass
+class Measure(ASTNode):
+    """
+    Measure grouping (events between bar lines).
+    
+    Groups events that occur within a single measure, separated by | bar lines.
+    Measures enable validation of note durations against the active time signature.
+    
+    Attributes:
+        events: List of events in this measure
+        measure_number: Measure number for tracking and error reporting (1-indexed)
+        start_time: Absolute start time in MIDI ticks (populated during semantic analysis)
+        end_time: Absolute end time in MIDI ticks (populated during semantic analysis)
+    
+    Example:
+        V1: c4/4 d4/4 e4/4 f4/4 | g4/2 a4/2 |
+            ^-- Measure 1 --^   ^-Measure 2-^
+    """
+    events: List[ASTNode] = field(default_factory=list)
+    measure_number: Optional[int] = None
+    start_time: Optional[float] = None
+    end_time: Optional[float] = None
+    location: Optional[SourceLocation] = None
+    
+    def __repr__(self) -> str:
+        num_events = len(self.events)
+        measure_str = f"#{self.measure_number} " if self.measure_number else ""
+        loc_str = f" at {self.location}" if self.location else ""
+        return f"Measure({measure_str}{num_events} events){loc_str}"
 
 
 # ============================================================================
@@ -608,6 +620,7 @@ class TimeSignature(ASTNode):
     """
     numerator: int
     denominator: int
+    location: Optional[SourceLocation] = None
     
     def __repr__(self) -> str:
         loc_str = f" at {self.location}" if self.location else ""
@@ -695,7 +708,7 @@ class Import(ASTNode):
 EventNode = Union[
     Note, Rest, Chord, PercussionNote,
     GraceNote, Tuplet,
-    Slur, Slide,
+    Slide, Measure,
     Articulation, Ornament, Tremolo, Reset,
     DynamicLevel, DynamicTransition, DynamicAccent, Expression,
     TimeSignature, KeySignature, Tempo, Pan,

@@ -4,7 +4,7 @@ Tests for timing calculation and state tracking in semantic analysis.
 
 import pytest
 from muslang.ast_nodes import *
-from muslang.semantics import SemanticAnalyzer
+from muslang.semantics import SemanticAnalyzer, SemanticError
 from muslang.config import *
 
 
@@ -175,32 +175,34 @@ class TestTimingCalculation:
         # Main note should start after grace note
         assert abs(processed_main.start_time - grace_duration) < 0.01
     
-    def test_slur_timing(self):
-        """Test timing for slurs"""
+    def test_legato_note_sequence_timing(self):
+        """Test timing for a legato-marked note sequence"""
         analyzer = SemanticAnalyzer()
-        
-        slur_notes = [
+
+        events = [
+            Articulation(type='legato'),
             Note(pitch='c', octave=4, duration=4),
             Note(pitch='d', octave=4, duration=4),
             Note(pitch='e', octave=4, duration=4),
         ]
-        slur = Slur(notes=slur_notes)
-        instrument = Instrument(name='piano', events=[], voices={1: [slur]})
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
-        
+
         result = analyzer._calculate_timing(seq)
-        
-        processed_slur = result.events[0].voices[1][0]
-        
-        # Notes in slur should be sequential
-        assert processed_slur.notes[0].start_time == 0.0
-        assert processed_slur.notes[0].end_time == DEFAULT_MIDI_PPQ
-        
-        assert processed_slur.notes[1].start_time == DEFAULT_MIDI_PPQ
-        assert processed_slur.notes[1].end_time == 2 * DEFAULT_MIDI_PPQ
-        
-        assert processed_slur.notes[2].start_time == 2 * DEFAULT_MIDI_PPQ
-        assert processed_slur.notes[2].end_time == 3 * DEFAULT_MIDI_PPQ
+        processed_events = result.events[0].voices[1]
+
+        note1 = processed_events[1]
+        note2 = processed_events[2]
+        note3 = processed_events[3]
+
+        assert note1.start_time == 0.0
+        assert note1.end_time == DEFAULT_MIDI_PPQ
+
+        assert note2.start_time == DEFAULT_MIDI_PPQ
+        assert note2.end_time == 2 * DEFAULT_MIDI_PPQ
+
+        assert note3.start_time == 2 * DEFAULT_MIDI_PPQ
+        assert note3.end_time == 3 * DEFAULT_MIDI_PPQ
 
     def test_slide_timing_uses_both_note_durations(self):
         """Test slide timing includes both from-note and to-note durations."""
@@ -240,6 +242,37 @@ class TestTimingCalculation:
         
         # Dotted quarter note
         assert analyzer._duration_to_ticks(4, True) == DEFAULT_MIDI_PPQ * 1.5
+
+    def test_measure_duration_mismatch_includes_instrument_and_line(self):
+        """Mismatch errors include instrument and source line context when available."""
+        analyzer = SemanticAnalyzer()
+
+        # 3/4 expects 3 quarter notes per measure, but provide 4 quarter notes.
+        measure = Measure(
+            events=[
+                Note(pitch='c', octave=4, duration=4),
+                Note(pitch='d', octave=4, duration=4),
+                Note(pitch='e', octave=4, duration=4),
+                Note(pitch='f', octave=4, duration=4),
+            ],
+            measure_number=1,
+            location=SourceLocation(line=21, column=3),
+        )
+
+        instrument = Instrument(
+            name='violin',
+            events=[],
+            voices={1: [TimeSignature(numerator=3, denominator=4), measure]},
+        )
+        seq = Sequence(events=[instrument])
+
+        with pytest.raises(SemanticError) as exc_info:
+            analyzer.analyze(seq)
+
+        error_msg = str(exc_info.value)
+        assert "Instrument 'violin'" in error_msg
+        assert "line 21" in error_msg
+        assert "Measure 1 duration mismatch" in error_msg
 
 
 class TestStateTracking:

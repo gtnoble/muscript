@@ -63,7 +63,8 @@ define(`MELODY_5', `r/4 r/8 g5/16 a5/16 g5/8 e5/8 d5/8 c5/8 r/4 a4/8 c5/8')dnl
 # ==============================
 
 # Rhodes Piano
-electric_piano_1: (tempo! 75) (time 4 4) (key a 'minor)
+(tempo! 75) (time 4 4) (key a 'minor)
+electric_piano_1 {
   # Intro (4 bars - build up)
   V1: @p :legato CHORD_A1 | CHORD_A2 | CHORD_A3 | CHORD_A4 |
   
@@ -83,18 +84,22 @@ electric_piano_1: (tempo! 75) (time 4 4) (key a 'minor)
   
   # Outro (8 bars - fade feel)
   V1: @diminuendo @mp REPEAT(2, `CHORD_A1 | CHORD_A2 | CHORD_A3 | CHORD_A4 | ')
+}
 
 # Bass
-bass: (tempo! 75) (time 4 4) (key a 'minor)
+(tempo! 75) (time 4 4) (key a 'minor)
+bass {
   V1: @mp r/1 | r/1 | r/1 | r/1 |
   V1: @mp REPEAT(4, `BASS_A | ')
   V1: @mf REPEAT(2, `BASS_B | ')
   V1: @mp REPEAT(2, `BASS_A | ')
   V1: @mf REPEAT(2, `BASS_C | ')
   V1: @diminuendo @mp REPEAT(2, `BASS_A | ')
+}
 
 # Drums
-drums: (tempo! 75) (time 4 4)
+(tempo! 75) (time 4 4)
+drums {
   # Intro - minimal drums
   V1: @p r/1 | r/1 | r/2 KICK_1 |
   V2: r/1 | r/1 | r/2 SNARE_1 |
@@ -128,9 +133,11 @@ drums: (tempo! 75) (time 4 4)
   V1: @mp REPEAT(7, `KICK_1 | ') kick/8 r/8 r/4 kick/4 snare/8 tom1/16 tom2/16 |
   V2: REPEAT(7, `SNARE_1 | ') r/2 r/4 snare/8 r/8 |
   V3: @diminuendo REPEAT(8, `HAT_1 | ')
+}
 
 # Lead Melody - Soft Square Wave or Bell-like
-lead_1_square: (tempo! 75) (time 4 4) (key a 'minor)
+(tempo! 75) (time 4 4) (key a 'minor)
+lead_1_square {
   V1: @pp r/1 | r/1 | r/1 | r/1 |
   V1: REPEAT(8, `r/1 | ')
   V1: REPEAT(8, `r/1 | ')
@@ -150,3 +157,4 @@ lead_1_square: (tempo! 75) (time 4 4) (key a 'minor)
   # Fade in outro
   V1: @diminuendo r/1 | MELODY_4 | r/1 | MELODY_5 |
   V1: @pp r/1 | r/2 MELODY_3 | r/1 | r/1 |
+}

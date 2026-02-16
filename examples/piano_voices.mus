@@ -2,7 +2,9 @@
 # Demonstrates polyphonic writing with multiple voices
 # Shows how to create complex piano textures with independent melodic lines
 
-piano: (tempo! 100) (time 4 4) (key c 'major)
+(tempo! 100) (time 4 4) (key c 'major)
+
+piano {
 
 # Section 1: Simple Two-Voice Counterpoint
 # Melody in right hand, bass in left hand
@@ -211,3 +213,4 @@ V1: c6/1 |
 V2: e5/1 |
 V3: g4/1 |
 V4: c3/1 |
+}

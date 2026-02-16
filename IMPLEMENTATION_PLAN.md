@@ -407,9 +407,8 @@ tuplet: "(" event+ ")" ":" INT
 // Example: r/4 (quarter rest), r/8. (dotted eighth rest)
 rest: "r" ("/" duration dotted?)?
 
-// Slurs - group notes with legato phrasing
-// Example: {c4/4 d4/4 e4/4}
-slur: "{" event+ "}"
+// Slurred phrasing is handled by articulation
+// Example: :legato c4/4 d4/4 e4/4
 
 // Slides/glissandi - angle brackets now unambiguous!
 // Examples: <c4/4 c5/4> (chromatic), <portamento: c4/4 g4/4>, <stepped: c4/4 c5/4>

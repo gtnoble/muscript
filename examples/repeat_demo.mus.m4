@@ -13,15 +13,19 @@ define(`ROCK_HAT', `hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8 hat/8')dnl
 
 REPEAT(2, 
 `
-piano: (tempo! 120) (time 4 4)
-  V1: PIANO_BAR
-  V2: BASS_BAR
+(tempo! 120) (time 4 4)
+piano {
+  V1: PIANO_BAR |
+  V2: BASS_BAR |
+}
 
-drums: (tempo! 120) (time 4 4)
-  V1: ROCK_KICK
-  V2: ROCK_SNARE
-  V3: ROCK_HAT
+drums {
+  V1: ROCK_KICK |
+  V2: ROCK_SNARE |
+  V3: ROCK_HAT |
+}
 
-flute: (tempo! 120) (time 4 4)
-  V1: FLUTE_BAR
+flute {
+  V1: FLUTE_BAR |
+}
 ')

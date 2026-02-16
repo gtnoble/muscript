@@ -286,20 +286,6 @@ class MIDIGenerator:
             raise ValueError(
                 f"Instrument '{instrument.name}' must contain at least one explicit voice"
             )
-
-        non_voice_note_types = (
-            Note, Rest, Chord, PercussionNote, Slur, Slide, GraceNote, Tuplet
-        )
-        for event in instrument.events:
-            if isinstance(event, non_voice_note_types):
-                raise ValueError(
-                    f"Instrument '{instrument.name}' contains {type(event).__name__} outside voice context"
-                )
-
-        # Process instrument-level directives (tempo, time signature, etc.)
-        # These don't advance time, so process them at time 0.
-        for event in instrument.events:
-            self._process_event(track_num, channel, event, 0, mapper)
         
         # Process voices (each voice starts at time 0, plays simultaneously)
         for voice_num, voice_events in instrument.voices.items():
@@ -401,11 +387,17 @@ class MIDIGenerator:
             self.midi.addControllerEvent(track, channel, time_beats, CC_PAN, pan_value)
             return time_ticks
         
-        elif isinstance(event, Slur):
-            return self._generate_slur(track, channel, event, time_ticks, mapper)
-        
         elif isinstance(event, Slide):
             return self._generate_slide(track, channel, event, time_ticks, mapper)
+        
+        elif isinstance(event, Measure):
+            # Process all events in measure sequentially
+            current_time = time_ticks
+            for measure_event in event.events:
+                current_time = self._process_event(
+                    track, channel, measure_event, current_time, mapper
+                )
+            return current_time
         
         elif isinstance(event, PercussionNote):
             midi_note = get_drum_midi_note(event.drum_sound)
@@ -499,46 +491,6 @@ class MIDIGenerator:
         else:
             # Normal: advance by full base duration
             return time_ticks + base_duration_ticks
-    
-    def _generate_slur(
-        self, 
-        track: int, 
-        channel: int, 
-        slur: Slur, 
-        time_ticks: int, 
-        mapper: ArticulationMapper
-    ) -> int:
-        """
-        Generate slurred notes with overlap and legato CC.
-        
-        Args:
-            track: MIDI track number
-            channel: MIDI channel number
-            slur: Slur AST node
-            time_ticks: Current time in MIDI ticks
-            mapper: Articulation/dynamic state tracker
-        
-        Returns:
-            New time in ticks after slur
-        """
-        # Enable legato CC at start
-        time_beats = time_ticks / self.ppq
-        self.midi.addControllerEvent(track, channel, time_beats, CC_LEGATO, 127)
-        
-        # Generate slurred notes with overlap
-        slur_time_ticks = time_ticks
-        for i, note in enumerate(slur.notes):
-            is_last = (i == len(slur.notes) - 1)
-            overlap = not is_last  # Overlap all but last note
-            slur_time_ticks = self._generate_note(
-                track, channel, note, slur_time_ticks, mapper, overlap=overlap
-            )
-        
-        # Disable legato CC at end
-        end_time_beats = slur_time_ticks / self.ppq
-        self.midi.addControllerEvent(track, channel, end_time_beats, CC_LEGATO, 0)
-        
-        return slur_time_ticks
     
     def _generate_slide(
         self, 

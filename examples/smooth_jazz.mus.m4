@@ -67,7 +67,8 @@ define(`KICK_FILL',`tom2/16 tom3/16 tom4/16 tom3/16 tom2/16 tom1/16 snare/16 r/1
 # Composition
 # ==============================
 
-electric_piano_1: (tempo! 96) (time 4 4) (key d 'minor) (pan 48)
+(tempo! 96) (time 4 4) (key d 'minor) (pan 48)
+electric_piano_1 {
   # Intro (8)
   V1: @mp :legato REPEAT(1, `COMP_LOOP_A')
   V1: @mp :tenuto REPEAT(1, `COMP_LOOP_A')
@@ -85,8 +86,10 @@ electric_piano_1: (tempo! 96) (time 4 4) (key d 'minor) (pan 48)
   V1: @mf BAR1_Dm9 | BAR2_Gm9 | BAR3_C13 | BAR4_Fmaj9 | BAR5_Bbmaj9 | BAR6_EmA | BAR7_Dm9 |
   V1: @diminuendo BAR8_A7sus |
   V1: @p d3/1,f3/1,a3/1,c4/1 |
+}
 
-bass: (tempo! 96) (time 4 4) (key d 'minor) (pan 64)
+(tempo! 96) (time 4 4) (key d 'minor) (pan 64)
+bass {
   # Intro (8)
   V1: @mp r/1 | r/1 | r/1 | r/1 |
   V1: REPEAT(1, `BASS_LOOP_A')
@@ -103,8 +106,10 @@ bass: (tempo! 96) (time 4 4) (key d 'minor) (pan 64)
   # Outro (8)
   V1: @mf B_Dm9 | B_Gm9 | B_C13 | B_Fmaj9 | B_Bbmaj9 | B_EmA | B_Dm9 | @diminuendo B_A7sus |
   V1: @p d2/1 |
+}
 
-drums: (tempo! 96) (time 4 4)
+(tempo! 96) (time 4 4)
+drums {
   # Intro (8) — brushes-ish (hat only), then groove
   V1: @p r/1 | r/1 | r/1 | r/1 |
   V1: @mp REPEAT(4, `KICK_A ')
@@ -132,3 +137,4 @@ drums: (tempo! 96) (time 4 4)
   V1: @mf REPEAT(7, `KICK_A ') KICK_FILL
   V2: @mf REPEAT(8, `SN_BACK ')
   V3: @diminuendo REPEAT(7, `HAT_SW ') r/1
+}

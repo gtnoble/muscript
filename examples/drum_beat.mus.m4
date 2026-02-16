@@ -16,29 +16,29 @@ define(`BREAK_HAT', `hat/8 hat/8 openhat/8 hat/8 hat/8 hat/8 openhat/8 hat/8')dn
 
 # Section 1: Basic Rock Beat
 # Classic kick on 1 and 3, snare on 2 and 4, hi-hat eighths
-drums: (tempo! 120) (time 4 4)
-REPEAT(4,
-`
-  V1: ROCK_KICK
-  V2: ROCK_SNARE
-  V3: ROCK_HAT
-')
+(tempo! 120) (time 4 4)
+drums {
+  V1: REPEAT(4, `ROCK_KICK | ')
+  V2: REPEAT(4, `ROCK_SNARE | ')
+  V3: REPEAT(4, `ROCK_HAT | ')
+}
 
 # Section 2: Four-on-the-Floor (Disco/House)
-(tempo! 120)
-REPEAT(4,
-`
-  V1: FLOOR_KICK
-  V2: FLOOR_SNARE
-  V3: ROCK_HAT
-')
+drums {
+  V1: REPEAT(4, `FLOOR_KICK | ')
+  V2: REPEAT(4, `FLOOR_SNARE | ')
+  V3: REPEAT(4, `ROCK_HAT | ')
+}
 
 # Section 3: Funk Pattern with Ghost Notes
-(tempo! 110)
-  V1: REPEAT(2, `BREAK_KICK ')
-  V2: @mf REPEAT(2, `BREAK_SNARE ')
-  V3: :staccato REPEAT(16, `hat/16 ')
+drums {
+  V1: REPEAT(2, `BREAK_KICK | ')
+  V2: @mf REPEAT(2, `BREAK_SNARE | ')
+  V3: :staccato REPEAT(16, `hat/16 ') |
+}
 
 # Section 4: Drum Fill with Toms
-  V1: @f tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8
-  V1: @ff crash/2 kick/4 snare/4
+drums {
+  V1: @f tom1/8 tom1/8 tom2/8 tom2/8 tom3/8 tom3/8 tom4/8 tom4/8 |
+  V1: @ff crash/2 kick/4 snare/4 |
+}

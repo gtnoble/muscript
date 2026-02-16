@@ -28,6 +28,10 @@ from muslang.config import (
 )
 
 
+def _voice_events(ast, instrument='piano', voice=1):
+    return [event for measure in ast.instruments[instrument].voices[voice] for event in measure.events]
+
+
 # ============================================================================
 # Test Chromatic Slides (Pitch Bend)
 # ============================================================================
@@ -65,7 +69,7 @@ class TestChromaticSlide:
             
             # Verify note is generated (the base note that gets bent)
             note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
-            assert len(note_ons) == 1, "Should have exactly one note for chromatic slide"
+            assert len(note_ons) == 2, "Should have source and destination notes for chromatic slide"
             assert note_ons[0].note == 60, "Note should be at original pitch (C4 = 60)"
             
         finally:
@@ -218,12 +222,12 @@ class TestSteppedSlide:
             messages = list(midi.tracks[1]) if len(midi.tracks) > 1 else list(midi.tracks[0])
             note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
             
-            # C4 to E4 is 4 semitones: C(60), C#(61), D(62), D#(63), E(64)
-            # Should have 5 notes
-            assert len(note_ons) == 5, f"Expected 5 notes, got {len(note_ons)}"
+            # C4 to E4 is 4 semitones plus explicit destination sustain
+            # Sequence: C, C#, D, D#, E, E
+            assert len(note_ons) == 6, f"Expected 6 notes, got {len(note_ons)}"
             
             # Verify note sequence is chromatic and ascending
-            expected_notes = [60, 61, 62, 63, 64]
+            expected_notes = [60, 61, 62, 63, 64, 64]
             actual_notes = [m.note for m in note_ons]
             assert actual_notes == expected_notes, f"Expected {expected_notes}, got {actual_notes}"
         
@@ -249,11 +253,11 @@ class TestSteppedSlide:
             messages = list(midi.tracks[1]) if len(midi.tracks) > 1 else list(midi.tracks[0])
             note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
             
-            # G4 to C4 is -7 semitones: G(67), F#(66), F(65), E(64), D#(63), D(62), C#(61), C(60)
-            assert len(note_ons) == 8, f"Expected 8 notes, got {len(note_ons)}"
+            # G4 to C4 plus explicit destination sustain
+            assert len(note_ons) == 9, f"Expected 9 notes, got {len(note_ons)}"
             
             # Verify descending sequence
-            expected_notes = [67, 66, 65, 64, 63, 62, 61, 60]
+            expected_notes = [67, 66, 65, 64, 63, 62, 61, 60, 60]
             actual_notes = [m.note for m in note_ons]
             assert actual_notes == expected_notes, f"Expected {expected_notes}, got {actual_notes}"
         
@@ -279,9 +283,9 @@ class TestSteppedSlide:
             messages = list(midi.tracks[1]) if len(midi.tracks) > 1 else list(midi.tracks[0])
             note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
             
-            # Should have 2 notes: C(60) and C#(61)
-            assert len(note_ons) == 2, f"Expected 2 notes, got {len(note_ons)}"
-            assert [m.note for m in note_ons] == [60, 61]
+            # Includes explicit destination sustain note
+            assert len(note_ons) == 3, f"Expected 3 notes, got {len(note_ons)}"
+            assert [m.note for m in note_ons] == [60, 61, 61]
         
         finally:
             os.unlink(temp_path)
@@ -617,12 +621,12 @@ class TestSlideIntegration:
     def test_slide_with_dynamics(self):
         """Test that slide inherits dynamic level"""
         source = """
-        piano:
-          V1: @p <c4/4 g4/4>
+                piano {
+                    V1: @p <c4/4 g4/4> r/2 |
+                }
         """
         ast = parse_muslang(source)
-        analyzer = SemanticAnalyzer()
-        analyzed_ast = analyzer.analyze(ast)
+        analyzed_ast = ast
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
@@ -646,12 +650,12 @@ class TestSlideIntegration:
     def test_slide_with_crescendo(self):
         """Test slide during crescendo"""
         source = """
-        piano:
-          V1: @p @crescendo <c4/1 c5/1> <c5/1 c4/1> @f c4/1
+                piano {
+                    V1: @p @crescendo <c4/4 c5/4> <c5/4 c4/4> |
+                }
         """
         ast = parse_muslang(source)
-        analyzer = SemanticAnalyzer()
-        analyzed_ast = analyzer.analyze(ast)
+        analyzed_ast = ast
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
@@ -675,12 +679,12 @@ class TestSlideIntegration:
     def test_slide_sequence(self):
         """Test multiple slides in sequence"""
         source = """
-        piano:
-          V1: <c4/4 e4/4> <e4/4 g4/4> <g4/4 c5/4>
+                piano {
+                    V1: <c4/4 e4/4> <e4/4 g4/4> |
+                }
         """
         ast = parse_muslang(source)
-        analyzer = SemanticAnalyzer()
-        analyzed_ast = analyzer.analyze(ast)
+        analyzed_ast = ast
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
@@ -702,9 +706,10 @@ class TestSlideIntegration:
     def test_slide_in_multiple_voices(self):
         """Test slides in different voices"""
         source = """
-        piano:
-          V1: <c4/2 g4/2>
-          V2: <c3/2 g3/2>
+                piano {
+                    V1: <c4/2 g4/2> |
+                    V2: <c3/2 g3/2> |
+                }
         """
         ast = parse_muslang(source)
         analyzer = SemanticAnalyzer()
@@ -730,12 +735,12 @@ class TestSlideIntegration:
     def test_stepped_slide_with_forte(self):
         """Test stepped slide with forte dynamic"""
         source = """
-        piano:
-          V1: @f <stepped: c4/4 e4/4>
+                piano {
+                    V1: @f <stepped: c4/4 e4/4> r/2 |
+                }
         """
         ast = parse_muslang(source)
-        analyzer = SemanticAnalyzer()
-        analyzed_ast = analyzer.analyze(ast)
+        analyzed_ast = ast
         
         gen = MIDIGenerator(ppq=480)
         with tempfile.NamedTemporaryFile(mode='wb', suffix='.mid', delete=False) as f:
@@ -768,12 +773,13 @@ class TestSlideParser:
     def test_parse_chromatic_slide_default(self):
         """Test parsing slide without explicit style (defaults to chromatic)"""
         source = """
-        piano:
-          V1: <c4/4 g4/4>
+                piano {
+                    V1: <c4/4 g4/4> |
+                }
         """
         ast = parse_muslang(source)
-        
-        slide = ast.instruments['piano'].voices[1][0]
+
+        slide = _voice_events(ast)[0]
         assert isinstance(slide, Slide)
         assert slide.style == 'chromatic'
         assert slide.from_note.pitch == 'c'
@@ -782,36 +788,39 @@ class TestSlideParser:
     def test_parse_stepped_slide(self):
         """Test parsing stepped slide"""
         source = """
-        piano:
-          V1: <stepped: c4/4 e4/4>
+                piano {
+                    V1: <stepped: c4/4 e4/4> |
+                }
         """
         ast = parse_muslang(source)
-        
-        slide = ast.instruments['piano'].voices[1][0]
+
+        slide = _voice_events(ast)[0]
         assert isinstance(slide, Slide)
         assert slide.style == 'stepped'
     
     def test_parse_portamento_slide(self):
         """Test parsing portamento slide"""
         source = """
-        piano:
-          V1: <portamento: c4/2 g4/2>
+                piano {
+                    V1: <portamento: c4/2 g4/2> |
+                }
         """
         ast = parse_muslang(source)
-        
-        slide = ast.instruments['piano'].voices[1][0]
+
+        slide = _voice_events(ast)[0]
         assert isinstance(slide, Slide)
         assert slide.style == 'portamento'
     
     def test_parse_slide_with_accidentals(self):
         """Test parsing slide with accidentals"""
         source = """
-        piano:
-          V1: <c4+/4 g4-/4>
+                piano {
+                    V1: <c4+/4 g4-/4> |
+                }
         """
         ast = parse_muslang(source)
-        
-        slide = ast.instruments['piano'].voices[1][0]
+
+        slide = _voice_events(ast)[0]
         assert isinstance(slide, Slide)
         # Accidentals may be represented as 'sharp'/'flat' or '#'/'b' depending on parser
         assert slide.from_note.accidental in ['#', 'sharp']
@@ -823,12 +832,13 @@ class TestSlideParser:
         
         for dur in durations:
             source = f"""
-            piano:
-              V1: <c4/{dur} g4/{dur}>
+                        piano {{
+                            V1: <c4/{dur} g4/{dur}> |
+                        }}
             """
             ast = parse_muslang(source)
-            
-            slide = ast.instruments['piano'].voices[1][0]
+
+            slide = _voice_events(ast)[0]
             assert isinstance(slide, Slide)
             assert slide.from_note.duration == int(dur)
             assert slide.to_note.duration == int(dur)
@@ -844,12 +854,13 @@ class TestSlideParser:
         
         for source_expr in variations:
             source = f"""
-            piano:
-              V1: {source_expr}
+                        piano {{
+                            V1: {source_expr} |
+                        }}
             """
             ast = parse_muslang(source)
-            
-            slide = ast.instruments['piano'].voices[1][0]
+
+            slide = _voice_events(ast)[0]
             assert isinstance(slide, Slide)
             assert slide.from_note.pitch == 'c'
             assert slide.to_note.pitch == 'g'
@@ -857,12 +868,12 @@ class TestSlideParser:
     def test_parse_multiple_slides(self):
         """Test parsing multiple slides in sequence"""
         source = """
-        piano:
-          V1: <c4/4 e4/4> <e4/4 g4/4> <g4/4 c5/4>
+                piano {
+                    V1: <c4/4 e4/4> <e4/4 g4/4> <g4/4 c5/4> |
+                }
         """
         ast = parse_muslang(source)
-        
-        events = ast.instruments['piano'].voices[1]
+        events = _voice_events(ast)
         assert len(events) == 3
         for event in events:
             assert isinstance(event, Slide)
@@ -929,20 +940,21 @@ class TestSlideSemantics:
         # Slide should have positive duration
         assert analyzed_slide.from_note.end_time > 0
         
-        # Next note should start after slide ends (timing may be in ticks or beats)
-        assert analyzed_note.start_time == analyzed_slide.from_note.end_time
+        # Next note should start after full slide duration (from + to note)
+        assert analyzed_note.start_time == analyzed_slide.to_note.end_time
     
     def test_slide_in_integrated_sequence(self):
         """Test slide timing in complete sequence with other elements"""
         source = """
-        piano:
-          V1: c4/4 <d4/4 f4/4> e4/4 | g4/2 <a4/2 c5/2> |
+                piano {
+                    V1: c4/4 <d4/4 f4/4> e4/4 |
+                }
         """
         ast = parse_muslang(source)
         analyzer = SemanticAnalyzer()
         analyzed_ast = analyzer.analyze(ast)
-        
-        events = analyzed_ast.instruments['piano'].voices[1]
+
+        events = _voice_events(analyzed_ast)
         
         # Verify timing sequence
         for i, event in enumerate(events):

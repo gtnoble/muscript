@@ -18,33 +18,32 @@
 
 ?start: composition
 
-composition: instrument+
+composition: (directive | instrument)+
 
-instrument: INSTRUMENT_NAME ":" events
+?directive: tempo | time_signature | key_signature | pan
 
-events: event+
+instrument: INSTRUMENT_NAME "{" voice_content+ "}"
 
-?event: note
-      | rest
-      | chord
-      | grace_note
-      | tuplet
-      | slur
-      | slide
-      | articulation
-      | dynamic_level
-      | dynamic_transition
-      | dynamic_accent
-      | ornament
-      | tremolo
-      | reset
-      | percussion_note
-      | tempo
-      | time_signature
-      | key_signature
-      | pan
-      | voice
-      | bar_line
+voice_content: VOICE ":" measures
+
+measures: measure ("|" measure)* "|"
+
+measure: measure_event+
+
+?measure_event: note
+              | rest
+              | chord
+              | grace_note
+              | tuplet
+              | slide
+              | articulation
+              | dynamic_level
+              | dynamic_transition
+              | dynamic_accent
+              | ornament
+              | tremolo
+              | reset
+              | percussion_note
 
 // ============================================================================
 // NOTES - Scientific Pitch Notation (NO AMBIGUITY!)
@@ -100,15 +99,11 @@ grace_note: "~" note
 // Uses parentheses for concise grouping syntax
 // Distinguishable from directives because directives have keywords after (
 
-tuplet: "(" event+ ")" ":" INT
+tuplet: "(" measure_event+ ")" ":" INT
 
 // ============================================================================
 // PHRASE GROUPINGS
 // ============================================================================
-
-// Slurs - group notes with legato phrasing
-// Example: {c4/4 d4/4 e4/4}
-slur: "{" event+ "}"
 
 // Slides/glissandi - angle brackets NOW UNAMBIGUOUS!
 // OLD: <note note> conflicted with octave < operator
@@ -201,12 +196,7 @@ PAN_KW.2: "pan"
 // Voices - for polyphony
 // Example: V1: c4/4 d4/4 | V2: e4/4 f4/4
 // VOICE token has priority .2 for strong lexical matching
-voice: VOICE ":"
-
 VOICE.2: /V[0-9]+/
-
-// Bar lines - visual separators
-bar_line: "|"
 
 // ============================================================================
 // PERCUSSION - General MIDI Drum Mapping

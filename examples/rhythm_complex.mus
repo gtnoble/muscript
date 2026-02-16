@@ -2,10 +2,11 @@
 # Demonstrates advanced rhythmic features in Muslang
 # Including tuplets, grace notes, time signature changes, and complex patterns
 
-piano: (tempo! 120)
+(tempo! 120) (time 4 4)
+
+piano {
 V1:
   # Section 1: Triplets (3 notes in space of 2)
-  (time 4 4)
   c4/4 d4/4 (e4/8 f4/8 g4/8):3   a4/4 |
   b4/4 c5/4 (d5/8 c5/8 b4/8):3 a4/4 |
 
@@ -31,35 +32,55 @@ V1:
   # Section 7: Syncopation
   r/8 c4/8 r/8 e4/4 g4/8 r/4 |
   r/8 c5/8 r/4 g4/8 e4/8 c4/4 |
+}
 
   # Section 8: 3/4 Time (Waltz)
-  (time 3 4)
+(time 3 4)
+
+piano {
+V1:
   c4/4 e4/4 g4/4 |
   c5/4. b4/8 a4/8 g4/8 |
   f4/4 d4/4 b3/4 |
   c4/2. |
+}
 
   # Section 9: 6/8 Time (Compound Meter)
-  (time 6 8)
+(time 6 8)
+
+piano {
+V1:
   c4/8 e4/8 g4/8 c5/4. |
   b4/8 g4/8 e4/8 d4/4. |
   c4/4. d4/4. |
   e4/8 f4/8 g4/8 a4/8 b4/8 c5/8 |
+}
 
   # Section 10: 5/4 Time (Irregular Meter)
-  (time 5 4)
+(time 5 4)
+
+piano {
+V1:
   c4/4 d4/4 e4/4 f4/4 g4/4 |
   a4/2. g4/2 |
   f4/4 e4/4 d4/4 c4/2 |
+}
 
   # Section 11: 7/8 Time (Progressive)
-  (time 7 8)
+(time 7 8)
+
+piano {
+V1:
   c4/8 d4/8 e4/8 f4/8 g4/8 a4/8 b4/8 |
   c5/4. b4/4 |
   a4/8 g4/8 f4/8 e4/8 d4/8 c4/4 |
+}
 
   # Section 12: Back to 4/4 with Complex Patterns
-  (time 4 4)
+(time 4 4)
+
+piano {
+V1:
   # Triplet eighths alternating with regular eighths
   (c4/8 d4/8 e4/8):3 f4/8 (g4/8 a4/8 b4/8):3 c5/8 |
 
@@ -74,3 +95,4 @@ V1:
   f4/2~ f4/4 e4/4 |
   d4/1 |
   c4/1 |
+}

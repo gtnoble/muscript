@@ -5,300 +5,355 @@
 # Opening: Grand orchestral introduction
 # All instruments together with dynamic buildup
 
+(tempo! 110) (time 4 4) (key d 'major)
+
 # Strings section
-violin: (tempo! 110) (time 4 4) (key d 'major)
+violin {
   V1: @p :legato @crescendo
       d5/2 f5+/2 |
       a5/2 d6/2 |
       @f c6+/2~ c6+/4 b5/4 |
       a5/1 |
+}
 
-viola: (tempo! 110) (time 4 4) (key d 'major)
+viola {
   V1: @p :legato @crescendo
       f4+/2 a4/2 |
       d5/2 f5+/2 |
       @f e5/2~ e5/4 d5/4 |
       c5+/1 |
+}
 
-cello: (tempo! 110) (time 4 4) (key d 'major)
+cello {
   V1: @p :legato @crescendo
       d4/2 d4/2 |
       f4+/2 a4/2 |
       @f a4/2 g4/2 |
       f4+/1 |
+}
 
 # Woodwinds enter
-flute: (tempo! 110) (time 4 4) (key d 'major)
+flute {
   V1: r/1 |
       @mp :legato
       a5/4 b5/4 c6+/4 d6/4 |
       @mf e6/2 d6/2 |
       %trill c6+/2 b5/2 |
+}
 
-clarinet: (tempo! 110) (time 4 4) (key d 'major)
+clarinet {
   V1: r/1 |
       @mp :legato
       f5+/4 g5/4 a5/4 b5/4 |
       @mf c6+/2 b5/2 |
       a5/2 g5/2 |
+}
 
 # Brass fanfare
-trumpet: (tempo! 110) (time 4 4) (key d 'major)
+trumpet {
   V1: r/2 @ff :marcato d5/4 f5+/4 |
       a5/4 d6/4 @sforzando c6+/2 |
       b5/4 a5/4 g5/4 f5+/4 |
       a5/1 |
+}
 
-trombone: (tempo! 110) (time 4 4) (key d 'major)
+trombone {
   V1: r/2 @ff :marcato d4/4 f4+/4 |
       a4/4 d5/4 @sforzando e5/2 |
       d5/4 c5+/4 b4/4 a4/4 |
       d5/1 |
+}
 
 # Melody section: Flowing legato theme
-violin:
+violin {
   V1: @mp :legato
       d5/4 e5/4 f5+/4 g5/4 |
       a5/2. g5/4 |
       f5+/2 e5/2 |
       d5/1 |
+}
 
-flute:
+flute {
   V1: @p :legato
       f5+/4 g5/4 a5/4 b5/4 |
       c6+/2. b5/4 |
       a5/2 g5/2 |
       f5+/1 |
+}
 
 # Supporting harmony
-viola:
+viola {
   V1: @pp :legato
       a4/2 d5/2 |
       c5+/2 b4/2 |
       a4/2 g4/2 |
       f4+/1 |
+}
 
-cello:
+cello {
   V1: @pp :legato
       d4/1 |
       a3/1 |
       d4/1 |
       d3/1 |
+}
 
 # Contrasting staccato section
-violin:
+violin {
   V1: @mf :staccato
       a5/8 a5/8 a5/8 a5/8 g5/8 g5/8 g5/8 g5/8 |
       f5+/8 f5+/8 f5+/8 f5+/8 e5/8 e5/8 e5/8 e5/8 |
+}
 
-clarinet:
+clarinet {
   V1: @mf :staccato
       f5+/8 f5+/8 f5+/8 f5+/8 e5/8 e5/8 e5/8 e5/8 |
       d5/8 d5/8 d5/8 d5/8 c5+/8 c5+/8 c5+/8 c5+/8 |
+}
 
-trumpet:
+trumpet {
   V1: @f :staccato
       d5/4 r/4 c5+/4 r/4 |
       b4/4 r/4 a4/4 r/4 |
+}
 
 # Call and response section
-flute:
+flute {
   V1: @mf :legato
       d6/4 c6+/4 b5/4 a5/4 |
       r/1 |
+}
 
-clarinet:
+clarinet {
   V1: r/1 |
       @mf :legato
       a5/4 g5/4 f5+/4 e5/4 |
+}
 
-violin:
+violin {
   V1: @mp
       g5/2 f5+/2 |
       e5/1 |
+}
 
 # Dramatic crescendo
-violin:
+violin {
   V1: @p @crescendo :legato
       d5/4 e5/4 f5+/4 g5/4 |
       a5/4 b5/4 c6+/4 d6/4 |
       @ff :marcato e6/2 f6+/2 |
+}
 
-viola:
+viola {
   V1: @p @crescendo :legato
       f4+/4 g4/4 a4/4 b4/4 |
       c5+/4 d5/4 e5/4 f5+/4 |
       @ff :marcato g5/2 a5/2 |
+}
 
-cello:
+cello {
   V1: @p @crescendo :tenuto
       d4/1 |
       f4+/1 |
       @ff :marcato a4/1 |
+}
 
-trumpet:
+trumpet {
   V1: @mp @crescendo :marcato
       d5/2 f5+/2 |
       a5/2 d6/2 |
       @ff a5/2 d6/2 |
+}
 
-trombone:
+trombone {
   V1: @mp @crescendo :marcato
       d4/2 a4/2 |
       d5/2 f5+/2 |
       @ff d5/2 a4/2 |
+}
 
 # Lyrical middle section with ornaments
-flute:
+flute {
   V1: @p :legato
       %turn d6/2 c6+/4 b5/4 |
       %trill a5/2. g5/4 |
       f5+/4 e5/4 d5/4 c5+/4 |
       %mordent d5/1 |
+}
 
-clarinet:
+clarinet {
   V1: @pp :legato
       f5+/2 e5/2 |
       %turn d5/2 c5+/2 |
       b4/2 a4/2 |
       g4/1 |
+}
 
-violin:
+violin {
   V1: @mp :legato
       a5/4 b5/4 %turn c6+/2 |
       d6/4 c6+/4 b5/4 a5/4 |
       g5/2 %trill f5+/2 |
       d5/1 |
+}
 
 # Rhythmic section with accents
-trumpet:
+trumpet {
   V1: @f :marcato
       @sforzando d5/4 d5/8 e5/8 @sforzando f5+/4 f5+/8 g5/8 |
       @sforzando a5/4 a5/4 @sforzando a5/4 r/4 |
+}
 
-trombone:
+trombone {
   V1: @f :marcato
       @sforzando d4/4 d4/8 e4/8 @sforzando f4+/4 f4+/8 g4/8 |
       @sforzando a4/4 a4/4 @sforzando a4/4 r/4 |
+}
 
-violin:
+violin {
   V1: @mf :staccato
       d5/8 f5+/8 a5/8 d6/8 c6+/8 a5/8 f5+/8 d5/8 |
       e5/8 g5/8 b5/8 e6/8 d6/8 b5/8 g5/8 e5/8 |
+}
 
 # Waltz section in 3/4
-violin: (time 3 4)
+(time 3 4)
+
+violin {
   V1: @mp :legato
       d5/4 f5+/4 a5/4 |
       d6/4 c6+/4 b5/4 |
       a5/4 g5/4 f5+/4 |
       e5/2. |
+}
 
-viola: (time 3 4)
+viola {
   V1: @mp :legato
       d4/4 a4/4 f4+/4 |
       b4/4 a4/4 g4/4 |
       f4+/4 e4/4 d4/4 |
       c4+/2. |
+}
 
-cello: (time 3 4)
+cello {
   V1: @mp :tenuto
       d3/4 d4/4 d4/4 |
       g3/4 g4/4 g4/4 |
       d3/4 d4/4 d4/4 |
       a2/4 a3/4 a3/4 |
+}
 
 # Tutti climax - all instruments forte
-violin: (time 4 4)
+(time 4 4)
+
+violin {
   V1: @ff :marcato
       d6/2 @sforzando a5/2 |
       @sforzando f6+/4 e6/4 d6/4 c6+/4 |
       b5/2 a5/2 |
       d6/1 |
+}
 
-viola: (time 4 4)
+viola {
   V1: @ff :marcato
       f5+/2 @sforzando d5/2 |
       @sforzando a5/4 g5/4 f5+/4 e5/4 |
       d5/2 c5+/2 |
       f5+/1 |
+}
 
-cello: (time 4 4)
+cello {
   V1: @ff :marcato
       d4/2 @sforzando f4+/2 |
       @sforzando d5/4 c5+/4 b4/4 a4/4 |
       g4/2 e4/2 |
       d4/1 |
+}
 
-flute: (time 4 4)
+flute {
   V1: @ff :legato
       a6/2 @sforzando f6+/2 |
       @sforzando d7/4 c7+/4 b6/4 a6/4 |
       g6/2 f6+/2 |
       d6/1 |
+}
 
-clarinet: (time 4 4)
+clarinet {
   V1: @ff :legato
       f6+/2 @sforzando d6/2 |
       @sforzando a6/4 g6/4 f6+/4 e6/4 |
       d6/2 c6+/2 |
       f6+/1 |
+}
 
-trumpet: (time 4 4)
+trumpet {
   V1: @ff :marcato
       d5/2 @sforzando d6/2 |
       @sforzando d6/4 d6/4 d6/4 d6/4 |
       c6+/2 a5/2 |
       d6/1 |
+}
 
-trombone: (time 4 4)
+trombone {
   V1: @ff :marcato
       d4/2 @sforzando d5/2 |
       @sforzando d5/4 d5/4 d5/4 d5/4 |
       g4/2 e4/2 |
       d4/1 |
+}
 
 # Soft ending - diminuendo to quiet close
-violin:
+violin {
   V1: @f @diminuendo :legato
       d5/2 f5+/2 |
       @mp a5/2 d6/2 |
       @p c6+/2 b5/2 |
       @pp a5/1 |
+}
 
-viola:
+viola {
   V1: @f @diminuendo :legato
       a4/2 d5/2 |
       @mp f5+/2 a5/2 |
       @p g5/2 f5+/2 |
       @pp d5/1 |
+}
 
-cello:
+cello {
   V1: @f @diminuendo :tenuto
       d4/1 |
       @mp d4/1 |
       @p a3/1 |
       @pp d3/1 |
+}
 
-flute:
+flute {
   V1: @mp @diminuendo :legato
       f5+/2 a5/2 |
       @p d6/2 f6+/2 |
       @pp e6/2 d6/2 |
       @pp c6+/1 |
+}
 
 # Final chord - pianissimo
-violin:
+violin {
   V1: @pp d6/1
-viola:
+}
+viola {
   V1: @pp f5+/1
-cello:
+}
+cello {
   V1: @pp a4/1
-flute:
+}
+flute {
   V1: @pp a5/1
-clarinet:
+}
+clarinet {
   V1: @pp f5+/1
-trumpet:
+}
+trumpet {
   V1: @pp d5/1
-trombone:
+}
+trombone {
   V1: @pp d4/1
+}

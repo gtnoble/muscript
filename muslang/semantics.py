@@ -22,6 +22,7 @@ class SemanticAnalyzer:
         self.current_time_sig = TimeSignature(numerator=4, denominator=4)
         self.current_key_sig: Optional[KeySignature] = None
         self.current_tempo = DEFAULT_TEMPO
+        self.current_instrument_name: Optional[str] = None
         self.errors: List[str] = []
         self.warnings: List[str] = []
         
@@ -47,7 +48,7 @@ class SemanticAnalyzer:
         
         return ast
     
-    def _validate_ast(self, node: ASTNode):
+    def _validate_ast(self, node: ASTNode, instrument_name: Optional[str] = None):
         """Validate AST structure"""
         if isinstance(node, Note):
             # Validate pitch range
@@ -57,10 +58,6 @@ class SemanticAnalyzer:
             # Validate duration
             if node.duration and node.duration not in [1, 2, 4, 8, 16, 32, 64]:
                 self._error(f"Invalid duration: {node.duration}")
-        
-        elif isinstance(node, Slur):
-            if len(node.notes) < 2:
-                self._error("Slur must contain at least 2 notes")
         
         elif isinstance(node, Slide):
             # Check pitch interval
@@ -75,22 +72,35 @@ class SemanticAnalyzer:
         
         elif isinstance(node, TimeSignature):
             if node.numerator < 1:
-                self._error(f"Time signature numerator must be >= 1: {node.numerator}")
+                self._error(
+                    self._with_instrument_and_line(
+                        message=f"Time signature numerator must be >= 1: {node.numerator}",
+                        instrument_name=instrument_name,
+                        node=node,
+                    )
+                )
             if node.denominator not in [1, 2, 4, 8, 16, 32]:
-                self._error(f"Invalid time signature denominator: {node.denominator}")
+                self._error(
+                    self._with_instrument_and_line(
+                        message=f"Invalid time signature denominator: {node.denominator}",
+                        instrument_name=instrument_name,
+                        node=node,
+                    )
+                )
         
         elif isinstance(node, Tempo):
             if node.bpm < 20 or node.bpm > 400:
                 self._warning(f"Unusual tempo: {node.bpm} BPM")
 
         elif isinstance(node, Instrument):
+            instrument_name = node.name
             if not node.voices:
                 self._error(
                     f"Instrument '{node.name}' must declare at least one explicit voice"
                 )
 
             non_voice_note_types = (
-                Note, Rest, Chord, PercussionNote, Slur, Slide, GraceNote, Tuplet
+                Note, Rest, Chord, PercussionNote, Slide, GraceNote, Tuplet
             )
             for event in node.events:
                 if isinstance(event, non_voice_note_types):
@@ -100,7 +110,7 @@ class SemanticAnalyzer:
         
         # Recursively validate children
         for child in self._get_children(node):
-            self._validate_ast(child)
+            self._validate_ast(child, instrument_name)
     
     def _apply_key_signatures(self, node: ASTNode) -> ASTNode:
         """Apply key signature accidentals to notes"""
@@ -126,26 +136,6 @@ class SemanticAnalyzer:
     def _expand_ornaments(self, node: ASTNode) -> ASTNode:
         """Expand ornaments into note sequences"""
         if isinstance(node, Instrument):
-            # Process non-voice events
-            expanded = []
-            i = 0
-            while i < len(node.events):
-                event = node.events[i]
-                
-                if isinstance(event, Ornament) and i + 1 < len(node.events):
-                    next_event = node.events[i + 1]
-                    if isinstance(next_event, Note):
-                        # Expand ornament
-                        notes = self._expand_single_ornament(event, next_event)
-                        expanded.extend(notes)
-                        i += 2  # Skip both ornament and note
-                        continue
-                
-                # Recursively process event
-                processed = self._expand_ornaments(event)
-                expanded.append(processed)
-                i += 1
-            
             # Process voice events
             expanded_voices = {}
             for voice_num, voice_events in node.voices.items():
@@ -170,7 +160,7 @@ class SemanticAnalyzer:
                 
                 expanded_voices[voice_num] = expanded_voice
             
-            return replace(node, events=expanded, voices=expanded_voices)
+            return replace(node, voices=expanded_voices)
         
         elif isinstance(node, Sequence):
             if node.instruments:
@@ -212,6 +202,8 @@ class SemanticAnalyzer:
     def _calculate_timing(self, node: ASTNode) -> ASTNode:
         """Calculate absolute timing for all events"""
         if isinstance(node, Instrument):
+            previous_instrument_name = self.current_instrument_name
+            self.current_instrument_name = node.name
             # Process voices - each voice starts at time 0 independently
             updated_voices = {}
             for voice_num, voice_events in node.voices.items():
@@ -222,15 +214,9 @@ class SemanticAnalyzer:
                     updated_events.append(event_with_timing)
                     current_time += duration
                 updated_voices[voice_num] = updated_events
-            
-            # Directives at instrument level don't need timing (they're meta-events)
-            # but process them anyway in case they have nested content
-            updated_directives = []
-            for event in node.events:
-                event_with_timing, _ = self._calculate_event_timing(event, 0.0)
-                updated_directives.append(event_with_timing)
-            
-            return replace(node, events=updated_directives, voices=updated_voices)
+
+            self.current_instrument_name = previous_instrument_name
+            return replace(node, voices=updated_voices)
         
         elif isinstance(node, Sequence):
             # Handle instruments dict or events list
@@ -312,19 +298,6 @@ class SemanticAnalyzer:
             updated_grace_note = replace(event.note, start_time=start_time, end_time=end_time)
             return replace(event, note=updated_grace_note), grace_duration
         
-        elif isinstance(event, Slur):
-            # Process notes in slur, they advance time sequentially
-            current_slur_time = start_time
-            updated_notes = []
-            
-            for note in event.notes:
-                updated_note, duration = self._calculate_event_timing(note, current_slur_time)
-                updated_notes.append(updated_note)
-                current_slur_time += duration
-            
-            total_duration = current_slur_time - start_time
-            return replace(event, notes=updated_notes), total_duration
-        
         elif isinstance(event, Slide):
             # Slide consumes both note durations:
             # from_note = glide duration, to_note = destination sustain duration
@@ -338,6 +311,28 @@ class SemanticAnalyzer:
                 event,
                 from_note=from_note_updated,
                 to_note=to_note_updated,
+            ), total_duration
+        
+        elif isinstance(event, Measure):
+            # Process all events in measure and validate duration
+            current_measure_time = start_time
+            updated_events = []
+            
+            for measure_event in event.events:
+                updated_event, duration = self._calculate_event_timing(measure_event, current_measure_time)
+                updated_events.append(updated_event)
+                current_measure_time += duration
+            
+            total_duration = current_measure_time - start_time
+            
+            # Validate measure duration against current time signature
+            self._validate_measure(event, total_duration)
+            
+            return replace(
+                event,
+                events=updated_events,
+                start_time=start_time,
+                end_time=current_measure_time
             ), total_duration
         
         elif isinstance(event, Tempo):
@@ -378,13 +373,86 @@ class SemanticAnalyzer:
         
         return ticks
     
+    def _validate_measure(self, measure: Measure, total_duration_ticks: float):
+        """
+        Validate that measure duration matches the current time signature.
+        
+        Args:
+            measure: The Measure node to validate
+            total_duration_ticks: The calculated total duration in MIDI ticks
+        
+        Raises:
+            SemanticError: If measure duration doesn't match time signature
+        """
+        # Calculate expected duration based on time signature
+        # Time signature numerator/denominator tells us beats per measure
+        # For 4/4: 4 quarter notes = 4 * PPQ ticks
+        # For 3/4: 3 quarter notes = 3 * PPQ ticks
+        # For 6/8: 6 eighth notes = 6 * (PPQ/2) = 3 * PPQ ticks
+        
+        # Expected duration = (numerator / denominator) * 4 * PPQ
+        # This gives us the measure length in terms of whole notes
+        beats_per_measure = self.current_time_sig.numerator
+        beat_unit = self.current_time_sig.denominator
+        
+        # Convert to ticks: (beats_per_measure / beat_unit) * 4 quarter notes * PPQ
+        expected_ticks = (beats_per_measure / beat_unit) * 4 * DEFAULT_MIDI_PPQ
+        
+        # Allow small floating point tolerance
+        tolerance = 1.0
+        
+        if abs(total_duration_ticks - expected_ticks) > tolerance:
+            measure_num = measure.measure_number if measure.measure_number else "unknown"
+            actual_beats = (total_duration_ticks / DEFAULT_MIDI_PPQ)
+            expected_beats = (expected_ticks / DEFAULT_MIDI_PPQ)
+
+            self._error(
+                self._with_instrument_and_line(
+                    message=(
+                        f"Measure {measure_num} duration mismatch: "
+                        f"has {actual_beats:.2f} quarter notes worth of duration, "
+                        f"expected {expected_beats:.2f} for time signature "
+                        f"{self.current_time_sig.numerator}/{self.current_time_sig.denominator}"
+                    ),
+                    instrument_name=self.current_instrument_name,
+                    node=measure,
+                )
+            )
+
+    def _with_instrument_and_line(
+        self,
+        message: str,
+        instrument_name: Optional[str],
+        node: Optional[ASTNode] = None,
+    ) -> str:
+        """Attach instrument and optional source line information to a message."""
+        parts = []
+        if instrument_name:
+            parts.append(f"Instrument '{instrument_name}'")
+
+        line = self._get_line_number(node)
+        if line is not None:
+            parts.append(f"line {line}")
+
+        if not parts:
+            return message
+
+        return f"{' at '.join(parts)}: {message}"
+
+    def _get_line_number(self, node: Optional[ASTNode]) -> Optional[int]:
+        """Extract source line number from AST node location when available."""
+        if node is None:
+            return None
+
+        location = getattr(node, 'location', None)
+        if location and getattr(location, 'line', None) is not None:
+            return location.line
+
+        return None
+    
     def _track_state(self, node: ASTNode) -> ASTNode:
         """Track articulation and dynamic state"""
         if isinstance(node, Instrument):
-            # Directives at instrument level don't need state tracking
-            # (they're meta-events that don't have velocity/articulation)
-            updated_directives = list(node.events)
-            
             # Process voice events - each voice has independent state
             updated_voices = {}
             for voice_num, voice_events in node.voices.items():
@@ -403,7 +471,7 @@ class SemanticAnalyzer:
                     updated_voice_events.append(updated_event)
                 updated_voices[voice_num] = updated_voice_events
             
-            return replace(node, events=updated_directives, voices=updated_voices)
+            return replace(node, voices=updated_voices)
         
         elif isinstance(node, Sequence):
             # Handle instruments dict or events list
@@ -510,19 +578,19 @@ class SemanticAnalyzer:
                                  dynamic_level=state['dynamic_level'])
             return replace(event, note=updated_note)
         
-        elif isinstance(event, Slur):
-            # Apply state to notes in slur
-            updated_notes = []
-            for note in event.notes:
-                updated_note = self._apply_state_to_event(note, state)
-                updated_notes.append(updated_note)
-            return replace(event, notes=updated_notes)
-        
         elif isinstance(event, Slide):
             # Apply state to both notes in slide
             from_note_updated = self._apply_state_to_event(event.from_note, state)
             to_note_updated = self._apply_state_to_event(event.to_note, state)
             return replace(event, from_note=from_note_updated, to_note=to_note_updated)
+        
+        elif isinstance(event, Measure):
+            # Apply state to all events in measure
+            updated_events = []
+            for measure_event in event.events:
+                updated_event = self._apply_state_to_event(measure_event, state)
+                updated_events.append(updated_event)
+            return replace(event, events=updated_events)
         
         else:
             # Other event types don't need state tracking
@@ -571,13 +639,11 @@ class SemanticAnalyzer:
             else:
                 return node.events
         elif isinstance(node, Instrument):
-            # Collect both non-voice events and all voice events
+            # Collect instrument-level events plus all voice events
             children = list(node.events)
             for voice_events in node.voices.values():
                 children.extend(voice_events)
             return children
-        elif isinstance(node, Slur):
-            return node.notes
         elif isinstance(node, Chord):
             return node.notes
         elif isinstance(node, Tuplet):
@@ -610,17 +676,7 @@ class SemanticAnalyzer:
                 return replace(node, events=new_events)
         
         elif isinstance(node, Instrument):
-            # Transform non-voice events
-            new_events = []
-            for event in node.events:
-                result = transform_func(event)
-                if result is not None:
-                    if isinstance(result, Sequence):
-                        new_events.extend(result.events)
-                    else:
-                        new_events.append(result)
-            
-            # Transform voice events
+            # Transform voice events only
             new_voices = {}
             for voice_num, voice_events in node.voices.items():
                 new_voice_events = []
@@ -633,11 +689,7 @@ class SemanticAnalyzer:
                             new_voice_events.append(result)
                 new_voices[voice_num] = new_voice_events
             
-            return replace(node, events=new_events, voices=new_voices)
-        
-        elif isinstance(node, Slur):
-            new_notes = [transform_func(n) for n in node.notes if transform_func(n) is not None]
-            return replace(node, notes=new_notes)
+            return replace(node, voices=new_voices)
         
         elif isinstance(node, Chord):
             new_notes = [transform_func(n) for n in node.notes if transform_func(n) is not None]

@@ -87,19 +87,19 @@ def test_validate_valid_durations():
         assert len(analyzer.errors) == 0
 
 
-def test_validate_slur_minimum_notes():
-    """Test slur with too few notes"""
+def test_validate_slide_reasonable_interval_no_error():
+    """Test slide with reasonable interval does not produce validation errors"""
     analyzer = SemanticAnalyzer()
-    
-    # Slur with only one note
-    note = Note(pitch='c', octave=4, duration=4)
-    slur = Slur(notes=[note])
-    instrument = Instrument(name='piano', events=[], voices={1: [slur]})
+
+    slide = Slide(
+        from_note=Note(pitch='c', octave=4, duration=4),
+        to_note=Note(pitch='g', octave=4, duration=4),
+    )
+    instrument = Instrument(name='piano', events=[], voices={1: [slide]})
     ast = Sequence(events=[instrument])
-    
+
     analyzer._validate_ast(ast)
-    assert len(analyzer.errors) > 0
-    assert "at least 2 notes" in analyzer.errors[0]
+    assert len(analyzer.errors) == 0
 
 
 def test_validate_tuplet_ratio():
@@ -143,6 +143,27 @@ def test_validate_time_signature_denominator():
     analyzer._validate_ast(ast)
     assert len(analyzer.errors) > 0
     assert "Invalid time signature denominator" in analyzer.errors[0]
+
+
+def test_validate_time_signature_includes_instrument_and_line():
+    """Test time signature validation error includes instrument and line when available."""
+    analyzer = SemanticAnalyzer()
+
+    # Invalid denominator with explicit source location
+    time_sig = TimeSignature(
+        numerator=4,
+        denominator=3,
+        location=SourceLocation(line=12, column=7),
+    )
+    instrument = Instrument(name='piano', events=[time_sig], voices={1: []})
+    ast = Sequence(events=[instrument])
+
+    analyzer._validate_ast(ast)
+    assert len(analyzer.errors) > 0
+    error_msg = analyzer.errors[0]
+    assert "Instrument 'piano'" in error_msg
+    assert "line 12" in error_msg
+    assert "Invalid time signature denominator" in error_msg
 
 
 def test_validate_tempo_warning():

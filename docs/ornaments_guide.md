@@ -52,11 +52,12 @@ The ornament marker applies to the **immediately following note**.
 ### Examples
 
 ```muslang
-piano:
+piano {
   V1: %trill c4/2      # Trill on C4
       %mordent d4/4    # Mordent on D4
       %turn e4/4       # Turn on E4
       %tremolo g4/1    # Tremolo on G4
+}
 ```
 
 ---
@@ -83,8 +84,10 @@ The alternation happens at **32nd note** speed (8 notes per quarter note).
 
 ```muslang
 # Simple trill
-piano: (key c 'major)
+piano {
+  (key c 'major)
   V1: %trill c4/2
+}
 ```
 
 **Expansion** (in C major, upper neighbor is D):
@@ -96,9 +99,11 @@ c4/32 d4/32 c4/32 d4/32 c4/32 d4/32 c4/32 d4/32  # (continues for half note dura
 
 ```muslang
 # Trill in a melody
-piano: (key g 'major) (tempo! 120)
+piano {
+  (key g 'major) (tempo! 120)
   V1: g4/4 a4/4 %trill b4/2 |
       a4/4 g4/4 f4+/4 e4/4 |
+}
 ```
 
 ### Duration Effect
@@ -133,8 +138,10 @@ The first two notes are 32nd notes, the last gets the remaining duration.
 
 ```muslang
 # Simple mordent
-piano: (key c 'major)
+piano {
+  (key c 'major)
   V1: %mordent c4/4
+}
 ```
 
 **Expansion** (in C major, lower neighbor is B):
@@ -148,9 +155,11 @@ c4/4   # Main note (minus time stolen by first two)
 
 ```muslang
 # Mordents in Bach-style melody
-piano: (key d 'major) (tempo! 100)
+piano {
+  (key d 'major) (tempo! 100)
   V1: @mf d4/4 %mordent e4/4 f4+/4 %mordent g4/4 |
       a4/2 %mordent d5/2 |
+}
 ```
 
 ### Visual Effect
@@ -183,8 +192,10 @@ All four notes are equal duration, fitting into the main note's time.
 
 ```muslang
 # Simple turn
-piano: (key c 'major)
+piano {
+  (key c 'major)
   V1: %turn c4/4
+}
 ```
 
 **Expansion** (in C major):
@@ -199,10 +210,12 @@ c4/16   # Main note (C)
 
 ```muslang
 # Classical-style melody with turns
-piano: (key f 'major) (tempo! 90)
+piano {
+  (key f 'major) (tempo! 90)
   V1: :legato @mp
       f4/4 g4/4 %turn a4/2 |
       b4-/4 a4/4 g4/4 %turn f4/2 |
+}
 ```
 
 ### Visual Effect
@@ -229,8 +242,9 @@ The tremolo repeats the note at **16th note** speed (4 notes per quarter note).
 
 ```muslang
 # Simple tremolo
-piano:
+piano {
   V1: %tremolo c4/1
+}
 ```
 
 **Expansion**:
@@ -242,11 +256,13 @@ c4/16 c4/16 c4/16 c4/16  # (continues for whole note = 16 repetitions)
 
 ```muslang
 # Tense, suspenseful passage
-piano: (tempo! 120)
+piano {
+  (tempo! 120)
   V1: @pp @crescendo
       %tremolo c4/1 |
       %tremolo c4/1 |
       @f c4/4 e4/4 g4/4 c5/4 |
+}
 ```
 
 ### Duration Effect
@@ -262,9 +278,10 @@ Muslang's tremolo is a **single-note tremolo** (bowed tremolo on strings). For *
 
 ```muslang
 # Fingered tremolo between C and E
-piano:
+piano {
   V1: c4/16 e4/16 c4/16 e4/16 c4/16 e4/16 c4/16 e4/16
       c4/16 e4/16 c4/16 e4/16 c4/16 e4/16 c4/16 e4/16
+}
 ```
 
 ---
@@ -276,25 +293,31 @@ All ornaments respect the **current key signature** when determining neighboring
 ### Example: C Major
 
 ```muslang
-piano: (key c 'major)
+piano {
+  (key c 'major)
   V1: %trill c4/4   # Trills C-D (D natural)
       %trill f4/4   # Trills F-G (no sharps in C major)
+}
 ```
 
 ### Example: G Major (F♯)
 
 ```muslang
-piano: (key g 'major)
+piano {
+  (key g 'major)
   V1: %trill f4+/4  # Trills F♯-G (upper neighbor is G)
       %mordent g4/4 # Mordent G-F♯-G (lower neighbor is F♯)
+}
 ```
 
 ### Example: D Minor (B♭)
 
 ```muslang
-piano: (key d 'minor)
+piano {
+  (key d 'minor)
   V1: %trill d4/4   # Trills D-E (E natural in D minor)
       %turn b4-/4   # Turn: C-B♭-A-B♭
+}
 ```
 
 ### Chromatic Neighbors
@@ -303,8 +326,10 @@ Neighbors are calculated **diatonically** (by scale degree), not chromatically:
 
 ```muslang
 # In C major
-piano: (key c 'major)
+piano {
+  (key c 'major)
   V1: %trill e4/4   # E-F (not E-F♯), F is natural in C major
+}
 ```
 
 ### Accidentals on Main Note
@@ -313,8 +338,10 @@ If the main note has an accidental, neighbors are still calculated from the scal
 
 ```muslang
 # C major, but note is altered
-piano: (key c 'major)
+piano {
+  (key c 'major)
   V1: %trill c4+/4  # C♯-D (trill uses D from scale)
+}
 ```
 
 ---
@@ -381,60 +408,71 @@ Example in C major:
 
 ```muslang
 # Ornate Baroque-style melody
-piano: (key d 'major) (tempo! 100)
+piano {
+  (key d 'major) (tempo! 100)
   V1: @mf :legato
       d4/8 f4+/8 %trill a4/4 g4/8 f4+/8 |
       e4/8 d4/8 %trill c4+/2 |
+}
 ```
 
 ### Example 2: Mordent Accents
 
 ```muslang
 # Crisp articulation with mordents
-piano: (key g 'major) (tempo! 120)
+piano {
+  (key g 'major) (tempo! 120)
   V1: :staccato @f
       %mordent g4/8 g4/8 %mordent d5/8 d5/8 |
       %mordent b4/4 %mordent g4/4 |
+}
 ```
 
 ### Example 3: Turn Embellishment
 
 ```muslang
 # Elegant melody with turns
-piano: (key f 'major) (tempo! 90)
+piano {
+  (key f 'major) (tempo! 90)
   V1: :legato @mp
       f4/4 %turn a4/4 c5/4 %turn f5/4 |
       e5/4 d5/4 c5/4 %turn b4-/4 |
       a4/2 %turn g4/2 | f4/1 |
+}
 ```
 
 ### Example 4: Tremolo Suspense
 
 ```muslang
 # Building tension with tremolo
-piano: (tempo! 120) (key c 'minor)
+piano {
+  (tempo! 120) (key c 'minor)
   V1: @pp @crescendo
       %tremolo c4/2 %tremolo e4-/2 |
       %tremolo g4/2 %tremolo c5/2 |
       @ff c5/4 g4/4 e4-/4 c4/4 |
+}
 ```
 
 ### Example 5: Mixed Ornaments
 
 ```muslang
 # Showcase different ornaments
-piano: (key d 'major) (tempo! 110)
+piano {
+  (key d 'major) (tempo! 110)
   V1: @mf
       d4/4 %trill f4+/4 a4/4 %mordent d5/4 |
       %turn c5+/4 b4/4 a4/4 g4/4 |
       %tremolo f4+/2 e4/4 d4/4 |
+}
 ```
 
 ### Example 6: Ornaments with Dynamics
 
 ```muslang
 # Expressive phrasing
-piano: (key e- 'major) (tempo! 80)
+piano {
+  (key e- 'major) (tempo! 80)
   V1: @p :legato
       e4-/8 g4/8 %trill b4-/4. a4-/8 |
       
@@ -446,13 +484,15 @@ piano: (key e- 'major) (tempo! 80)
       @p @diminuendo
       c5/4 b4-/4 a4-/4 %turn g4/4 |
       @pp e4-/1 |
+}
 ```
 
 ### Example 7: Bach-style Ornamentation
 
 ```muslang
 # Baroque counterpoint
-piano: (key g 'major) (tempo! 100)
+piano {
+  (key g 'major) (tempo! 100)
   V1: 
     :legato @mf
     %mordent g5/4 f5+/8 e5/8 %turn d5/4 c5/8 b4/8 |
@@ -462,13 +502,15 @@ piano: (key g 'major) (tempo! 100)
     :legato @mp
     g3/4 a3/4 b3/4 c4/4 |
     %turn d4/2 g3/2 |
+}
 ```
 
 ### Example 8: Romantic Expressiveness
 
 ```muslang
 # Lyrical romantic melody
-piano: (key a- 'major) (tempo! 70)
+piano {
+  (key a- 'major) (tempo! 70)
   V1: :legato @p
       e4-/4 %turn a4-/4 c5/4. b4-/8 |
       
@@ -481,6 +523,7 @@ piano: (key a- 'major) (tempo! 70)
       @diminuendo
       f4/4 %turn e4-/4 d4-/4 c4/4 |
       @pp a3-/1 |
+}
 ```
 
 ---
@@ -493,12 +536,14 @@ Use ornaments where they enhance the musical line, not everywhere:
 
 ```muslang
 # Good - selective ornamentation
-piano:
+piano {
   V1: c4/4 d4/4 %trill e4/2
+}
 
 # Overdone - too many ornaments
-piano:
+piano {
   V1: %trill c4/4 %mordent d4/4 %turn e4/4 %tremolo f4/4
+}
 ```
 
 ### 2. Duration Considerations
@@ -507,12 +552,14 @@ Give ornaments enough time to be heard:
 
 ```muslang
 # Good - quarter note or longer
-piano:
+piano {
   V1: %trill c4/4
+}
 
 # Questionable - sixteenth note trill is extremely fast
-piano:
+piano {
   V1: %trill c4/16
+}
 ```
 
 ### 3. Key Signature Awareness
@@ -521,8 +568,10 @@ Remember ornaments use scale neighbors:
 
 ```muslang
 # In G major, F is sharp
-piano: (key g 'major)
+piano {
+  (key g 'major)
   V1: %trill e4/4  # Will trill E-F♯ (not E-F)
+}
 ```
 
 ### 4. Dynamics with Ornaments
@@ -531,12 +580,14 @@ Ornaments inherit current dynamic level:
 
 ```muslang
 # Soft trill
-piano:
+piano {
   V1: @p %trill c4/2
+}
 
 # Loud, emphatic mordent
-piano:
+piano {
   V1: @ff %mordent g4/4
+}
 ```
 
 ### 5. Articulation Interaction
@@ -545,12 +596,14 @@ Ornaments expand into multiple notes that inherit articulation:
 
 ```muslang
 # Staccato trill - each alternation is staccato
-piano:
+piano {
   V1: :staccato %trill c4/4
+}
 
 # Legato turn - smooth rotation
-piano:
+piano {
   V1: :legato %turn d4/4
+}
 ```
 
 ---
@@ -564,9 +617,10 @@ Ornament the top note of a chord:
 ```muslang
 # Not directly supported - ornament applies to following whole chord
 # Workaround: Use voices
-piano:
+piano {
   V1: %trill g4/2
   V2: c4/2,e4/2
+}
 ```
 
 ### Chain Ornaments
@@ -574,8 +628,9 @@ piano:
 Multiple ornaments in sequence:
 
 ```muslang
-piano:
+piano {
   V1: %trill c4/4 %mordent d4/4 %turn e4/4 %trill f4/4
+}
 ```
 
 ### Crescendo with Tremolo
@@ -583,19 +638,21 @@ piano:
 Building tension:
 
 ```muslang
-piano:
+piano {
   V1: @pp @crescendo %tremolo c4/1 @ff c4/4
+}
 ```
 
 ### Ornaments Across Key Changes
 
 ```muslang
-piano:
+piano {
   (key c 'major)
   V1: %trill e4/4 f4/4 |  # Trill E-F
   
   (key g 'major)
   V1: %trill e4/4 f4+/4 |  # Trill E-F♯ (F is sharp in G)
+}
 ```
 
 ---
@@ -606,8 +663,10 @@ piano:
 
 **Check**: Key signature - neighbors come from current scale
 ```muslang
-piano: (key d 'major)
+piano {
+  (key d 'major)
   V1: %trill f4+/4  # F♯-G (not F♯-F)
+}
 ```
 
 ### Problem: Ornament too fast/slow
@@ -615,28 +674,34 @@ piano: (key d 'major)
 **Adjust**: Use longer note duration for slower ornament
 ```muslang
 # Too fast
-piano: (tempo! 200)
+piano {
+  (tempo! 200)
   V1: %trill c4/16
+}
 
 # Better
-piano: (tempo! 120)
+piano {
+  (tempo! 120)
   V1: %trill c4/4
+}
 ```
 
 ### Problem: Mordent sounds choppy
 
 **Solution**: Use legato articulation
 ```muslang
-piano:
+piano {
   V1: :legato %mordent d4/4
+}
 ```
 
 ### Problem: Can't hear tremolo
 
 **Check**: Volume - use appropriate dynamic
 ```muslang
-piano:
+piano {
   V1: @f %tremolo c4/2  # Loud enough to hear
+}
 ```
 
 ---

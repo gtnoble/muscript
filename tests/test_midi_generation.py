@@ -371,15 +371,15 @@ class TestArticulationMapping:
 class TestAdvancedFeatures:
     """Test advanced MIDI generation features"""
     
-    def test_slur(self):
-        """Test slur generation with legato CC"""
-        notes = [
+    def test_legato_articulation_note_generation(self):
+        """Test legato articulation still generates notes correctly"""
+        events = [
+            Articulation(type='legato'),
             Note(pitch='c', octave=4, duration=4),
             Note(pitch='d', octave=4, duration=4),
             Note(pitch='e', octave=4, duration=4),
         ]
-        slur = Slur(notes=notes)
-        instrument = Instrument(name='piano', events=[], voices={1: [slur]})
+        instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
         
         gen = MIDIGenerator(ppq=480)
@@ -389,15 +389,12 @@ class TestAdvancedFeatures:
         try:
             gen.generate(ast, temp_path)
             
-            # Verify legato CC is sent
+            # Verify notes are present
             midi = mido.MidiFile(temp_path)
             messages = list(midi.tracks[1]) if len(midi.tracks) > 1 else list(midi.tracks[0])
-            
-            # Should have legato CC on and off
-            legato_msgs = [m for m in messages if m.type == 'control_change' and m.control == CC_LEGATO]
-            assert len(legato_msgs) == 2
-            assert legato_msgs[0].value == 127  # On
-            assert legato_msgs[1].value == 0    # Off
+
+            note_ons = [m for m in messages if m.type == 'note_on' and m.velocity > 0]
+            assert len(note_ons) == 3
         finally:
             os.unlink(temp_path)
     

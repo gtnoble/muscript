@@ -26,7 +26,7 @@ from lark.exceptions import LarkError
 from .ast_nodes import (
     Note, Rest, Chord, PercussionNote,
     GraceNote, Tuplet,
-    Slur, Slide,
+    Slide, Measure,
     Articulation, Ornament, Tremolo, Reset, Expression,
     DynamicLevel, DynamicTransition, DynamicAccent,
     TimeSignature, KeySignature, Tempo, Pan,
@@ -81,13 +81,18 @@ class MuslangTransformer(Transformer):
         concatenating their events in order of appearance.
         
         Args:
-            items: List of Instrument nodes
+            items: List of directives and Instrument nodes
             
         Returns:
-            Sequence node with instruments dict
+            Sequence node with instruments dict and directives in events
         """
+        directives = []
         instruments = {}
-        for inst in items:
+        for item in items:
+            if isinstance(item, (Tempo, TimeSignature, KeySignature)):
+                directives.append(item)
+                continue
+            inst = item
             if inst.name in instruments:
                 # Merge: concatenate events to existing instrument
                 existing = instruments[inst.name]
@@ -108,85 +113,103 @@ class MuslangTransformer(Transformer):
             else:
                 instruments[inst.name] = inst
         
-        return Sequence(instruments=instruments)
+        return Sequence(instruments=instruments, events=directives)
     
     def instrument(self, items) -> Instrument:
         """
-        Transform instrument declaration, grouping events by voice.
+        Transform instrument declaration.
         
-        ALL notes must be in voices. Only directives (tempo, time signature, etc.)
-        are allowed at the instrument level.
+        Grammar: instrument: INSTRUMENT_NAME ":" voice_content+
         
         Args:
-            items: [Token(INSTRUMENT_NAME), events_list]
+            items: [Token(INSTRUMENT_NAME), voice_content_dict, ...]
             
         Returns:
-            Instrument node with name, events, and voices dict
+            Instrument node with name and voices populated
         """
         name_token = items[0]
-        events_list = items[1] if len(items) > 1 else []
         instrument_name = str(name_token)
+        
+        # Merge all voice_content dicts
+        voices = {}
+        for voice_dict in items[1:]:
+            if isinstance(voice_dict, dict):
+                voices.update(voice_dict)
         
         # Reset state for each instrument
         self.current_duration = DEFAULT_NOTE_DURATION
         self.current_voice = None
         
-        # Allowed directive types (not notes/chords/percussion)
-        DIRECTIVE_TYPES = (Tempo, TimeSignature, KeySignature, Pan, 
-                          Articulation, DynamicLevel, DynamicTransition, 
-                          DynamicAccent, Reset, Ornament, Tremolo, Expression)
-        
-        # Group events by voice
-        voices = {}
-        non_voice_events = []
-        current_voice = None
-        
-        for event in events_list:
-            if isinstance(event, Voice):
-                # Voice declaration - switch context
-                current_voice = event.number
-                if current_voice not in voices:
-                    voices[current_voice] = []
-            elif current_voice is not None:
-                # We're in a voice context - add to that voice
-                voices[current_voice].append(event)
-            else:
-                # No voice context - only directives allowed
-                if isinstance(event, DIRECTIVE_TYPES):
-                    non_voice_events.append(event)
-                elif isinstance(event, (Note, Rest, Chord, PercussionNote, Slur, Slide, GraceNote, Tuplet)):
-                    raise ValueError(
-                        f"Error in instrument '{instrument_name}': "
-                        f"All notes must be in a voice (e.g., V1:). "
-                        f"Found {type(event).__name__} outside of voice context."
-                    )
-                else:
-                    non_voice_events.append(event)
-        
         # Require at least one voice
         if not voices:
             raise ValueError(
                 f"Error in instrument '{instrument_name}': "
-                f"At least one voice (e.g., V1:) is required."
+                f"At least one voice (e.g., V1:) is required with measures."
             )
         
         return Instrument(
             name=instrument_name,
-            events=non_voice_events,
+            events=[],  # No instrument-level events, all in voices
             voices=voices,
         )
     
-    def events(self, items) -> List[Any]:
+    def voice_content(self, items) -> dict:
         """
-        Transform events list.
+        Transform voice content (VOICE ":" measures).
+        
+        Grammar: voice_content: VOICE ":" measures
+        
+        Args:
+            items: [Token(VOICE), measures_list]
+            
+        Returns:
+            Dict mapping voice number to measures list
+        """
+        voice_token = items[0]
+        measures_list = items[1]
+        
+        # Extract number from VOICE token (e.g., "V1" -> 1)
+        voice_number = int(str(voice_token)[1:])  # Skip the 'V' prefix
+        
+        return {voice_number: measures_list}
+    
+    def measures(self, items) -> List[Measure]:
+        """
+        Transform measures list (measure (\"|\", measure)* \"|\").
+        
+        Grammar: measures: measure ("|" measure)* "|"
+        
+        Args:
+            items: List of Measure nodes (bar line tokens are consumed by grammar)
+            
+        Returns:
+            List of Measure nodes with measure numbers assigned
+        """
+        measure_list = [item for item in items if isinstance(item, Measure)]
+        
+        # Assign measure numbers (1-indexed)
+        for idx, measure in enumerate(measure_list, start=1):
+            measure.measure_number = idx
+        
+        return measure_list
+    
+    def measure(self, items) -> Measure:
+        """
+        Transform measure (measure_event+).
+        
+        Grammar: measure: measure_event+
         
         Args:
             items: List of event nodes
             
         Returns:
-            List of event nodes (filtering out None values from bar lines)
+            Measure node containing the events
         """
-        return [item for item in items if item is not None]
+        location = None
+        if items:
+            first_item = items[0]
+            location = getattr(first_item, 'location', None)
+        return Measure(events=items, location=location)
     
     # ========================================================================
     # Notes and Basic Rhythm
@@ -378,29 +401,6 @@ class MuslangTransformer(Transformer):
         actual_duration = 2
         
         return Tuplet(notes=notes, ratio=ratio, actual_duration=actual_duration)
-    
-    # ========================================================================
-    # Slurs
-    # ========================================================================
-    
-    def slur(self, items) -> Slur:
-        """
-        Transform slur.
-        
-        Args:
-            items: List of event nodes
-            
-        Grammar: slur: "{" event+ "}"
-        
-        Args:
-            items: List of event nodes
-            
-        Returns:
-            Slur node
-        """
-        # Collect all notes from events (filter out non-notes)
-        notes = [item for item in items if isinstance(item, (Note, Chord))]
-        return Slur(notes=notes)
     
     # ========================================================================
     # Slides
@@ -598,7 +598,18 @@ class MuslangTransformer(Transformer):
         ints = [int(item) for item in items if isinstance(item, (int, Token)) and (isinstance(item, int) or item.type == 'INT')]
         numerator = ints[0] if len(ints) > 0 else 4
         denominator = ints[1] if len(ints) > 1 else 4
-        return TimeSignature(numerator=numerator, denominator=denominator)
+        location = None
+        for item in items:
+            if isinstance(item, Token):
+                if hasattr(item, 'line') and hasattr(item, 'column'):
+                    location = SourceLocation(line=item.line, column=item.column)
+                    break
+
+        return TimeSignature(
+            numerator=numerator,
+            denominator=denominator,
+            location=location,
+        )
     
     def key_root(self, items) -> list:
         """
@@ -673,24 +684,8 @@ class MuslangTransformer(Transformer):
     # ========================================================================
     # Voices
     # ========================================================================
-    
-    def voice(self, items) -> Voice:
-        """
-        Transform voice declaration.
-        
-        Grammar: voice: VOICE ":"
-        
-        Args:
-            items: [VOICE token] - voice identifier (e.g., "V1", "V2")
-            
-        Returns:
-            Voice node (events will be populated by instrument)
-        """
-        # Extract number from VOICE token (e.g., "V1" -> 1)
-        voice_token = str(items[0])
-        voice_number = int(voice_token[1:])  # Skip the 'V' prefix
-        self.current_voice = voice_number
-        return Voice(number=voice_number, events=[])
+    # Structure Markers (removed - now handled by grammar and measures)
+    # ========================================================================
     
     # ========================================================================
     # Percussion
@@ -742,22 +737,6 @@ class MuslangTransformer(Transformer):
             duration=duration,
             dotted=dotted,
         )
-    
-    # ========================================================================
-    # Structure Markers
-    # ========================================================================
-    
-    def bar_line(self, items) -> None:
-        """
-        Transform bar line (just ignore it).
-        
-        Bar lines are structural markers for readability but don't affect
-        the semantic meaning of the music.
-        
-        Returns:
-            None
-        """
-        return None
 
 
 # ============================================================================
