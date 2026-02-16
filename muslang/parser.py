@@ -20,7 +20,7 @@ Key features:
 
 from pathlib import Path
 from typing import Optional, List, Any
-from lark import Lark, Transformer, Token, Tree
+from lark import Lark, Transformer, Token, Tree, v_args
 from lark.exceptions import LarkError
 
 from .ast_nodes import (
@@ -193,7 +193,8 @@ class MuslangTransformer(Transformer):
         
         return measure_list
     
-    def measure(self, items) -> Measure:
+    @v_args(meta=True)
+    def measure(self, items, meta) -> Measure:
         """
         Transform measure (measure_event+).
         
@@ -201,14 +202,12 @@ class MuslangTransformer(Transformer):
         
         Args:
             items: List of event nodes
+            meta: Lark meta object with source location information
             
         Returns:
             Measure node containing the events
         """
-        location = None
-        if items:
-            first_item = items[0]
-            location = getattr(first_item, 'location', None)
+        location = self._get_location(meta)
         return Measure(events=items, location=location)
     
     # ========================================================================
@@ -562,7 +561,8 @@ class MuslangTransformer(Transformer):
     # Musical Directives
     # ========================================================================
     
-    def tempo(self, items) -> Tempo:
+    @v_args(meta=True)
+    def tempo(self, items, meta) -> Tempo:
         """
         Transform tempo directive.
         
@@ -570,6 +570,7 @@ class MuslangTransformer(Transformer):
         
         Args:
             items: [Token(TEMPO_KW), int] - keyword and BPM value
+            meta: Lark meta object with source location information
             
         Returns:
             Tempo node
@@ -580,9 +581,11 @@ class MuslangTransformer(Transformer):
             if isinstance(item, int) or (isinstance(item, Token) and item.type == 'INT'):
                 bpm = int(item)
                 break
+        location = self._get_location(meta)
         return Tempo(bpm=bpm if bpm else 120)
     
-    def time_signature(self, items) -> TimeSignature:
+    @v_args(meta=True)
+    def time_signature(self, items, meta) -> TimeSignature:
         """
         Transform time signature.
         
@@ -590,6 +593,7 @@ class MuslangTransformer(Transformer):
         
         Args:
             items: [Token(TIME_KW), int, int] - keyword, numerator, denominator
+            meta: Lark meta object with source location information
             
         Returns:
             TimeSignature node
@@ -598,12 +602,7 @@ class MuslangTransformer(Transformer):
         ints = [int(item) for item in items if isinstance(item, (int, Token)) and (isinstance(item, int) or item.type == 'INT')]
         numerator = ints[0] if len(ints) > 0 else 4
         denominator = ints[1] if len(ints) > 1 else 4
-        location = None
-        for item in items:
-            if isinstance(item, Token):
-                if hasattr(item, 'line') and hasattr(item, 'column'):
-                    location = SourceLocation(line=item.line, column=item.column)
-                    break
+        location = self._get_location(meta)
 
         return TimeSignature(
             numerator=numerator,

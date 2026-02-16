@@ -633,9 +633,11 @@ class SemanticAnalyzer:
     def _get_children(self, node: ASTNode) -> List[ASTNode]:
         """Get child nodes for traversal"""
         if isinstance(node, Sequence):
-            # For top-level sequences, return instruments; for sub-sequences, return events
+            # For top-level sequences, return both instruments and directives
             if node.instruments:
-                return list(node.instruments.values())
+                children = list(node.events)  # directives first
+                children.extend(node.instruments.values())
+                return children
             else:
                 return node.events
         elif isinstance(node, Instrument):
