@@ -208,6 +208,7 @@ Articulations control **how notes are played**. Use `:` prefix.
 
 | Articulation | Symbol      | Effect                          |
 |--------------|-------------|---------------------------------|
+| Natural      | `:natural`  | Natural/default (92% duration)  |
 | Staccato     | `:staccato` | Short, detached (55% duration)  |
 | Legato       | `:legato`   | Smooth, connected (100%)        |
 | Tenuto       | `:tenuto`   | Full value, slightly emphasized |
@@ -755,7 +756,7 @@ piano {
 
 | Prefix | Purpose      | Examples                                    |
 |--------|--------------|---------------------------------------------|
-| `:`    | Articulation | `:staccato`, `:legato`, `:tenuto`, `:reset` |
+| `:`    | Articulation | `:natural`, `:staccato`, `:legato`, `:tenuto`, `:marcato`, `:reset` |
 | `@`    | Dynamics     | `@p`, `@ff`, `@crescendo`, `@sforzando`     |
 | `%`    | Ornaments    | `%trill`, `%mordent`, `%turn`, `%tremolo`   |
 | `~`    | Grace notes  | `~c4/32`                                    |
@@ -780,7 +781,7 @@ V1: c4/4,e4/4,g4/4;
 V1: r/4 r/2;
 
 # Articulations
-:staccato :legato :tenuto :marcato :reset
+:natural :staccato :legato :tenuto :marcato :reset
 
 # Dynamics
 @pp @p @mp @mf @f @ff

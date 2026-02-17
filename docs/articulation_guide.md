@@ -35,6 +35,7 @@ Both systems use **persistent state** - settings remain in effect until explicit
 Articulations use the **`:` prefix**:
 
 ```muslang
+:natural    # Natural/default articulation
 :staccato   # Short, detached notes
 :legato     # Smooth, connected notes
 :tenuto     # Full value notes

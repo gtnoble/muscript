@@ -207,11 +207,11 @@ class Articulation(ASTNode):
     """
     Articulation marking that affects how notes are played.
     
-    Uses colon prefix (:) in source: :legato, :staccato, :tenuto, :marcato
+    Uses colon prefix (:) in source: :legato, :staccato, :tenuto, :marcato, :natural
     Articulations control note duration and attack characteristics.
     
     Attributes:
-        type: Type of articulation (legato, staccato, tenuto, marcato)
+        type: Type of articulation (legato, staccato, tenuto, marcato, natural)
         persistent: If True, applies to all following notes until changed
                    If False, applies only to the immediately following note
         scope: Where this articulation was declared (composition, instrument, or voice)
@@ -221,8 +221,9 @@ class Articulation(ASTNode):
         :staccato -> Short, detached notes
         :tenuto   -> Full value, slight emphasis
         :marcato  -> Strong accent
+        :natural  -> Natural/default articulation (no duration alteration)
     """
-    type: Literal['legato', 'staccato', 'tenuto', 'marcato']
+    type: Literal['legato', 'staccato', 'tenuto', 'marcato', 'natural']
     persistent: bool = True
     scope: Literal['composition', 'instrument', 'voice'] = 'voice'
     location: Optional[SourceLocation] = None

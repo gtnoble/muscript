@@ -138,7 +138,7 @@ SLIDE_TYPE: "portamento" | "stepped"
 // How to play the notes
 
 articulation: ":" ARTICULATION_TYPE
-ARTICULATION_TYPE: "legato" | "staccato" | "tenuto" | "marcato"
+ARTICULATION_TYPE: "legato" | "staccato" | "tenuto" | "marcato" | "natural"
 
 // Reset articulation to natural
 // OLD: . or .natural - ambiguous with dotted!
