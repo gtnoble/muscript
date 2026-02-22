@@ -41,8 +41,8 @@ class TestChromaticSlide:
     
     def test_chromatic_slide_pitch_bend_generation(self):
         """Test that chromatic slide generates correct pitch bend events"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='c', octave=5, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('c', 5, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -77,8 +77,8 @@ class TestChromaticSlide:
     
     def test_chromatic_slide_ascending(self):
         """Test ascending chromatic slide (C4 to G4)"""
-        from_note = Note(pitch='c', octave=4, duration=2)
-        to_note = Note(pitch='g', octave=4, duration=2)
+        from_note = Note(pitches=[('c', 4, None)], duration=2)
+        to_note = Note(pitches=[('g', 4, None)], duration=2)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -106,8 +106,8 @@ class TestChromaticSlide:
     
     def test_chromatic_slide_descending(self):
         """Test descending chromatic slide (C5 to C4)"""
-        from_note = Note(pitch='c', octave=5, duration=2)
-        to_note = Note(pitch='c', octave=4, duration=2)
+        from_note = Note(pitches=[('c', 5, None)], duration=2)
+        to_note = Note(pitches=[('c', 4, None)], duration=2)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -135,8 +135,8 @@ class TestChromaticSlide:
     def test_chromatic_slide_pitch_bend_range_clamping(self):
         """Test that pitch bend values are clamped to valid range (-8192 to 8191)"""
         # Create a slide larger than typical pitch bend range
-        from_note = Note(pitch='c', octave=2, duration=1)
-        to_note = Note(pitch='c', octave=6, duration=1)
+        from_note = Note(pitches=[('c', 2, None)], duration=1)
+        to_note = Note(pitches=[('c', 6, None)], duration=1)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -161,8 +161,8 @@ class TestChromaticSlide:
     
     def test_chromatic_slide_timing(self):
         """Test that pitch bend events are distributed over the duration"""
-        from_note = Note(pitch='c', octave=4, duration=1)  # Whole note
-        to_note = Note(pitch='g', octave=4, duration=1)
+        from_note = Note(pitches=[('c', 4, None)], duration=1)  # Whole note
+        to_note = Note(pitches=[('g', 4, None)], duration=1)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -205,8 +205,8 @@ class TestSteppedSlide:
     
     def test_stepped_slide_note_sequence(self):
         """Test that stepped slide generates correct chromatic note sequence"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='e', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('e', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='stepped')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -236,8 +236,8 @@ class TestSteppedSlide:
     
     def test_stepped_slide_descending(self):
         """Test descending stepped slide"""
-        from_note = Note(pitch='g', octave=4, duration=4)
-        to_note = Note(pitch='c', octave=4, duration=4)
+        from_note = Note(pitches=[('g', 4, None)], duration=4)
+        to_note = Note(pitches=[('c', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='stepped')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -266,8 +266,8 @@ class TestSteppedSlide:
     
     def test_stepped_slide_single_semitone(self):
         """Test stepped slide with single semitone interval"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='c', octave=4, duration=4, accidental='sharp')
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('c', 4, 'sharp')], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='stepped')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -292,8 +292,8 @@ class TestSteppedSlide:
     
     def test_stepped_slide_unison(self):
         """Test stepped slide with same start and end note (unison)"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='c', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('c', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='stepped')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -317,8 +317,8 @@ class TestSteppedSlide:
     
     def test_stepped_slide_timing_distribution(self):
         """Test that stepped slide notes are evenly distributed in time"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='e', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('e', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='stepped')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -365,8 +365,8 @@ class TestPortamentoSlide:
     
     def test_portamento_cc_generation(self):
         """Test that portamento slide generates correct CC events"""
-        from_note = Note(pitch='c', octave=4, duration=2)
-        to_note = Note(pitch='g', octave=4, duration=2)
+        from_note = Note(pitches=[('c', 4, None)], duration=2)
+        to_note = Note(pitches=[('g', 4, None)], duration=2)
         slide = Slide(from_note=from_note, to_note=to_note, style='portamento')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -402,8 +402,8 @@ class TestPortamentoSlide:
     
     def test_portamento_note_generation(self):
         """Test that portamento slide generates both from_note and to_note"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='g', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('g', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='portamento')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -440,8 +440,8 @@ class TestSlideDuration:
         durations = [1, 2, 4, 8, 16]  # whole, half, quarter, eighth, sixteenth
         
         for duration in durations:
-            from_note = Note(pitch='c', octave=4, duration=duration)
-            to_note = Note(pitch='g', octave=4, duration=duration)
+            from_note = Note(pitches=[('c', 4, None)], duration=duration)
+            to_note = Note(pitches=[('g', 4, None)], duration=duration)
             slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
             instrument = Instrument(name='piano', events=[], voices={1: [slide]})
             ast = Sequence(instruments={'piano': instrument})
@@ -465,8 +465,8 @@ class TestSlideDuration:
     
     def test_slide_with_dotted_note(self):
         """Test slide with dotted note duration"""
-        from_note = Note(pitch='c', octave=4, duration=4, dotted=True)  # Dotted quarter
-        to_note = Note(pitch='g', octave=4, duration=4, dotted=True)
+        from_note = Note(pitches=[('c', 4, None)], duration=4, dotted=True)  # Dotted quarter
+        to_note = Note(pitches=[('g', 4, None)], duration=4, dotted=True)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -489,8 +489,8 @@ class TestSlideDuration:
     
     def test_slide_timing_with_semantic_analysis(self):
         """Test that semantic analysis correctly calculates slide timing"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='g', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('g', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -528,8 +528,8 @@ class TestSlideIntervals:
         ]
         
         for pitch1, oct1, pitch2, oct2, acc2 in intervals:
-            from_note = Note(pitch=pitch1, octave=oct1, duration=4)
-            to_note = Note(pitch=pitch2, octave=oct2, duration=4, accidental=acc2)
+            from_note = Note(pitches=[(pitch1, oct1, None)], duration=4)
+            to_note = Note(pitches=[(pitch2, oct2, acc2)], duration=4)
             slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
             instrument = Instrument(name='piano', events=[], voices={1: [slide]})
             ast = Sequence(instruments={'piano': instrument})
@@ -554,8 +554,8 @@ class TestSlideIntervals:
         ]
         
         for pitch1, oct1, pitch2, oct2 in intervals:
-            from_note = Note(pitch=pitch1, octave=oct1, duration=4)
-            to_note = Note(pitch=pitch2, octave=oct2, duration=4)
+            from_note = Note(pitches=[(pitch1, oct1, None)], duration=4)
+            to_note = Note(pitches=[(pitch2, oct2, None)], duration=4)
             slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
             instrument = Instrument(name='piano', events=[], voices={1: [slide]})
             ast = Sequence(instruments={'piano': instrument})
@@ -578,8 +578,8 @@ class TestSlideIntervals:
         ]
         
         for pitch1, oct1, pitch2, oct2 in intervals:
-            from_note = Note(pitch=pitch1, octave=oct1, duration=2)
-            to_note = Note(pitch=pitch2, octave=oct2, duration=2)
+            from_note = Note(pitches=[(pitch1, oct1, None)], duration=2)
+            to_note = Note(pitches=[(pitch2, oct2, None)], duration=2)
             slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
             instrument = Instrument(name='piano', events=[], voices={1: [slide]})
             ast = Sequence(instruments={'piano': instrument})
@@ -596,8 +596,8 @@ class TestSlideIntervals:
     
     def test_slide_extreme_interval_warning(self):
         """Test that very large slide intervals generate warning"""
-        from_note = Note(pitch='c', octave=2, duration=1)
-        to_note = Note(pitch='c', octave=5, duration=1)  # 36 semitones
+        from_note = Note(pitches=[('c', 2, None)], duration=1)
+        to_note = Note(pitches=[('c', 5, None)], duration=1)  # 36 semitones
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -786,8 +786,8 @@ class TestSlideParser:
         slide = _voice_events(ast)[0]
         assert isinstance(slide, Slide)
         assert slide.style == 'chromatic'
-        assert slide.from_note.pitch == 'c'
-        assert slide.to_note.pitch == 'g'
+        assert slide.from_note.pitches[0][0] == 'c'
+        assert slide.to_note.pitches[0][0] == 'g'
     
     def test_parse_stepped_slide(self):
         """Test parsing stepped slide"""
@@ -827,8 +827,8 @@ class TestSlideParser:
         slide = _voice_events(ast)[0]
         assert isinstance(slide, Slide)
         # Accidentals may be represented as 'sharp'/'flat' or '#'/'b' depending on parser
-        assert slide.from_note.accidental in ['#', 'sharp']
-        assert slide.to_note.accidental in ['b', 'flat']
+        assert slide.from_note.pitches[0][2] in ['#', 'sharp']
+        assert slide.to_note.pitches[0][2] in ['b', 'flat']
     
     def test_parse_slide_with_different_durations(self):
         """Test parsing slide with various note durations"""
@@ -866,8 +866,8 @@ class TestSlideParser:
 
             slide = _voice_events(ast)[0]
             assert isinstance(slide, Slide)
-            assert slide.from_note.pitch == 'c'
-            assert slide.to_note.pitch == 'g'
+            assert slide.from_note.pitches[0][0] == 'c'
+            assert slide.to_note.pitches[0][0] == 'g'
     
     def test_parse_multiple_slides(self):
         """Test parsing multiple slides in sequence"""
@@ -892,8 +892,8 @@ class TestSlideSemantics:
     
     def test_slide_large_interval_warning(self):
         """Test that large slide intervals generate warnings"""
-        from_note = Note(pitch='c', octave=2, duration=1)
-        to_note = Note(pitch='g', octave=5, duration=1)  # Very large interval
+        from_note = Note(pitches=[('c', 2, None)], duration=1)
+        to_note = Note(pitches=[('g', 5, None)], duration=1)  # Very large interval
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -907,8 +907,8 @@ class TestSlideSemantics:
     
     def test_slide_reasonable_interval_no_warning(self):
         """Test that reasonable slide intervals don't generate warnings"""
-        from_note = Note(pitch='c', octave=4, duration=2)
-        to_note = Note(pitch='c', octave=5, duration=2)  # One octave
+        from_note = Note(pitches=[('c', 4, None)], duration=2)
+        to_note = Note(pitches=[('c', 5, None)], duration=2)  # One octave
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -922,12 +922,12 @@ class TestSlideSemantics:
     
     def test_slide_timing_calculation(self):
         """Test that slides get correct start_time and end_time"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='g', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('g', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         
         # Add another event after the slide
-        note_after = Note(pitch='e', octave=4, duration=4)
+        note_after = Note(pitches=[('e', 4, None)], duration=4)
         
         instrument = Instrument(name='piano', events=[], voices={1: [slide, note_after]})
         ast = Sequence(instruments={'piano': instrument})

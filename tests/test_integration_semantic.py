@@ -27,7 +27,7 @@ def test_key_signature_application():
     instrument = result.instruments['piano']
     
     # Check that F notes should have sharp accidental applied
-    f_notes = [e for e in instrument.voices[1] if hasattr(e, 'pitch') and e.pitch == 'f']
+    f_notes = [e for e in instrument.voices[1] if hasattr(e, 'pitches') and e.pitches and e.pitches[0][0] == 'f']
     for note in f_notes:
         # F in G major should become F#
         assert note.accidental == 'sharp'
@@ -50,7 +50,7 @@ def test_ornament_expansion():
     
     instrument = result.instruments['piano']
     events = [event for measure in instrument.voices[1] for event in measure.events]
-    notes = [event for event in events if hasattr(event, 'pitch')]
+    notes = [event for event in events if hasattr(event, 'pitches')]
 
     assert len(notes) == 8
     assert all(event.__class__.__name__ not in ('Ornament', 'Tremolo') for event in events)
@@ -70,10 +70,10 @@ def test_tremolo_expansion():
 
     instrument = result.instruments['piano']
     events = [event for measure in instrument.voices[1] for event in measure.events]
-    notes = [event for event in events if hasattr(event, 'pitch')]
+    notes = [event for event in events if hasattr(event, 'pitches')]
 
     assert len(notes) == 4
-    assert all(note.pitch == 'c' for note in notes)
+    assert all(note.pitches[0][0] == 'c' for note in notes)
     assert all(event.__class__.__name__ not in ('Ornament', 'Tremolo') for event in events)
 
 

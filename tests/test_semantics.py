@@ -20,7 +20,7 @@ def test_validate_note_octave_range():
     analyzer = SemanticAnalyzer()
     
     # Invalid octave - too low
-    note = Note(pitch='c', octave=-1, duration=4)
+    note = Note(pitches=[('c', -1, None)], duration=4)
     instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     
@@ -34,7 +34,7 @@ def test_validate_note_octave_range_too_high():
     analyzer = SemanticAnalyzer()
     
     # Invalid octave - too high
-    note = Note(pitch='c', octave=11, duration=4)
+    note = Note(pitches=[('c', 11, None)], duration=4)
     instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     
@@ -49,7 +49,7 @@ def test_validate_valid_octave():
     
     # Valid octaves
     for octave in [0, 4, 8, 10]:
-        note = Note(pitch='c', octave=octave, duration=4)
+        note = Note(pitches=[('c', octave, None)], duration=4)
         instrument = Instrument(name='piano', events=[], voices={1: [note]})
         ast = Sequence(events=[instrument])
         
@@ -63,7 +63,7 @@ def test_validate_note_duration():
     analyzer = SemanticAnalyzer()
     
     # Invalid duration
-    note = Note(pitch='c', octave=4, duration=3)  # 3 is not valid
+    note = Note(pitches=[('c', 4, None)], duration=3)  # 3 is not valid
     instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     
@@ -78,7 +78,7 @@ def test_validate_valid_durations():
     
     valid_durations = [1, 2, 4, 8, 16, 32, 64]
     for duration in valid_durations:
-        note = Note(pitch='c', octave=4, duration=duration)
+        note = Note(pitches=[('c', 4, None)], duration=duration)
         instrument = Instrument(name='piano', events=[], voices={1: [note]})
         ast = Sequence(events=[instrument])
         
@@ -92,8 +92,8 @@ def test_validate_slide_reasonable_interval_no_error():
     analyzer = SemanticAnalyzer()
 
     slide = Slide(
-        from_note=Note(pitch='c', octave=4, duration=4),
-        to_note=Note(pitch='g', octave=4, duration=4),
+        from_note=Note(pitches=[('c', 4, None)], duration=4),
+        to_note=Note(pitches=[('g', 4, None)], duration=4),
     )
     instrument = Instrument(name='piano', events=[], voices={1: [slide]})
     ast = Sequence(events=[instrument])
@@ -107,7 +107,7 @@ def test_validate_tuplet_ratio():
     analyzer = SemanticAnalyzer()
     
     # Invalid tuplet ratio
-    note = Note(pitch='c', octave=4, duration=8)
+    note = Note(pitches=[('c', 4, None)], duration=8)
     tuplet = Tuplet(notes=[note], ratio=1, actual_duration=2)
     instrument = Instrument(name='piano', events=[], voices={1: [tuplet]})
     ast = Sequence(events=[instrument])
@@ -185,8 +185,8 @@ def test_validate_slide_large_interval_warning():
     analyzer = SemanticAnalyzer()
     
     # Large interval slide (more than 2 octaves)
-    from_note = Note(pitch='c', octave=2, duration=4)
-    to_note = Note(pitch='c', octave=5, duration=4)
+    from_note = Note(pitches=[('c', 2, None)], duration=4)
+    to_note = Note(pitches=[('c', 5, None)], duration=4)
     slide = Slide(from_note=from_note, to_note=to_note)
     instrument = Instrument(name='piano', events=[], voices={1: [slide]})
     ast = Sequence(events=[instrument])
@@ -201,17 +201,17 @@ def test_note_to_midi():
     analyzer = SemanticAnalyzer()
     
     # Middle C (C4) should be MIDI note 60
-    note = Note(pitch='c', octave=4, duration=4)
+    note = Note(pitches=[('c', 4, None)], duration=4)
     midi = analyzer._note_to_midi(note)
     assert midi == 60
     
     # A4 should be MIDI note 69
-    note = Note(pitch='a', octave=4, duration=4)
+    note = Note(pitches=[('a', 4, None)], duration=4)
     midi = analyzer._note_to_midi(note)
     assert midi == 69
     
     # C5 (high C) should be MIDI note 72
-    note = Note(pitch='c', octave=5, duration=4)
+    note = Note(pitches=[('c', 5, None)], duration=4)
     midi = analyzer._note_to_midi(note)
     assert midi == 72
 
@@ -221,17 +221,17 @@ def test_note_to_midi_with_accidentals():
     analyzer = SemanticAnalyzer()
     
     # C#4 should be MIDI note 61
-    note = Note(pitch='c', octave=4, duration=4, accidental='sharp')
+    note = Note(pitches=[('c', 4, 'sharp')], duration=4)
     midi = analyzer._note_to_midi(note)
     assert midi == 61
     
     # Db4 should be MIDI note 61 (same as C#4)
-    note = Note(pitch='d', octave=4, duration=4, accidental='flat')
+    note = Note(pitches=[('d', 4, 'flat')], duration=4)
     midi = analyzer._note_to_midi(note)
     assert midi == 61
     
     # Bb3 should be MIDI note 58
-    note = Note(pitch='b', octave=3, duration=4, accidental='flat')
+    note = Note(pitches=[('b', 3, 'flat')], duration=4)
     midi = analyzer._note_to_midi(note)
     assert midi == 58
 
@@ -241,9 +241,9 @@ def test_full_analysis_pipeline():
     analyzer = SemanticAnalyzer()
     
     # Create simple AST
-    note1 = Note(pitch='c', octave=4, duration=4)
-    note2 = Note(pitch='e', octave=4, duration=4)
-    note3 = Note(pitch='g', octave=4, duration=4)
+    note1 = Note(pitches=[('c', 4, None)], duration=4)
+    note2 = Note(pitches=[('e', 4, None)], duration=4)
+    note3 = Note(pitches=[('g', 4, None)], duration=4)
     instrument = Instrument(name='piano', events=[], voices={1: [note1, note2, note3]})
     ast = Sequence(events=[instrument])
     
@@ -260,7 +260,7 @@ def test_analysis_with_errors_raises():
     analyzer = SemanticAnalyzer()
     
     # Create AST with error (invalid octave)
-    note = Note(pitch='c', octave=11, duration=4)
+    note = Note(pitches=[('c', 11, None)], duration=4)
     instrument = Instrument(name='piano', events=[], voices={1: [note]})
     ast = Sequence(events=[instrument])
     

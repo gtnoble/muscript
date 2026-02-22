@@ -55,9 +55,10 @@ class SemanticAnalyzer:
     def _validate_ast(self, node: ASTNode, instrument_name: Optional[str] = None):
         """Validate AST structure"""
         if isinstance(node, Note):
-            # Validate pitch range
-            if node.octave < 0 or node.octave > 10:
-                self._error(f"Octave out of range: {node.octave}")
+            # Validate pitch range for all pitches
+            for pitch, octave, accidental in node.pitches:
+                if octave < 0 or octave > 10:
+                    self._error(f"Octave out of range: {octave}")
             
             # Validate duration
             if node.duration and node.duration not in [1, 2, 4, 8, 16, 32, 64]:
@@ -104,7 +105,7 @@ class SemanticAnalyzer:
                 )
 
             non_voice_note_types = (
-                Note, Rest, Chord, PercussionNote, Slide, GraceNote, Tuplet
+                Note, Rest, PercussionNote, Slide, GraceNote, Tuplet
             )
             for event in node.events:
                 if isinstance(event, non_voice_note_types):
@@ -131,8 +132,8 @@ class SemanticAnalyzer:
             return node
         
         elif isinstance(node, Note):
-            if self.current_key_sig and node.accidental is None:
-                # Apply key signature using theory module
+            if self.current_key_sig:
+                # Apply key signature using theory module (handles each pitch)
                 return theory.apply_key_signature_to_note(node, self.current_key_sig)
         
         return self._transform_children(node, self._apply_key_signatures)
@@ -262,21 +263,6 @@ class SemanticAnalyzer:
             end_time = start_time + duration_ticks
             updated_rest = replace(event, start_time=start_time, end_time=end_time)
             return updated_rest, duration_ticks
-        
-        elif isinstance(event, Chord):
-            # All notes in chord have same timing
-            max_duration = 0.0
-            updated_notes = []
-            
-            for note in event.notes:
-                duration_ticks = self._duration_to_ticks(note.duration or DEFAULT_NOTE_DURATION, note.dotted)
-                end_time = start_time + duration_ticks
-                updated_note = replace(note, start_time=start_time, end_time=end_time)
-                updated_notes.append(updated_note)
-                max_duration = max(max_duration, duration_ticks)
-            
-            updated_chord = replace(event, notes=updated_notes, start_time=start_time, end_time=start_time + max_duration)
-            return updated_chord, max_duration
         
         elif isinstance(event, PercussionNote):
             duration_ticks = self._duration_to_ticks(event.duration or DEFAULT_NOTE_DURATION, event.dotted)
@@ -610,24 +596,12 @@ class SemanticAnalyzer:
             return event
         
         elif isinstance(event, Note):
-            # Apply current state to note
+            # Apply current state to note (single or multi-pitch)
             velocity = self._calculate_note_velocity(state, event)
             return replace(event, 
                          velocity=velocity,
                          articulation=state['articulation'],
                          dynamic_level=state['dynamic_level'])
-        
-        elif isinstance(event, Chord):
-            # Apply state to all notes in chord
-            updated_notes = []
-            for note in event.notes:
-                velocity = self._calculate_note_velocity(state, note)
-                updated_note = replace(note,
-                                     velocity=velocity,
-                                     articulation=state['articulation'],
-                                     dynamic_level=state['dynamic_level'])
-                updated_notes.append(updated_note)
-            return replace(event, notes=updated_notes)
         
         elif isinstance(event, PercussionNote):
             # Apply velocity to percussion
@@ -723,8 +697,6 @@ class SemanticAnalyzer:
             for voice_events in node.voices.values():
                 children.extend(voice_events)
             return children
-        elif isinstance(node, Chord):
-            return node.notes
         elif isinstance(node, Tuplet):
             return node.notes
         else:
@@ -779,10 +751,6 @@ class SemanticAnalyzer:
             
             return replace(node, voices=new_voices)
         
-        elif isinstance(node, Chord):
-            new_notes = [transform_func(n) for n in node.notes if transform_func(n) is not None]
-            return replace(node, notes=new_notes)
-        
         elif isinstance(node, Tuplet):
             new_notes = [transform_func(n) for n in node.notes if transform_func(n) is not None]
             return replace(node, notes=new_notes)
@@ -791,13 +759,17 @@ class SemanticAnalyzer:
             return node
     
     def _note_to_midi(self, note: Note) -> int:
-        """Convert note to MIDI note number"""
-        pitch_map = {'c': 0, 'd': 2, 'e': 4, 'f': 5, 'g': 7, 'a': 9, 'b': 11}
-        midi_note = (note.octave + 1) * 12 + pitch_map[note.pitch]
+        """Convert note to MIDI note number (uses first pitch for multi-pitch notes)"""
+        if not note.pitches:
+            raise ValueError("Note has no pitches")
         
-        if note.accidental == 'sharp':
+        pitch, octave, accidental = note.pitches[0]
+        pitch_map = {'c': 0, 'd': 2, 'e': 4, 'f': 5, 'g': 7, 'a': 9, 'b': 11}
+        midi_note = (octave + 1) * 12 + pitch_map[pitch]
+        
+        if accidental == 'sharp':
             midi_note += 1
-        elif note.accidental == 'flat':
+        elif accidental == 'flat':
             midi_note -= 1
         
         return midi_note

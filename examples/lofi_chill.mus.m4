@@ -11,22 +11,22 @@ define(`REPEAT_MEASURE', `ifelse($1, `0', `', `ifelse($1, `1', `$2', `$2 | REPEA
 # ==============================
 
 # A Section: Fmaj7 - G7 - Em7 - Am7 (vi-VII-v-i in A minor)
-define(`CHORD_A1', `f3/4,a3/4,c4/4,e4/4 r/8 a3/8,c4/8,e4/8 r/4 f3/4,a3/4,e4/4')dnl
-define(`CHORD_A2', `g3/4,b3/4,d4/4,f4/4 r/8 b3/8,d4/8,f4/8 r/4 g3/4,d4/4,f4/4')dnl
-define(`CHORD_A3', `e3/4,g3/4,b3/4,d4/4 r/8 g3/8,b3/8,d4/8 r/4 e3/4,b3/4,d4/4')dnl
-define(`CHORD_A4', `a2/4,c3/4,e3/4,g3/4 r/8 c3/8,e3/8,g3/8 r/4 a2/4,e3/4,g3/4')dnl
+define(`CHORD_A1', `f3,a3,c4,e4/4 r/8 a3,c4,e4/8 r/4 f3,a3,e4/4')dnl
+define(`CHORD_A2', `g3,b3,d4,f4/4 r/8 b3,d4,f4/8 r/4 g3,d4,f4/4')dnl
+define(`CHORD_A3', `e3,g3,b3,d4/4 r/8 g3,b3,d4/8 r/4 e3,b3,d4/4')dnl
+define(`CHORD_A4', `a2,c3,e3,g3/4 r/8 c3,e3,g3/8 r/4 a2,e3,g3/4')dnl
 
 # B Section: Dm7 - G7 - Cmaj7 - Fmaj7 (ii-V-I-IV progression)
-define(`CHORD_B1', `d3/4,f3/4,a3/4,c4/4 r/8 f3/8,a3/8,c4/8 r/4 d3/4,a3/4,c4/4')dnl
-define(`CHORD_B2', `g3/4,b3/4,d4/4,f4/4 r/8 b3/8,d4/8,f4/8 r/4 g3/4,b3/4,f4/8')dnl
-define(`CHORD_B3', `c3/4,e3/4,g3/4,b3/4 r/8 e3/8,g3/8,b3/8 r/4 c3/4,g3/4,b3/4')dnl
-define(`CHORD_B4', `f3/4,a3/4,c4/4,e4/4 r/8 a3/8,c4/8,e4/8 r/4 f3/4,c4/4,e4/4')dnl
+define(`CHORD_B1', `d3,f3,a3,c4/4 r/8 f3,a3,c4/8 r/4 d3,a3,c4/4')dnl
+define(`CHORD_B2', `g3,b3,d4,f4/4 r/8 b3,d4,f4/8 r/4 g3,d4,f4/4')dnl
+define(`CHORD_B3', `c3,e3,g3,b3/4 r/8 e3,g3,b3/8 r/4 c3,g3,b3/4')dnl
+define(`CHORD_B4', `f3,a3,c4,e4/4 r/8 a3,c4,e4/8 r/4 f3,c4,e4/4')dnl
 
 # C Section: Am7 - Dm7 - G7 - Cmaj7 (Bridge/Turnaround)
-define(`CHORD_C1', `a2/4,c3/4,e3/4,g3/4 r/8 c3/8,e3/8,g3/8 r/4 a2/4,e3/4,g3/4')dnl
-define(`CHORD_C2', `d3/4,f3/4,a3/4,c4/4 r/8 f3/8,a3/8,c4/8 r/4 d3/4,a3/4,c4/4')dnl
-define(`CHORD_C3', `g3/4,b3/4,d4/4,f4/4 r/8 b3/8,d4/8,f4/8 r/4 g3/4,d4/4,f4/4')dnl
-define(`CHORD_C4', `c3/4,e3/4,g3/4,b3/4 r/8 e3/8,g3/8,b3/8 r/4 c3/4,g3/4,b3/4')dnl
+define(`CHORD_C1', `a2,c3,e3,g3/4 r/8 c3,e3,g3/8 r/4 a2,e3,g3/4')dnl
+define(`CHORD_C2', `d3,f3,a3,c4/4 r/8 f3,a3,c4/8 r/4 d3,a3,c4/4')dnl
+define(`CHORD_C3', `g3,b3,d4,f4/4 r/8 b3,d4,f4/8 r/4 g3,d4,f4/4')dnl
+define(`CHORD_C4', `c3,e3,g3,b3/4 r/8 e3,g3,b3/8 r/4 c3,g3,b3/4')dnl
 
 # ==============================
 # Bass Lines (Walking bass style)

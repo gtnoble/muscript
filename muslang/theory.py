@@ -129,20 +129,25 @@ def get_upper_neighbor(note: Note, key_sig: Optional[KeySignatureInfo] = None) -
     Get the upper scale neighbor of a note.
     
     Args:
-        note: The base note
+        note: The base note (uses first pitch for multi-pitch notes)
         key_sig: Optional key signature context
     
     Returns:
         A new Note representing the upper neighbor
     """
+    # Use first pitch for multi-pitch notes
+    if not note.pitches:
+        raise ValueError("Note has no pitches")
+    pitch, octave, _ = note.pitches[0]
+    
     # Get next pitch in scale
     pitches = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
-    current_index = pitches.index(note.pitch)
+    current_index = pitches.index(pitch)
     next_index = (current_index + 1) % 7
     next_pitch = pitches[next_index]
     
     # Determine octave
-    next_octave = note.octave
+    next_octave = octave
     if next_index == 0:  # Wrapped around to C
         next_octave += 1
     
@@ -152,10 +157,8 @@ def get_upper_neighbor(note: Note, key_sig: Optional[KeySignatureInfo] = None) -
         accidental = key_sig.get_accidental(next_pitch)
     
     return Note(
-        pitch=next_pitch,
-        octave=next_octave,
+        pitches=[(next_pitch, next_octave, accidental)],
         duration=32,  # Grace note duration
-        accidental=accidental
     )
 
 
@@ -164,20 +167,25 @@ def get_lower_neighbor(note: Note, key_sig: Optional[KeySignatureInfo] = None) -
     Get the lower scale neighbor of a note.
     
     Args:
-        note: The base note
+        note: The base note (uses first pitch for multi-pitch notes)
         key_sig: Optional key signature context
     
     Returns:
         A new Note representing the lower neighbor
     """
+    # Use first pitch for multi-pitch notes
+    if not note.pitches:
+        raise ValueError("Note has no pitches")
+    pitch, octave, _ = note.pitches[0]
+    
     # Get previous pitch in scale
     pitches = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
-    current_index = pitches.index(note.pitch)
+    current_index = pitches.index(pitch)
     prev_index = (current_index - 1) % 7
     prev_pitch = pitches[prev_index]
     
     # Determine octave
-    prev_octave = note.octave
+    prev_octave = octave
     if prev_index == 6:  # Wrapped around to B
         prev_octave -= 1
     
@@ -187,10 +195,8 @@ def get_lower_neighbor(note: Note, key_sig: Optional[KeySignatureInfo] = None) -
         accidental = key_sig.get_accidental(prev_pitch)
     
     return Note(
-        pitch=prev_pitch,
-        octave=prev_octave,
+        pitches=[(prev_pitch, prev_octave, accidental)],
         duration=32,  # Grace note duration
-        accidental=accidental
     )
 
 
@@ -253,27 +259,28 @@ def _build_note(base_note: Note, pitch: str, octave: int, accidental: Optional[s
         raise ValueError(f"Cannot represent note duration units={units}")
     duration, dotted = duration_info
     return Note(
-        pitch=pitch,
-        octave=octave,
+        pitches=[(pitch, octave, accidental)],
         duration=duration,
         dotted=dotted,
-        accidental=accidental,
     )
 
 
 def _principal_from_units(note: Note, units: int) -> List[Note]:
     """Fallback to principal note with exact represented duration units."""
+    if not note.pitches:
+        return [note]
+    
     duration_info = _units_to_duration(units)
     if duration_info is None:
         return [note]
+    
+    pitch, octave, accidental = note.pitches[0]
     duration, dotted = duration_info
     return [
         Note(
-            pitch=note.pitch,
-            octave=note.octave,
+            pitches=[(pitch, octave, accidental)],
             duration=duration,
             dotted=dotted,
-            accidental=note.accidental,
         )
     ]
 
@@ -287,23 +294,29 @@ def _expand_trill(note: Note, upper: Note, total_units: int) -> List[Note]:
     count = total_units // segment_units
     remainder = total_units % segment_units
     notes: List[Note] = []
+    
+    note_pitch, note_octave, note_accidental = note.pitches[0] if note.pitches else ('c', 4, None)
+    upper_pitch, upper_octave, upper_accidental = upper.pitches[0] if upper.pitches else ('c', 4, None)
 
     for i in range(count):
         if i % 2 == 0:
-            notes.append(_build_note(note, note.pitch, note.octave, note.accidental, segment_units))
+            notes.append(_build_note(note, note_pitch, note_octave, note_accidental, segment_units))
         else:
-            notes.append(_build_note(note, upper.pitch, upper.octave, upper.accidental, segment_units))
+            notes.append(_build_note(note, upper_pitch, upper_octave, upper_accidental, segment_units))
 
     if remainder > 0:
         if _units_to_duration(remainder) is None:
             return _principal_from_units(note, total_units)
-        notes.append(_build_note(note, note.pitch, note.octave, note.accidental, remainder))
+        notes.append(_build_note(note, note_pitch, note_octave, note_accidental, remainder))
 
     return notes if notes else _principal_from_units(note, total_units)
 
 
 def _expand_mordent(note: Note, lower: Note, total_units: int) -> List[Note]:
     """Expand mordent as principal-lower-principal across full duration."""
+    note_pitch, note_octave, note_accidental = note.pitches[0] if note.pitches else ('c', 4, None)
+    lower_pitch, lower_octave, lower_accidental = lower.pitches[0] if lower.pitches else ('c', 4, None)
+    
     for short_units in (4, 2):
         remaining_units = total_units - (2 * short_units)
         if remaining_units < 2:
@@ -312,9 +325,9 @@ def _expand_mordent(note: Note, lower: Note, total_units: int) -> List[Note]:
             continue
 
         return [
-            _build_note(note, note.pitch, note.octave, note.accidental, short_units),
-            _build_note(note, lower.pitch, lower.octave, lower.accidental, short_units),
-            _build_note(note, note.pitch, note.octave, note.accidental, remaining_units),
+            _build_note(note, note_pitch, note_octave, note_accidental, short_units),
+            _build_note(note, lower_pitch, lower_octave, lower_accidental, short_units),
+            _build_note(note, note_pitch, note_octave, note_accidental, remaining_units),
         ]
 
     return _principal_from_units(note, total_units)
@@ -325,6 +338,10 @@ def _expand_turn(note: Note, upper: Note, lower: Note, total_units: int) -> List
     base = total_units // 4
     remainder = total_units % 4
     parts = [base, base, base, base]
+    
+    note_pitch, note_octave, note_accidental = note.pitches[0] if note.pitches else ('c', 4, None)
+    upper_pitch, upper_octave, upper_accidental = upper.pitches[0] if upper.pitches else ('c', 4, None)
+    lower_pitch, lower_octave, lower_accidental = lower.pitches[0] if lower.pitches else ('c', 4, None)
 
     # Keep later notes slightly longer when duration doesn't divide by 4 evenly.
     for i in range(remainder):
@@ -334,10 +351,10 @@ def _expand_turn(note: Note, upper: Note, lower: Note, total_units: int) -> List
         return _principal_from_units(note, total_units)
 
     return [
-        _build_note(note, upper.pitch, upper.octave, upper.accidental, parts[0]),
-        _build_note(note, note.pitch, note.octave, note.accidental, parts[1]),
-        _build_note(note, lower.pitch, lower.octave, lower.accidental, parts[2]),
-        _build_note(note, note.pitch, note.octave, note.accidental, parts[3]),
+        _build_note(note, upper_pitch, upper_octave, upper_accidental, parts[0]),
+        _build_note(note, note_pitch, note_octave, note_accidental, parts[1]),
+        _build_note(note, lower_pitch, lower_octave, lower_accidental, parts[2]),
+        _build_note(note, note_pitch, note_octave, note_accidental, parts[3]),
     ]
 
 
@@ -346,42 +363,51 @@ def _expand_tremolo(note: Note, total_units: int) -> List[Note]:
     segment_units = 8 if total_units >= 8 else 4 if total_units >= 4 else 2
     if total_units < segment_units:
         return _principal_from_units(note, total_units)
+    
+    note_pitch, note_octave, note_accidental = note.pitches[0] if note.pitches else ('c', 4, None)
 
     count = total_units // segment_units
     remainder = total_units % segment_units
     notes = [
-        _build_note(note, note.pitch, note.octave, note.accidental, segment_units)
+        _build_note(note, note_pitch, note_octave, note_accidental, segment_units)
         for _ in range(count)
     ]
 
     if remainder > 0:
         if _units_to_duration(remainder) is None:
             return _principal_from_units(note, total_units)
-        notes.append(_build_note(note, note.pitch, note.octave, note.accidental, remainder))
+        notes.append(_build_note(note, note_pitch, note_octave, note_accidental, remainder))
 
     return notes if notes else _principal_from_units(note, total_units)
 
 
 def apply_key_signature_to_note(note: Note, key_sig: KeySignatureInfo) -> Note:
     """
-    Apply key signature to a note if it doesn't have explicit accidental.
+    Apply key signature to a note if pitches don't have explicit accidentals.
     
     Args:
         note: The note to process
         key_sig: The key signature to apply
     
     Returns:
-        A new Note with key signature accidental applied (if needed)
+        A new Note with key signature accidentals applied (where needed)
     """
-    # If note already has an explicit accidental, don't override
-    if note.accidental is not None:
+    if not note.pitches:
         return note
     
-    # Check if key signature affects this pitch
-    if key_sig.affects_pitch(note.pitch):
-        accidental = key_sig.get_accidental(note.pitch)
-        # Create new note with accidental
-        from dataclasses import replace
-        return replace(note, accidental=accidental)
+    from dataclasses import replace
     
-    return note
+    # Apply key signature to each pitch that doesn't have an explicit accidental
+    new_pitches = []
+    for pitch, octave, accidental in note.pitches:
+        # If pitch already has an explicit accidental, keep it
+        if accidental is not None:
+            new_pitches.append((pitch, octave, accidental))
+        # Otherwise, check if key signature affects this pitch
+        elif key_sig.affects_pitch(pitch):
+            key_accidental = key_sig.get_accidental(pitch)
+            new_pitches.append((pitch, octave, key_accidental))
+        else:
+            new_pitches.append((pitch, octave, accidental))
+    
+    return replace(note, pitches=new_pitches)

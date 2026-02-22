@@ -337,18 +337,6 @@ class MIDIGenerator:
             )
             return time_ticks + duration_ticks
         
-        elif isinstance(event, Chord):
-            # Generate all notes at same time
-            max_duration = 0
-            for note in event.notes:
-                self._generate_note(track, channel, note, time_ticks)
-                duration_ticks = self._duration_to_ticks(
-                    note.duration or DEFAULT_NOTE_DURATION, 
-                    note.dotted
-                )
-                max_duration = max(max_duration, duration_ticks)
-            return time_ticks + max_duration
-        
         elif isinstance(event, Articulation):
             # Articulation state already applied to notes during semantic analysis
             return time_ticks
@@ -458,12 +446,12 @@ class MIDIGenerator:
         accent: Optional[str] = None
     ) -> int:
         """
-        Generate MIDI note on/off events.
+        Generate MIDI note on/off events (handles single and multi-pitch notes).
         
         Args:
             track: MIDI track number
             channel: MIDI channel number
-            note: Note AST node
+            note: Note AST node (may contain multiple pitches for chords)
             time_ticks: Current time in MIDI ticks
             overlap: Whether to overlap note with next (for legato)
             accent: Optional accent type (sforzando, forte-piano)
@@ -471,10 +459,14 @@ class MIDIGenerator:
         Returns:
             New time in ticks after note
         """
-        # Calculate MIDI note number
-        midi_note = self._note_to_midi(note)
+        if not note.pitches:
+            # Empty note, just advance time
+            return time_ticks + self._duration_to_ticks(
+                note.duration or DEFAULT_NOTE_DURATION,
+                note.dotted
+            )
         
-        # Calculate duration based on articulation (already computed in semantic analysis)
+        # Calculate base duration 
         base_duration_ticks = self._duration_to_ticks(
             note.duration or DEFAULT_NOTE_DURATION, 
             note.dotted
@@ -499,13 +491,17 @@ class MIDIGenerator:
         time_beats = time_ticks / self.ppq
         duration_beats = actual_duration_ticks / self.ppq
         
-        # Add note
-        self.midi.addNote(
-            track, channel, midi_note,
-            time_beats, duration_beats, velocity
-        )
+        # Generate MIDI events for each pitch in the note (chord support)
+        for pitch, octave, accidental in note.pitches:
+            midi_note = self._pitch_to_midi(pitch, octave, accidental)
+            
+            # Add note
+            self.midi.addNote(
+                track, channel, midi_note,
+                time_beats, duration_beats, velocity
+            )
         
-        # Add legato CC if needed
+        # Add legato CC if needed (only once per note, not per pitch)
         if articulation == 'legato':
             self.midi.addControllerEvent(track, channel, time_beats, CC_LEGATO, 127)
         
@@ -674,14 +670,16 @@ class MIDIGenerator:
         
         return time_ticks + from_duration_ticks + to_duration_ticks
     
-    def _note_to_midi(self, note: Note) -> int:
+    def _pitch_to_midi(self, pitch: str, octave: int, accidental: Optional[str]) -> int:
         """
-        Convert Note AST node to MIDI note number.
+        Convert pitch tuple to MIDI note number.
         
         MIDI note numbers: C-1=0, C0=12, C1=24, ..., C4 (middle C)=60, ..., G9=127
         
         Args:
-            note: Note AST node
+            pitch: Note pitch (c-g)
+            octave: Octave number
+            accidental: Optional accidental (sharp, flat, natural, or None)
         
         Returns:
             MIDI note number (0-127)
@@ -692,17 +690,33 @@ class MIDIGenerator:
         }
         
         # Base MIDI note number
-        midi_note = (note.octave + 1) * 12 + pitch_map[note.pitch]
+        midi_note = (octave + 1) * 12 + pitch_map[pitch]
         
         # Apply accidental
-        if note.accidental == 'sharp':
+        if accidental == 'sharp':
             midi_note += 1
-        elif note.accidental == 'flat':
+        elif accidental == 'flat':
             midi_note -= 1
         # 'natural' accidental doesn't change pitch (cancels key signature)
         
         # Clamp to valid MIDI range
         return max(MIDI_MIN_NOTE, min(MIDI_MAX_NOTE, midi_note))
+    
+    def _note_to_midi(self, note: Note) -> int:
+        """
+        Convert Note AST node to MIDI note number (uses first pitch).
+        
+        Args:
+            note: Note AST node
+        
+        Returns:
+            MIDI note number (0-127)
+        """
+        if not note.pitches:
+            return 60  # Default to middle C
+        
+        pitch, octave, accidental = note.pitches[0]
+        return self._pitch_to_midi(pitch, octave, accidental)
     
     def _duration_to_ticks(self, duration: int, dotted: bool) -> int:
         """

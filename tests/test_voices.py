@@ -30,9 +30,9 @@ class TestVoiceGrouping:
         assert 1 in inst.voices
         notes = [e for e in _voice_events(inst, 1) if isinstance(e, Note)]
         assert len(notes) == 3
-        assert notes[0].pitch == 'c'
-        assert notes[1].pitch == 'd'
-        assert notes[2].pitch == 'e'
+        assert notes[0].pitches[0][0] == 'c'
+        assert notes[1].pitches[0][0] == 'd'
+        assert notes[2].pitches[0][0] == 'e'
     
     def test_multiple_voices(self):
         """Test multiple voice declarations"""
@@ -65,10 +65,10 @@ class TestVoiceGrouping:
         # V1 should have 4 notes (c, d, f, g)
         voice1_notes = [e for e in _voice_events(inst, 1) if isinstance(e, Note)]
         assert len(voice1_notes) == 4
-        assert voice1_notes[0].pitch == 'c'
-        assert voice1_notes[1].pitch == 'd'
-        assert voice1_notes[2].pitch == 'f'
-        assert voice1_notes[3].pitch == 'g'
+        assert voice1_notes[0].pitches[0][0] == 'c'
+        assert voice1_notes[1].pitches[0][0] == 'd'
+        assert voice1_notes[2].pitches[0][0] == 'f'
+        assert voice1_notes[3].pitches[0][0] == 'g'
         # V2 should have 1 note
         voice2_notes = [e for e in _voice_events(inst, 2) if isinstance(e, Note)]
         assert len(voice2_notes) == 1
@@ -87,7 +87,7 @@ class TestVoiceGrouping:
         inst = ast.instruments['piano']
         voice1_notes = [e for e in _voice_events(inst, 1) if isinstance(e, Note)]
         assert len(voice1_notes) == 6
-        assert [n.pitch for n in voice1_notes] == ['c', 'd', 'e', 'f', 'g', 'a']
+        assert [n.pitches[0][0] for n in voice1_notes] == ['c', 'd', 'e', 'f', 'g', 'a']
 
 
 class TestVoiceTiming:

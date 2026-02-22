@@ -3,7 +3,7 @@ Quick test for Phase 4 parser implementation.
 """
 import pytest
 from muslang.parser import parse_muslang
-from muslang.ast_nodes import Instrument, Note, Chord, Articulation, DynamicLevel
+from muslang.ast_nodes import Instrument, Note, Articulation, DynamicLevel
 from lark.exceptions import LarkError
 
 
@@ -30,11 +30,10 @@ def test_basic_notes():
     # Check first note: c4/4
     note1 = voice_events[0]
     assert isinstance(note1, Note)
-    assert note1.pitch == 'c'
-    assert note1.octave == 4
+    assert len(note1.pitches) == 1
+    assert note1.pitches[0] == ('c', 4, None)
     assert note1.duration == 4
     assert note1.dotted == False
-    assert note1.accidental is None
     
     print("✓ Basic notes test passed")
 
@@ -83,10 +82,10 @@ def test_dynamics():
     print("✓ Dynamics test passed")
 
 def test_chord():
-    """Test chord parsing with comma separator."""
+    """Test chord parsing with comma separator and duration at end."""
     source = """
     piano {
-      V1: c4/4,e4/4,g4/4;
+      V1: c4,e4,g4/4;
     }
     """
     ast = parse_muslang(source)
@@ -94,13 +93,15 @@ def test_chord():
     voice_events = _events(ast)
     assert len(voice_events) == 1
     
-    # Should be a chord
+    # Should be a Note with multiple pitches (chord)
     chord = voice_events[0]
-    assert isinstance(chord, Chord)
-    assert len(chord.notes) == 3
-    assert chord.notes[0].pitch == 'c'
-    assert chord.notes[1].pitch == 'e'
-    assert chord.notes[2].pitch == 'g'
+    assert isinstance(chord, Note)
+    assert chord.is_chord
+    assert len(chord.pitches) == 3
+    assert chord.pitches[0] == ('c', 4, None)
+    assert chord.pitches[1] == ('e', 4, None)
+    assert chord.pitches[2] == ('g', 4, None)
+    assert chord.duration == 4
     
     print("✓ Chord test passed")
 
@@ -117,13 +118,13 @@ def test_accidentals():
     assert len(voice_events) == 3
     
     # C sharp
-    assert voice_events[0].accidental == 'sharp'
+    assert voice_events[0].pitches[0][2] == 'sharp'
     
     # D flat
-    assert voice_events[1].accidental == 'flat'
+    assert voice_events[1].pitches[0][2] == 'flat'
     
     # E natural (no accidental)
-    assert voice_events[2].accidental is None
+    assert voice_events[2].pitches[0][2] is None
     
     print("✓ Accidentals test passed")
 
@@ -246,10 +247,8 @@ def test_slide():
     
     slide = voice_events[0]
     assert isinstance(slide, Slide)
-    assert slide.from_note.pitch == 'c'
-    assert slide.from_note.octave == 4
-    assert slide.to_note.pitch == 'c'
-    assert slide.to_note.octave == 5
+    assert slide.from_note.pitches[0] == ('c', 4, None)
+    assert slide.to_note.pitches[0] == ('c', 5, None)
     assert slide.style == 'chromatic'
     
     print("✓ Slide test passed")

@@ -85,16 +85,19 @@ DOTTED: "."  // Dotted note (only valid AFTER duration - no ambiguity!)
 rest: "r" ("/" DURATION DOTTED?)?
 
 // ============================================================================
-// CHORDS - Comma Separator (NOT slash!)
+// CHORDS - Comma Separator with Duration at End
 // ============================================================================
-// OLD: c4/e4/g4 - AMBIGUOUS with duration separator!
-// NEW: c4/4,e4/4,g4/4 - comma groups chord tones, slash is duration
+// Cleaner syntax: duration/dotted specified ONCE at chord level, not per note
+// NEW: c4,e4,g4/4 - duration applies to entire chord
+// 
+// Each note can have its own accidental but shares duration/dotted with chord:
+//   c4+,e4,g4-/4  (C# major with flat G, quarter notes)
+//   c4,e4,g4      (C major triad, uses default duration)
 //
-// Examples: 
-//   c4/4,e4/4,g4/4 (C major triad, quarter notes)
-//   c4,e4,g4 (C major triad, default duration)
+// note_pitch: pitch+octave+accidental without duration (for use in chords)
 
-chord: note ("," note)+
+note_pitch: NOTE_NAME ACCIDENTAL?
+chord: note_pitch ("," note_pitch)+ ("/" DURATION DOTTED?)?
 
 // ============================================================================
 // GRACE NOTES - Tilde Prefix

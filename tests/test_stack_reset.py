@@ -20,11 +20,11 @@ class TestBasicStackOperations:
         """Test that articulation changes push to stack and :reset pops."""
         events = [
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Articulation(type='legato'),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             Reset(type='articulation'),  # Should pop legato, back to staccato
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -47,11 +47,11 @@ class TestBasicStackOperations:
         """Test that dynamic changes push to stack and @reset pops."""
         events = [
             DynamicLevel(level='p'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             DynamicLevel(level='f'),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             Reset(type='dynamic'),  # Should pop f, back to p
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -76,13 +76,13 @@ class TestBasicStackOperations:
             Articulation(type='staccato'),
             Articulation(type='legato'),
             Articulation(type='tenuto'),
-            Note(pitch='c', octave=4, duration=4),  # tenuto
+            Note(pitches=[('c', 4, None)], duration=4),  # tenuto
             Reset(type='articulation'),
-            Note(pitch='d', octave=4, duration=4),  # legato
+            Note(pitches=[('d', 4, None)], duration=4),  # legato
             Reset(type='articulation'),
-            Note(pitch='e', octave=4, duration=4),  # staccato
+            Note(pitches=[('e', 4, None)], duration=4),  # staccato
             Reset(type='articulation'),
-            Note(pitch='f', octave=4, duration=4),  # natural (system default)
+            Note(pitches=[('f', 4, None)], duration=4),  # natural (system default)
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -113,9 +113,9 @@ class TestStackIndependence:
         events = [
             DynamicLevel(level='f'),
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Reset(type='articulation'),  # Only pops articulation
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -134,9 +134,9 @@ class TestStackIndependence:
         events = [
             Articulation(type='legato'),
             DynamicLevel(level='f'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Reset(type='dynamic'),  # Only pops dynamics
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -158,9 +158,9 @@ class TestStackIndependence:
             Articulation(type='legato'),
             DynamicLevel(level='f'),
             Reset(type='articulation'),  # Back to staccato
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Reset(type='dynamic'),  # Back to p
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -186,11 +186,11 @@ class TestVoiceIndependence:
         """Test that V1 and V2 have independent articulation stacks."""
         v1_events = [
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
         v2_events = [
             Articulation(type='legato'),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: v1_events, 2: v2_events})
         seq = Sequence(events=[instrument])
@@ -217,9 +217,9 @@ class TestScopeInitialization:
             name='piano',
             events=[],
             voices={1: [
-                Note(pitch='c', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
                 Reset(type='articulation'),  # Should pop to system default (no composition default)
-                Note(pitch='d', octave=4, duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
             ]}
         )
         seq = Sequence(
@@ -244,9 +244,9 @@ class TestScopeInitialization:
             name='piano',
             events=[],
             voices={1: [
-                Note(pitch='c', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
                 Reset(type='articulation'),  # Should pop to composition default
-                Note(pitch='d', octave=4, duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
             ]},
             defaults_sequence=[(1, {'articulation': 'staccato'})]  # Instrument-level for V1
         )
@@ -273,13 +273,13 @@ class TestScopeInitialization:
             events=[],
             voices={1: [
                 Articulation(type='tenuto'),  # Voice-level
-                Note(pitch='c', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
                 Reset(type='articulation'),  # Back to instrument
-                Note(pitch='d', octave=4, duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
                 Reset(type='articulation'),  # Back to composition
-                Note(pitch='e', octave=4, duration=4),
+                Note(pitches=[('e', 4, None)], duration=4),
                 Reset(type='articulation'),  # Back to system
-                Note(pitch='f', octave=4, duration=4),
+                Note(pitches=[('f', 4, None)], duration=4),
             ]},
             defaults_sequence=[(1, {'articulation': 'staccato'})]
         )
@@ -312,9 +312,9 @@ class TestEdgeCases:
     def test_reset_at_system_default_is_noop(self):
         """Test that resetting when only system default remains is a no-op."""
         events = [
-            Note(pitch='c', octave=4, duration=4),  # natural (system default)
+            Note(pitches=[('c', 4, None)], duration=4),  # natural (system default)
             Reset(type='articulation'),  # No-op, already at bottom
-            Note(pitch='d', octave=4, duration=4),  # Still natural
+            Note(pitches=[('d', 4, None)], duration=4),  # Still natural
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -333,10 +333,10 @@ class TestEdgeCases:
         events = [
             Articulation(type='staccato'),
             Articulation(type='legato'),
-            Note(pitch='c', octave=4, duration=4),  # legato
+            Note(pitches=[('c', 4, None)], duration=4),  # legato
             Reset(type='articulation'),
             Reset(type='articulation'),  # Second reset immediately after first
-            Note(pitch='d', octave=4, duration=4),  # natural
+            Note(pitches=[('d', 4, None)], duration=4),  # natural
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -357,9 +357,9 @@ class TestEdgeCases:
         events = [
             DynamicLevel(level='p'),
             DynamicTransition(type='crescendo'),
-            Note(pitch='c', octave=4, duration=4),  # Crescendo active
+            Note(pitches=[('c', 4, None)], duration=4),  # Crescendo active
             Reset(type='dynamic'),  # Should clear transition
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -383,17 +383,17 @@ class TestMeasurePersistence:
         """Test that articulation stack persists across measure boundaries."""
         measure1_events = [
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
-            Note(pitch='f', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
+            Note(pitches=[('f', 4, None)], duration=4),
         ]
         measure2_events = [
-            Note(pitch='g', octave=4, duration=4),  # Should still be staccato
+            Note(pitches=[('g', 4, None)], duration=4),  # Should still be staccato
             Reset(type='articulation'),
-            Note(pitch='a', octave=4, duration=4),  # Should be natural
-            Note(pitch='b', octave=4, duration=4),
-            Note(pitch='c', octave=5, duration=4),
+            Note(pitches=[('a', 4, None)], duration=4),  # Should be natural
+            Note(pitches=[('b', 4, None)], duration=4),
+            Note(pitches=[('c', 5, None)], duration=4),
         ]
         
         voice_events = [

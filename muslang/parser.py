@@ -24,7 +24,7 @@ from lark import Lark, Transformer, Token, Tree, v_args
 from lark.exceptions import LarkError
 
 from .ast_nodes import (
-    Note, Rest, Chord, PercussionNote,
+    Note, Rest, PercussionNote,
     GraceNote, Tuplet,
     Slide, Measure,
     Articulation, Ornament, Tremolo, Reset, Expression,
@@ -495,11 +495,9 @@ class MuslangTransformer(Transformer):
             self.current_duration = duration
         
         return Note(
-            pitch=pitch,
-            octave=octave,
+            pitches=[(pitch, octave, accidental)],
             duration=duration,
             dotted=dotted,
-            accidental=accidental,
         )
     
     def rest(self, items) -> Rest:
@@ -541,21 +539,83 @@ class MuslangTransformer(Transformer):
         return Rest(duration=duration, dotted=dotted)
     
     # ========================================================================
-    # Chords
+    # Chords (Multi-Pitch Notes)
     # ========================================================================
     
-    def chord(self, items) -> Chord:
+    def note_pitch(self, items) -> tuple:
         """
-        Transform chord.
+        Transform note_pitch (pitch+octave+accidental without duration).
+        
+        Grammar: note_pitch: NOTE_NAME ACCIDENTAL?
         
         Args:
-            items: List of Note nodes
+            items: [Token(NOTE_NAME), accidental?]
             
         Returns:
-            Chord node containing all notes
+            Tuple of (pitch, octave, accidental)
         """
-        notes = [item for item in items if isinstance(item, Note)]
-        return Chord(notes=notes)
+        note_name_token = items[0]
+        note_name = str(note_name_token).lower()
+        
+        # Parse NOTE_NAME: first char is pitch, second is octave digit
+        pitch = note_name[0]
+        octave = int(note_name[1])
+        
+        # Extract optional accidental
+        accidental = None
+        for item in items[1:]:
+            if isinstance(item, Token):
+                item_str = str(item)
+                if item_str in ['+', '-']:
+                    accidental = {'+': 'sharp', '-': 'flat'}[item_str]
+            elif isinstance(item, str):
+                if item in ['+', '-']:
+                    accidental = {'+': 'sharp', '-': 'flat'}[item]
+        
+        return (pitch, octave, accidental)
+    
+    def chord(self, items) -> Note:
+        """
+        Transform chord into a Note with multiple pitches.
+        
+        Grammar: chord: note_pitch ("," note_pitch)+ ("/" DURATION DOTTED?)?
+        
+        Args:
+            items: List of note_pitch tuples and optional duration/dotted
+            
+        Returns:
+            Note with multiple pitches
+        """
+        # Collect all pitches (tuples)
+        pitches = [item for item in items if isinstance(item, tuple)]
+        
+        # Extract optional duration and dotted
+        duration = None
+        dotted = False
+        
+        for item in items:
+            if isinstance(item, Token):
+                item_str = str(item)
+                if item_str in ['1', '2', '4', '8', '16', '32', '64']:
+                    duration = int(item_str)
+                elif item_str == '.':
+                    dotted = True
+            elif isinstance(item, int):
+                duration = item
+            elif isinstance(item, str) and item == '.':
+                dotted = True
+        
+        # Use current duration if not specified
+        if duration is None:
+            duration = self.current_duration
+        else:
+            self.current_duration = duration
+        
+        return Note(
+            pitches=pitches,
+            duration=duration,
+            dotted=dotted,
+        )
     
     # ========================================================================
     # Grace Notes
@@ -601,7 +661,7 @@ class MuslangTransformer(Transformer):
         else:
             ratio = 3  # Default triplet
         
-        notes = [item for item in items[:-1] if isinstance(item, (Note, Chord, Rest))]
+        notes = [item for item in items[:-1] if isinstance(item, (Note, Rest))]
         
         # Calculate actual duration based on tuplet convention:
         # - Triplet (3): fit into space of 2

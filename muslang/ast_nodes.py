@@ -7,7 +7,7 @@ with type hints and include source location information for error reporting.
 
 Node Hierarchy:
     ASTNode (base)
-    ├── Note, Rest, Chord, PercussionNote
+    ├── Note (single or multi-pitch), Rest, PercussionNote
     ├── GraceNote, Tuplet
     ├── Slide
     ├── Articulation, Ornament, Tremolo, Reset
@@ -66,21 +66,24 @@ class ASTNode:
 @dataclass
 class Note(ASTNode):
     """
-    A single musical note with scientific pitch notation.
+    A musical note or chord (single or multiple pitches played simultaneously).
     
     Uses scientific pitch notation where octave is ALWAYS specified (not stateful).
-    For example: c4/4 = C octave 4, quarter note
+    For example: 
+        c4/4          -> Single note C4 quarter note
+        c4,e4,g4/4    -> Chord (C major triad) quarter note
     
-    Represents a pitch with octave, duration, accidental, and modifiers.
+    Represents one or more pitches with shared duration, articulation, and dynamics.
+    All pitches in a chord share the same timing and modifiers.
     
     Attributes:
-        pitch: Note pitch (c, d, e, f, g, a, or b)
-        octave: Octave number (0-9, C4 = middle C)
-                Always specified in source - NO stateful octave tracking!
+        pitches: List of (pitch, octave, accidental) tuples. Single note has 1 pitch, chord has 2+.
+                 pitch: Note pitch (c, d, e, f, g, a, or b)
+                 octave: Octave number (0-9, C4 = middle C)
+                 accidental: Sharp (+), flat (-), or natural (=) modifier, or None
         duration: Note duration (1=whole, 2=half, 4=quarter, 8=eighth, etc.)
                   None means use default duration from context
         dotted: Whether the note is dotted (1.5x duration)
-        accidental: Sharp (+), flat (-), or natural (=) accidental modifier
         start_time: Absolute start time in MIDI ticks (populated during semantic analysis)
         end_time: Absolute end time in MIDI ticks (populated during semantic analysis)
         velocity: MIDI velocity (0-127, populated during state tracking)
@@ -88,14 +91,13 @@ class Note(ASTNode):
         dynamic_level: Applied dynamic level (populated during state tracking)
     
     Examples:
-        c4/4   -> C4 quarter note (pitch=c, octave=4, duration=4)
-        d5+/8. -> D#5 dotted eighth (pitch=d, octave=5, duration=8, dotted=True, accidental=sharp)
+        Single note:  pitches=[('c', 4, None)], duration=4
+        Chord:        pitches=[('c', 4, None), ('e', 4, None), ('g', 4, None)], duration=4
+        With accidentals: pitches=[('c', 4, 'sharp'), ('e', 4, None), ('g', 4, 'flat')], duration=4
     """
-    pitch: Literal['c', 'd', 'e', 'f', 'g', 'a', 'b']
-    octave: int
+    pitches: List[tuple[Literal['c', 'd', 'e', 'f', 'g', 'a', 'b'], int, Optional[Literal['sharp', 'flat', 'natural']]]] = field(default_factory=list)
     duration: Optional[int] = None
     dotted: bool = False
-    accidental: Optional[Literal['sharp', 'flat', 'natural']] = None
     location: Optional[SourceLocation] = None
     # Timing information (populated during semantic analysis)
     start_time: Optional[float] = None  # In MIDI ticks
@@ -105,18 +107,30 @@ class Note(ASTNode):
     articulation: Optional[str] = None
     dynamic_level: Optional[str] = None
     
+    @property
+    def is_chord(self) -> bool:
+        """Returns True if this Note represents a chord (2+ pitches)."""
+        return len(self.pitches) > 1
+    
     def __repr__(self) -> str:
-        acc_str = {
-            'sharp': '+',
-            'flat': '-',
-            'natural': '='
-        }.get(self.accidental, '')
+        def format_pitch(pitch: str, octave: int, accidental: Optional[str]) -> str:
+            acc_str = {
+                'sharp': '+',
+                'flat': '-',
+                'natural': '='
+            }.get(accidental, '')
+            return f"{pitch}{acc_str}{octave}"
         
-        dur_str = str(self.duration) if self.duration else ''
+        if self.pitches:
+            pitch_strs = ','.join(format_pitch(p, o, a) for p, o, a in self.pitches)
+        else:
+            pitch_strs = ''
+        
+        dur_str = f"/{self.duration}" if self.duration else ''
         dot_str = '.' if self.dotted else ''
         loc_str = f" at {self.location}" if self.location else ""
         
-        return f"Note({self.pitch}{acc_str}{self.octave}{dur_str}{dot_str}){loc_str}"
+        return f"Note({pitch_strs}{dur_str}{dot_str}){loc_str}"
 
 
 @dataclass
@@ -143,27 +157,6 @@ class Rest(ASTNode):
         dot_str = '.' if self.dotted else ''
         loc_str = f" at {self.location}" if self.location else ""
         return f"Rest({dur_str}{dot_str}){loc_str}"
-
-
-@dataclass
-class Chord(ASTNode):
-    """
-    Multiple notes played simultaneously.
-    
-    Attributes:
-        notes: List of notes in the chord (must have at least 2 notes)
-        start_time: Absolute start time in MIDI ticks (populated during semantic analysis)
-        end_time: Absolute end time in MIDI ticks (populated during semantic analysis)
-    """
-    notes: List[Note] = field(default_factory=list)
-    # Timing information (populated during semantic analysis)
-    start_time: Optional[float] = None
-    end_time: Optional[float] = None
-    
-    def __repr__(self) -> str:
-        note_strs = '/'.join(str(n.pitch) + str(n.octave) for n in self.notes)
-        loc_str = f" at {self.location}" if self.location else ""
-        return f"Chord({note_strs}){loc_str}"
 
 
 @dataclass
@@ -728,7 +721,7 @@ class Import(ASTNode):
 
 # Union type for all nodes that can appear in an event sequence
 EventNode = Union[
-    Note, Rest, Chord, PercussionNote,
+    Note, Rest, PercussionNote,
     GraceNote, Tuplet,
     Slide, Measure,
     Articulation, Ornament, Tremolo, Reset,

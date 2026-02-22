@@ -15,7 +15,7 @@ class TestTimingCalculation:
         """Test timing calculation for a simple note"""
         analyzer = SemanticAnalyzer()
         
-        note = Note(pitch='c', octave=4, duration=4, dotted=False)
+        note = Note(pitches=[('c', 4, None)], duration=4, dotted=False)
         instrument = Instrument(name='piano', events=[], voices={1: [note]})
         seq = Sequence(events=[instrument])
         
@@ -31,9 +31,9 @@ class TestTimingCalculation:
         analyzer = SemanticAnalyzer()
         
         notes = [
-            Note(pitch='c', octave=4, duration=4),  # Quarter note
-            Note(pitch='d', octave=4, duration=4),  # Quarter note
-            Note(pitch='e', octave=4, duration=2),  # Half note
+            Note(pitches=[('c', 4, None)], duration=4),  # Quarter note
+            Note(pitches=[('d', 4, None)], duration=4),  # Quarter note
+            Note(pitches=[('e', 4, None)], duration=2),  # Half note
         ]
         instrument = Instrument(name='piano', events=[], voices={1: notes})
         seq = Sequence(events=[instrument])
@@ -58,7 +58,7 @@ class TestTimingCalculation:
         """Test timing for dotted notes"""
         analyzer = SemanticAnalyzer()
         
-        note = Note(pitch='c', octave=4, duration=4, dotted=True)
+        note = Note(pitches=[('c', 4, None)], duration=4, dotted=True)
         instrument = Instrument(name='piano', events=[], voices={1: [note]})
         seq = Sequence(events=[instrument])
         
@@ -75,9 +75,9 @@ class TestTimingCalculation:
         analyzer = SemanticAnalyzer()
         
         events = [
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Rest(duration=4),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -100,12 +100,8 @@ class TestTimingCalculation:
         """Test timing for chords"""
         analyzer = SemanticAnalyzer()
         
-        chord_notes = [
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
-            Note(pitch='g', octave=4, duration=4),
-        ]
-        chord = Chord(notes=chord_notes)
+        # Chord is now a Note with multiple pitches
+        chord = Note(pitches=[('c', 4, None), ('e', 4, None), ('g', 4, None)], duration=4)
         instrument = Instrument(name='piano', events=[], voices={1: [chord]})
         seq = Sequence(events=[instrument])
         
@@ -113,23 +109,19 @@ class TestTimingCalculation:
         
         processed_chord = result.events[0].voices[1][0]
         
-        # All notes in chord should start at same time
-        for note in processed_chord.notes:
-            assert note.start_time == 0.0
-            assert note.end_time == DEFAULT_MIDI_PPQ
-        
-        # Chord itself should have timing
+        # Chord (multi-pitch Note) should have timing
         assert processed_chord.start_time == 0.0
         assert processed_chord.end_time == DEFAULT_MIDI_PPQ
+        assert processed_chord.is_chord  # Should be recognized as a chord
     
     def test_tuplet_timing(self):
         """Test timing for tuplets (triplets)"""
         analyzer = SemanticAnalyzer()
         
         tuplet_notes = [
-            Note(pitch='c', octave=4, duration=8),
-            Note(pitch='d', octave=4, duration=8),
-            Note(pitch='e', octave=4, duration=8),
+            Note(pitches=[('c', 4, None)], duration=8),
+            Note(pitches=[('d', 4, None)], duration=8),
+            Note(pitches=[('e', 4, None)], duration=8),
         ]
         tuplet = Tuplet(notes=tuplet_notes, ratio=3, actual_duration=2)
         instrument = Instrument(name='piano', events=[], voices={1: [tuplet]})
@@ -155,9 +147,9 @@ class TestTimingCalculation:
         """Test timing for grace notes"""
         analyzer = SemanticAnalyzer()
         
-        grace_note = Note(pitch='c', octave=4, duration=16)
+        grace_note = Note(pitches=[('c', 4, None)], duration=16)
         grace = GraceNote(note=grace_note)
-        main_note = Note(pitch='d', octave=4, duration=4)
+        main_note = Note(pitches=[('d', 4, None)], duration=4)
         
         instrument = Instrument(name='piano', events=[], voices={1: [grace, main_note]})
         seq = Sequence(events=[instrument])
@@ -182,9 +174,9 @@ class TestTimingCalculation:
 
         events = [
             Articulation(type='legato'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -210,8 +202,8 @@ class TestTimingCalculation:
         analyzer = SemanticAnalyzer()
 
         slide = Slide(
-            from_note=Note(pitch='c', octave=4, duration=4),
-            to_note=Note(pitch='g', octave=4, duration=4),
+            from_note=Note(pitches=[('c', 4, None)], duration=4),
+            to_note=Note(pitches=[('g', 4, None)], duration=4),
             style='chromatic',
         )
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
@@ -251,10 +243,10 @@ class TestTimingCalculation:
         # 3/4 expects 3 quarter notes per measure, but provide 4 quarter notes.
         measure = Measure(
             events=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='e', octave=4, duration=4),
-                Note(pitch='f', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('e', 4, None)], duration=4),
+                Note(pitches=[('f', 4, None)], duration=4),
             ],
             measure_number=1,
             location=SourceLocation(line=21, column=3),
@@ -283,7 +275,7 @@ class TestStateTracking:
         """Test default articulation and dynamic state"""
         analyzer = SemanticAnalyzer()
         
-        note = Note(pitch='c', octave=4, duration=4)
+        note = Note(pitches=[('c', 4, None)], duration=4)
         instrument = Instrument(name='piano', events=[], voices={1: [note]})
         seq = Sequence(events=[instrument])
         
@@ -304,10 +296,10 @@ class TestStateTracking:
         
         events = [
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             Articulation(type='legato'),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -332,10 +324,10 @@ class TestStateTracking:
         
         events = [
             DynamicLevel(level='p'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             DynamicLevel(level='f'),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -364,10 +356,10 @@ class TestStateTracking:
         events = [
             DynamicLevel(level='p'),
             DynamicTransition(type='crescendo'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
-            Note(pitch='f', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
+            Note(pitches=[('f', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -393,10 +385,10 @@ class TestStateTracking:
         events = [
             DynamicLevel(level='f'),
             DynamicTransition(type='diminuendo'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
-            Note(pitch='f', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
+            Note(pitches=[('f', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -421,9 +413,9 @@ class TestStateTracking:
         
         events = [
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Reset(type='articulation'),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -446,10 +438,10 @@ class TestStateTracking:
         events = [
             Articulation(type='staccato'),
             DynamicLevel(level='ff'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Reset(type='articulation'),  # Only reset articulation
             Reset(type='dynamic'),  # Only reset dynamics
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -475,11 +467,8 @@ class TestStateTracking:
         events = [
             Articulation(type='legato'),
             DynamicLevel(level='f'),
-            Chord(notes=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='e', octave=4, duration=4),
-                Note(pitch='g', octave=4, duration=4),
-            ]),
+            # Chord is now a multi-pitch Note
+            Note(pitches=[('c', 4, None), ('e', 4, None), ('g', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         seq = Sequence(events=[instrument])
@@ -489,11 +478,11 @@ class TestStateTracking:
         
         processed_chord = result.events[0].voices[1][2]
         
-        # All notes in chord should have same state
-        for note in processed_chord.notes:
-            assert note.articulation == 'legato'
-            assert note.dynamic_level == 'f'
-            assert note.velocity == VELOCITY_F
+        # Chord (multi-pitch Note) should have state applied
+        assert processed_chord.articulation == 'legato'
+        assert processed_chord.dynamic_level == 'f'
+        assert processed_chord.velocity == VELOCITY_F
+        assert processed_chord.is_chord  # Should be recognized as a chord
     
     def test_percussion_velocity(self):
         """Test velocity tracking for percussion"""
@@ -525,12 +514,12 @@ class TestIntegratedTimingAndState:
         events = [
             DynamicLevel(level='p'),
             Articulation(type='legato'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=8),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=8),
             Rest(duration=8),
             Articulation(type='staccato'),
             DynamicLevel(level='f'),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         # For analyze(), need to wrap in Voice node which _regroup_voices expects
         voice_events = [Voice(number=1, events=[])] + events
@@ -581,14 +570,14 @@ class TestIntegratedTimingAndState:
         
         piano_events = [
             DynamicLevel(level='mf'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         
         violin_events = [
             DynamicLevel(level='f'),
             Articulation(type='legato'),
-            Note(pitch='e', octave=5, duration=2),
+            Note(pitches=[('e', 5, None)], duration=2),
         ]
         
         # For analyze(), need to wrap in Voice nodes which _regroup_voices expects
@@ -624,11 +613,11 @@ class TestMetaEventChanges:
         # Start in 4/4, switch to 3/4, then 5/4
         events = [
             TimeSignature(numerator=4, denominator=4),
-            Note(pitch='c', octave=4, duration=4),  # 1 beat
+            Note(pitches=[('c', 4, None)], duration=4),  # 1 beat
             TimeSignature(numerator=3, denominator=4),
-            Note(pitch='d', octave=4, duration=4),  # 1 beat
+            Note(pitches=[('d', 4, None)], duration=4),  # 1 beat
             TimeSignature(numerator=5, denominator=4),
-            Note(pitch='e', octave=4, duration=2),  # 2 beats
+            Note(pitches=[('e', 4, None)], duration=2),  # 2 beats
         ]
         
         instrument = Instrument(name='piano', events=[], voices={1: events})
@@ -655,10 +644,10 @@ class TestMetaEventChanges:
         # First measure in 4/4 (expects 4 quarter notes)
         measure1 = Measure(
             events=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='e', octave=4, duration=4),
-                Note(pitch='f', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('e', 4, None)], duration=4),
+                Note(pitches=[('f', 4, None)], duration=4),
             ],
             measure_number=1,
         )
@@ -666,9 +655,9 @@ class TestMetaEventChanges:
         # Second measure in 3/4 (expects 3 quarter notes)
         measure2 = Measure(
             events=[
-                Note(pitch='g', octave=4, duration=4),
-                Note(pitch='a', octave=4, duration=4),
-                Note(pitch='b', octave=4, duration=4),
+                Note(pitches=[('g', 4, None)], duration=4),
+                Note(pitches=[('a', 4, None)], duration=4),
+                Note(pitches=[('b', 4, None)], duration=4),
             ],
             measure_number=2,
         )
@@ -694,10 +683,10 @@ class TestMetaEventChanges:
         # First measure in 4/4 (correct: 4 quarter notes)
         measure1 = Measure(
             events=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='e', octave=4, duration=4),
-                Note(pitch='f', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('e', 4, None)], duration=4),
+                Note(pitches=[('f', 4, None)], duration=4),
             ],
             measure_number=1,
         )
@@ -705,10 +694,10 @@ class TestMetaEventChanges:
         # Second measure should be in 3/4 but has 4 quarter notes (invalid)
         measure2 = Measure(
             events=[
-                Note(pitch='g', octave=4, duration=4),
-                Note(pitch='a', octave=4, duration=4),
-                Note(pitch='b', octave=4, duration=4),
-                Note(pitch='c', octave=5, duration=4),
+                Note(pitches=[('g', 4, None)], duration=4),
+                Note(pitches=[('a', 4, None)], duration=4),
+                Note(pitches=[('b', 4, None)], duration=4),
+                Note(pitches=[('c', 5, None)], duration=4),
             ],
             measure_number=2,
             location=SourceLocation(line=10, column=1),
@@ -740,42 +729,42 @@ class TestMetaEventChanges:
         # Cycle through different time signatures
         measure_4_4 = Measure(
             events=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='c', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
             ],
             measure_number=1,
         )
         
         measure_3_4 = Measure(
             events=[
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
             ],
             measure_number=2,
         )
         
         measure_5_8 = Measure(
             events=[
-                Note(pitch='e', octave=4, duration=8),
-                Note(pitch='e', octave=4, duration=8),
-                Note(pitch='e', octave=4, duration=8),
-                Note(pitch='e', octave=4, duration=8),
-                Note(pitch='e', octave=4, duration=8),
+                Note(pitches=[('e', 4, None)], duration=8),
+                Note(pitches=[('e', 4, None)], duration=8),
+                Note(pitches=[('e', 4, None)], duration=8),
+                Note(pitches=[('e', 4, None)], duration=8),
+                Note(pitches=[('e', 4, None)], duration=8),
             ],
             measure_number=3,
         )
         
         measure_6_8 = Measure(
             events=[
-                Note(pitch='f', octave=4, duration=8),
-                Note(pitch='f', octave=4, duration=8),
-                Note(pitch='f', octave=4, duration=8),
-                Note(pitch='f', octave=4, duration=8),
-                Note(pitch='f', octave=4, duration=8),
-                Note(pitch='f', octave=4, duration=8),
+                Note(pitches=[('f', 4, None)], duration=8),
+                Note(pitches=[('f', 4, None)], duration=8),
+                Note(pitches=[('f', 4, None)], duration=8),
+                Note(pitches=[('f', 4, None)], duration=8),
+                Note(pitches=[('f', 4, None)], duration=8),
+                Note(pitches=[('f', 4, None)], duration=8),
             ],
             measure_number=4,
         )
@@ -804,11 +793,11 @@ class TestMetaEventChanges:
         
         events = [
             Tempo(bpm=120),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Tempo(bpm=60),  # Half speed
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             Tempo(bpm=240),  # Double speed
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         
         instrument = Instrument(name='piano', events=[], voices={1: events})
@@ -836,12 +825,12 @@ class TestMetaEventChanges:
         # C major (no sharps/flats) -> G major (F#) -> D major (F#, C#)
         events = [
             KeySignature(root='c', mode='major'),
-            Note(pitch='f', octave=4, duration=4),  # Natural F in C major
+            Note(pitches=[('f', 4, None)], duration=4),  # Natural F in C major
             KeySignature(root='g', mode='major'),
-            Note(pitch='f', octave=4, duration=4),  # Should become F# in G major
+            Note(pitches=[('f', 4, None)], duration=4),  # Should become F# in G major
             KeySignature(root='d', mode='major'),
-            Note(pitch='c', octave=4, duration=4),  # Should become C# in D major
-            Note(pitch='f', octave=4, duration=4),  # Should become F# in D major
+            Note(pitches=[('c', 4, None)], duration=4),  # Should become C# in D major
+            Note(pitches=[('f', 4, None)], duration=4),  # Should become F# in D major
         ]
         
         instrument = Instrument(name='piano', events=[], voices={1: events})
@@ -852,20 +841,20 @@ class TestMetaEventChanges:
         notes = [e for e in result.events[0].voices[1] if isinstance(e, Note)]
         
         # First F note in C major should have no accidental (or natural)
-        assert notes[0].pitch == 'f'
-        assert notes[0].accidental in [None, 'natural']
+        assert notes[0].pitches[0][0] == 'f'
+        assert notes[0].pitches[0][2] in [None, 'natural']
         
         # Second F note in G major should have sharp
-        assert notes[1].pitch == 'f'
-        assert notes[1].accidental == 'sharp'
+        assert notes[1].pitches[0][0] == 'f'
+        assert notes[1].pitches[0][2] == 'sharp'
         
         # C note in D major should have sharp
-        assert notes[2].pitch == 'c'
-        assert notes[2].accidental == 'sharp'
+        assert notes[2].pitches[0][0] == 'c'
+        assert notes[2].pitches[0][2] == 'sharp'
         
         # F note in D major should have sharp
-        assert notes[3].pitch == 'f'
-        assert notes[3].accidental == 'sharp'
+        assert notes[3].pitches[0][0] == 'f'
+        assert notes[3].pitches[0][2] == 'sharp'
     
     def test_combined_meta_event_changes(self):
         """Test that tempo, time signature, and key signature changes work together"""
@@ -874,19 +863,19 @@ class TestMetaEventChanges:
         # Complex scenario with all three types of changes
         measure1 = Measure(
             events=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='e', octave=4, duration=4),
-                Note(pitch='f', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('e', 4, None)], duration=4),
+                Note(pitches=[('f', 4, None)], duration=4),
             ],
             measure_number=1,
         )
         
         measure2 = Measure(
             events=[
-                Note(pitch='f', octave=4, duration=4),
-                Note(pitch='g', octave=4, duration=4),
-                Note(pitch='a', octave=4, duration=4),
+                Note(pitches=[('f', 4, None)], duration=4),
+                Note(pitches=[('g', 4, None)], duration=4),
+                Note(pitches=[('a', 4, None)], duration=4),
             ],
             measure_number=2,
         )

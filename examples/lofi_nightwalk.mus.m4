@@ -4,8 +4,8 @@
 define(`REPEAT', `ifelse($1, `0', `', `$2`'REPEAT(decr($1), `$2')')')dnl
 define(`REPEAT_MEASURE', `ifelse($1, `0', `', `ifelse($1, `1', `$2', `$2 | REPEAT_MEASURE(decr($1), `$2')')')')dnl
 
-define(`H1', `f3/2,a3/2,c4/2,e4/2 g3/2,b3-/2,d4/2,f4/2')dnl
-define(`H2', `e3-/2,g3/2,b3-/2,d4/2 a2-/2,c3/2,e3-/2,g3/2')dnl
+define(`H1', `f3,a3,c4,e4/2 g3,b3-,d4,f4/2')dnl
+define(`H2', `e3-,g3,b3-,d4/2 a2-,c3,e3-,g3/2')dnl
 
 define(`B1', `f1/2 c2/2')dnl
 define(`B2', `g1/2 d2/2')dnl

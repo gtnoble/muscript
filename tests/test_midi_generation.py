@@ -28,50 +28,50 @@ class TestNoteToMIDI:
     def test_middle_c(self):
         """C4 (middle C) should be MIDI note 60"""
         gen = MIDIGenerator()
-        note = Note(pitch='c', octave=4)
+        note = Note(pitches=[('c', 4, None)])
         assert gen._note_to_midi(note) == 60
     
     def test_a440(self):
         """A4 (concert pitch) should be MIDI note 69"""
         gen = MIDIGenerator()
-        note = Note(pitch='a', octave=4)
+        note = Note(pitches=[('a', 4, None)])
         assert gen._note_to_midi(note) == 69
     
     def test_lowest_note(self):
         """C0 should be MIDI note 12"""
         gen = MIDIGenerator()
-        note = Note(pitch='c', octave=0)
+        note = Note(pitches=[('c', 0, None)])
         assert gen._note_to_midi(note) == 12
     
     def test_highest_note(self):
         """G9 should be MIDI note 127"""
         gen = MIDIGenerator()
-        note = Note(pitch='g', octave=9)
+        note = Note(pitches=[('g', 9, None)])
         assert gen._note_to_midi(note) == 127
     
     def test_sharp_accidental(self):
         """C#4 should be MIDI note 61"""
         gen = MIDIGenerator()
-        note = Note(pitch='c', octave=4, accidental='sharp')
+        note = Note(pitches=[('c', 4, 'sharp')])
         assert gen._note_to_midi(note) == 61
     
     def test_flat_accidental(self):
         """Bb4 should be MIDI note 70"""
         gen = MIDIGenerator()
-        note = Note(pitch='b', octave=4, accidental='flat')
+        note = Note(pitches=[('b', 4, 'flat')])
         assert gen._note_to_midi(note) == 70
     
     def test_natural_accidental(self):
         """F-natural 4 should be MIDI note 65"""
         gen = MIDIGenerator()
-        note = Note(pitch='f', octave=4, accidental='natural')
+        note = Note(pitches=[('f', 4, 'natural')])
         assert gen._note_to_midi(note) == 65
     
     def test_octave_range(self):
         """Test all octaves for C"""
         gen = MIDIGenerator()
         for octave in range(0, 10):
-            note = Note(pitch='c', octave=octave)
+            note = Note(pitches=[('c', octave, None)])
             expected = (octave + 1) * 12
             assert gen._note_to_midi(note) == expected
 
@@ -161,7 +161,7 @@ class TestBasicMIDIGeneration:
     def test_single_note(self):
         """Generate MIDI with single note"""
         # Create AST
-        note = Note(pitch='c', octave=4, duration=4)
+        note = Note(pitches=[('c', 4, None)], duration=4)
         instrument = Instrument(name='piano', events=[], voices={1: [note]})
         ast = Sequence(instruments={'piano': instrument})
         
@@ -192,10 +192,10 @@ class TestBasicMIDIGeneration:
         """Generate MIDI with simple melody"""
         # C4 D4 E4 F4
         notes = [
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
-            Note(pitch='f', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
+            Note(pitches=[('f', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: notes})
         ast = Sequence(instruments={'piano': instrument})
@@ -223,9 +223,9 @@ class TestBasicMIDIGeneration:
     def test_rest(self):
         """Test rest handling"""
         events = [
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Rest(duration=4),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -256,12 +256,7 @@ class TestBasicMIDIGeneration:
     def test_chord(self):
         """Test chord generation"""
         # C major chord: C4 E4 G4
-        chord_notes = [
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
-            Note(pitch='g', octave=4, duration=4),
-        ]
-        chord = Chord(notes=chord_notes)
+        chord = Note(pitches=[('c', 4, None), ('e', 4, None), ('g', 4, None)], duration=4)
         instrument = Instrument(name='piano', events=[], voices={1: [chord]})
         ast = Sequence(instruments={'piano': instrument})
         
@@ -330,11 +325,11 @@ class TestArticulationMapping:
         """Legato and staccato directives should produce different note lengths."""
         staccato_events = [
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
         legato_events = [
             Articulation(type='legato'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
 
         staccato_ast = Sequence(instruments={'piano': Instrument(name='piano', events=[], voices={1: staccato_events})})
@@ -371,7 +366,7 @@ class TestArticulationMapping:
         """Staccato should shorten note duration"""
         events = [
             Articulation(type='staccato'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -409,9 +404,9 @@ class TestArticulationMapping:
         # Test piano (p) and forte (f)
         events = [
             DynamicLevel(level='p'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             DynamicLevel(level='f'),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -449,9 +444,9 @@ class TestAdvancedFeatures:
         """Test legato articulation still generates notes correctly"""
         events = [
             Articulation(type='legato'),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -536,7 +531,7 @@ class TestOrnamentMIDI:
         """Test tempo meta-event"""
         events = [
             Tempo(bpm=140),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -562,7 +557,7 @@ class TestOrnamentMIDI:
         """Test time signature meta-event"""
         events = [
             TimeSignature(numerator=3, denominator=4),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -594,7 +589,7 @@ class TestOrnamentMIDI:
         """Test pan CC event"""
         events = [
             Pan(position=64),  # Center
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -649,10 +644,10 @@ class TestMultiInstrument:
     
     def test_two_instruments(self):
         """Generate MIDI with two instruments"""
-        piano_notes = [Note(pitch='c', octave=4, duration=4)]
+        piano_notes = [Note(pitches=[('c', 4, None)], duration=4)]
         piano = Instrument(name='piano', events=[], voices={1: piano_notes})
         
-        violin_notes = [Note(pitch='e', octave=5, duration=4)]
+        violin_notes = [Note(pitches=[('e', 5, None)], duration=4)]
         violin = Instrument(name='violin', events=[], voices={1: violin_notes})
         
         ast = Sequence(instruments={'piano': piano, 'violin': violin})
@@ -680,7 +675,7 @@ class TestMultiInstrument:
     
     def test_instrument_program_change(self):
         """Test that different instruments get correct program changes"""
-        violin = Instrument(name='violin', events=[], voices={1: [Note(pitch='e', octave=5, duration=4)]})
+        violin = Instrument(name='violin', events=[], voices={1: [Note(pitches=[('e', 5, None)], duration=4)]})
         ast = Sequence(instruments={'violin': violin})
         
         gen = MIDIGenerator(ppq=480)
@@ -706,8 +701,8 @@ class TestSlideGeneration:
     
     def test_chromatic_slide(self):
         """Test chromatic slide with pitch bend"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='c', octave=5, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('c', 5, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='chromatic')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -734,8 +729,8 @@ class TestSlideGeneration:
     
     def test_stepped_slide(self):
         """Test stepped slide with chromatic notes"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='e', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('e', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='stepped')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -759,8 +754,8 @@ class TestSlideGeneration:
     
     def test_portamento_slide(self):
         """Test portamento slide with CC"""
-        from_note = Note(pitch='c', octave=4, duration=4)
-        to_note = Note(pitch='g', octave=4, duration=4)
+        from_note = Note(pitches=[('c', 4, None)], duration=4)
+        to_note = Note(pitches=[('g', 4, None)], duration=4)
         slide = Slide(from_note=from_note, to_note=to_note, style='portamento')
         instrument = Instrument(name='piano', events=[], voices={1: [slide]})
         ast = Sequence(instruments={'piano': instrument})
@@ -805,20 +800,20 @@ class TestEdgeCases:
         """Very high notes should be clamped"""
         # Try to create a note beyond MIDI range
         gen = MIDIGenerator()
-        note = Note(pitch='g', octave=10)  # Beyond normal range
+        note = Note(pitches=[('g', 10, None)])  # Beyond normal range
         midi_note = gen._note_to_midi(note)
         assert midi_note <= MIDI_MAX_NOTE
     
     def test_very_low_note(self):
         """Very low notes should be clamped"""
         gen = MIDIGenerator()
-        note = Note(pitch='c', octave=0, accidental='flat')  # Below MIDI range
+        note = Note(pitches=[('c', 0, 'flat')])  # Below MIDI range
         midi_note = gen._note_to_midi(note)
         assert midi_note >= MIDI_MIN_NOTE
     
     def test_nested_sequence(self):
         """Nested sequences should be flattened"""
-        inner_seq = Sequence(events=[Note(pitch='c', octave=4, duration=4)])
+        inner_seq = Sequence(events=[Note(pitches=[('c', 4, None)], duration=4)])
         outer_seq = Sequence(events=[inner_seq])
         instrument = Instrument(name='piano', events=[], voices={1: [outer_seq]})
         ast = Sequence(instruments={'piano': instrument})
@@ -843,7 +838,7 @@ class TestEdgeCases:
         """MIDI generation should fail fast for unexpanded ornament nodes"""
         events = [
             Ornament(type='trill'),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -867,11 +862,11 @@ class TestMetaEventChanges:
         """Test multiple time signature changes are written to MIDI"""
         events = [
             TimeSignature(numerator=4, denominator=4),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             TimeSignature(numerator=3, denominator=4),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             TimeSignature(numerator=5, denominator=4),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -910,11 +905,11 @@ class TestMetaEventChanges:
         """Test multiple tempo changes are written to MIDI"""
         events = [
             Tempo(bpm=120),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Tempo(bpm=60),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             Tempo(bpm=180),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -952,10 +947,10 @@ class TestMetaEventChanges:
         """Test that time signature changes occur at the correct times"""
         events = [
             TimeSignature(numerator=4, denominator=4),
-            Note(pitch='c', octave=4, duration=4),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
             TimeSignature(numerator=3, denominator=4),
-            Note(pitch='e', octave=4, duration=4),
+            Note(pitches=[('e', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -992,9 +987,9 @@ class TestMetaEventChanges:
         """Test that tempo changes occur at the correct times"""
         events = [
             Tempo(bpm=120),
-            Note(pitch='c', octave=4, duration=4),
+            Note(pitches=[('c', 4, None)], duration=4),
             Tempo(bpm=90),
-            Note(pitch='d', octave=4, duration=4),
+            Note(pitches=[('d', 4, None)], duration=4),
         ]
         instrument = Instrument(name='piano', events=[], voices={1: events})
         ast = Sequence(instruments={'piano': instrument})
@@ -1035,19 +1030,19 @@ class TestMetaEventChanges:
         """Test combinations of tempo and time signature changes"""
         measure1 = Measure(
             events=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='e', octave=4, duration=4),
-                Note(pitch='f', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('e', 4, None)], duration=4),
+                Note(pitches=[('f', 4, None)], duration=4),
             ],
             measure_number=1,
         )
         
         measure2 = Measure(
             events=[
-                Note(pitch='g', octave=4, duration=4),
-                Note(pitch='a', octave=4, duration=4),
-                Note(pitch='b', octave=4, duration=4),
+                Note(pitches=[('g', 4, None)], duration=4),
+                Note(pitches=[('a', 4, None)], duration=4),
+                Note(pitches=[('b', 4, None)], duration=4),
             ],
             measure_number=2,
         )
@@ -1093,9 +1088,9 @@ class TestMetaEventChanges:
         # Time signature before measure
         measure = Measure(
             events=[
-                Note(pitch='c', octave=4, duration=4),
-                Note(pitch='d', octave=4, duration=4),
-                Note(pitch='e', octave=4, duration=4),
+                Note(pitches=[('c', 4, None)], duration=4),
+                Note(pitches=[('d', 4, None)], duration=4),
+                Note(pitches=[('e', 4, None)], duration=4),
             ],
             measure_number=1,
         )

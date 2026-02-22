@@ -12,22 +12,22 @@ define(`REPEAT_MEASURE', `ifelse($1, `0', `', `ifelse($1, `1', `$2', `$2 | REPEA
 # ==============================
 
 # C major 9 - D minor 7 - E minor 7 - F major 9 (comma-separated chords)
-define(`CHORD_A1', `c3/4.,e3/4.,g3/4.,b3/4.,d4/4. r/8 c3/8,e3/8,g3/8,b3/8,d4/8 r/8 r/4')dnl
-define(`CHORD_A2', `d3/4.,f3/4.,a3/4.,c4/4. r/8 d3/8,f3/8,a3/8,c4/8 r/8 r/4')dnl
-define(`CHORD_B1', `e3/4.,g3/4.,b3/4.,d4/4. r/8 e3/8,g3/8,b3/8,d4/8 r/8 r/4')dnl
-define(`CHORD_B2', `f3/4.,a3/4.,c4/4.,e4/4.,g4/4. r/8 f3/8,a3/8,c4/8,e4/8 r/8 r/4')dnl
+define(`CHORD_A1', `c3,e3,g3,b3,d4/4. r/8 c3,e3,g3,b3,d4/8 r/8 r/4')dnl
+define(`CHORD_A2', `d3,f3,a3,c4/4. r/8 d3,f3,a3,c4/8 r/8 r/4')dnl
+define(`CHORD_B1', `e3,g3,b3,d4/4. r/8 e3,g3,b3,d4/8 r/8 r/4')dnl
+define(`CHORD_B2', `f3,a3,c4,e4,g4/4. r/8 f3,a3,c4,e4/8 r/8 r/4')dnl
 
 # G major 7 - A minor 7 - D minor 7 - G7
-define(`CHORD_C1', `g3/4.,b3/4.,d4/4.,f4+/4. r/8 g3/8,b3/8,d4/8,f4+/8 r/8 r/4')dnl
-define(`CHORD_C2', `a3/4.,c4/4.,e4/4.,g4/4. r/8 a3/8,c4/8,e4/8,g4/8 r/8 r/4')dnl
-define(`CHORD_D1', `d3/4.,f3/4.,a3/4.,c4/4. r/8 d3/8,f3/8,a3/8,c4/8 r/8 r/4')dnl
-define(`CHORD_D2', `g3/4.,b3/4.,d4/4.,f4/4. r/8 g3/8,b3/8,d4/8,f4/8 r/8 r/4')dnl
+define(`CHORD_C1', `g3,b3,d4,f4+/4. r/8 g3,b3,d4,f4+/8 r/8 r/4')dnl
+define(`CHORD_C2', `a3,c4,e4,g4/4. r/8 a3,c4,e4,g4/8 r/8 r/4')dnl
+define(`CHORD_D1', `d3,f3,a3,c4/4. r/8 d3,f3,a3,c4/8 r/8 r/4')dnl
+define(`CHORD_D2', `g3,b3,d4,f4/4. r/8 g3,b3,d4,f4/8 r/8 r/4')dnl
 
 # E minor 9 - A7 - D minor 7 - G7 (bridge)
-define(`CHORD_E1', `e3/4.,g3/4.,b3/4.,d4/4.,f4+/4. r/8 e3/8,g3/8,b3/8,d4/8 r/8 r/4')dnl
-define(`CHORD_E2', `a3/4.,c4+/4.,e4/4.,g4/4.,b4+/4. r/8 a3/8,c4+/8,e4/8,g4/8 r/8 r/4')dnl
-define(`CHORD_F1', `d3/4.,f3/4.,a3/4.,c4/4. r/8 d3/8,f3/8,a3/8,c4/8 r/8 r/4')dnl
-define(`CHORD_F2', `g3/4.,b3/4.,d4/4.,f4/4.,a4+/4. r/8 g3/8,b3/8,d4/8,f4/8 r/8 r/4')dnl
+define(`CHORD_E1', `e3,g3,b3,d4,f4+/4. r/8 e3,g3,b3,d4/8 r/8 r/4')dnl
+define(`CHORD_E2', `a3,c4+,e4,g4,b4+/4. r/8 a3,c4+,e4,g4/8 r/8 r/4')dnl
+define(`CHORD_F1', `d3,f3,a3,c4/4. r/8 d3,f3,a3,c4/8 r/8 r/4')dnl
+define(`CHORD_F2', `g3,b3,d4,f4,a4+/4. r/8 g3,b3,d4,f4/8 r/8 r/4')dnl
 
 # ==============================
 # Bass (1 bar each)

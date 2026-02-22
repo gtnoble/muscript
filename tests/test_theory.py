@@ -73,90 +73,90 @@ def test_key_signature_e_minor():
 
 def test_get_upper_neighbor_no_key():
     """Test getting upper neighbor without key signature"""
-    note = Note(pitch='c', octave=4, duration=4)
+    note = Note(pitches=[('c', 4, None)], duration=4)
     upper = get_upper_neighbor(note)
     
-    assert upper.pitch == 'd'
-    assert upper.octave == 4
+    assert upper.pitches[0][0] == 'd'
+    assert upper.pitches[0][1] == 4
     assert upper.duration == 32  # Grace note duration
 
 
 def test_get_upper_neighbor_octave_wrap():
     """Test upper neighbor wraps to next octave at B"""
-    note = Note(pitch='b', octave=4, duration=4)
+    note = Note(pitches=[('b', 4, None)], duration=4)
     upper = get_upper_neighbor(note)
     
-    assert upper.pitch == 'c'
-    assert upper.octave == 5  # Should wrap to next octave
+    assert upper.pitches[0][0] == 'c'
+    assert upper.pitches[0][1] == 5  # Should wrap to next octave
 
 
 def test_get_upper_neighbor_with_key():
     """Test upper neighbor respects key signature"""
     key = KeySignatureInfo('g', 'major')  # F#
-    note = Note(pitch='e', octave=4, duration=4)
+    note = Note(pitches=[('e', 4, None)], duration=4)
     upper = get_upper_neighbor(note, key)
     
-    assert upper.pitch == 'f'
-    assert upper.accidental == 'sharp'  # Should be F# in G major
+    assert upper.pitches[0][0] == 'f'
+    assert upper.pitches[0][2] == 'sharp'  # Should be F# in G major
 
 
 def test_get_lower_neighbor_no_key():
     """Test getting lower neighbor without key signature"""
-    note = Note(pitch='d', octave=4, duration=4)
+    note = Note(pitches=[('d', 4, None)], duration=4)
     lower = get_lower_neighbor(note)
     
-    assert lower.pitch == 'c'
-    assert lower.octave == 4
+    assert lower.pitches[0][0] == 'c'
+    assert lower.pitches[0][1] == 4
     assert lower.duration == 32
 
 
 def test_get_lower_neighbor_octave_wrap():
     """Test lower neighbor wraps to previous octave at C"""
-    note = Note(pitch='c', octave=4, duration=4)
+    note = Note(pitches=[('c', 4, None)], duration=4)
     lower = get_lower_neighbor(note)
     
-    assert lower.pitch == 'b'
-    assert lower.octave == 3  # Should wrap to previous octave
+    assert lower.pitches[0][0] == 'b'
+    assert lower.pitches[0][1] == 3  # Should wrap to previous octave
 
 
 def test_get_lower_neighbor_with_key():
     """Test lower neighbor respects key signature"""
     key = KeySignatureInfo('f', 'major')  # Bb
-    note = Note(pitch='c', octave=4, duration=4)
+    note = Note(pitches=[('c', 4, None)], duration=4)
     lower = get_lower_neighbor(note, key)
     
-    assert lower.pitch == 'b'
-    assert lower.accidental == 'flat'  # Should be Bb in F major
+    assert lower.pitches[0][0] == 'b'
+    assert lower.pitches[0][2] == 'flat'  # Should be Bb in F major
 
 
 def test_expand_trill():
     """Test trill expansion"""
-    note = Note(pitch='c', octave=4, duration=4)
+    note = Note(pitches=[('c', 4, None)], duration=4)
     notes = expand_ornament('trill', note)
     
     assert len(notes) == 8  # 8 fast notes
     # Should alternate between main note and upper neighbor
-    assert notes[0].pitch == 'c'
-    assert notes[1].pitch == 'd'
-    assert notes[2].pitch == 'c'
-    assert notes[3].pitch == 'd'
+    assert notes[0].pitches[0][0] == 'c'
+    assert notes[1].pitches[0][0] == 'd'
+    assert notes[2].pitches[0][0] == 'c'
+    assert notes[3].pitches[0][0] == 'd'
 
 
 def test_expand_trill_with_key():
     """Test trill expansion with key signature"""
     key = KeySignatureInfo('g', 'major')  # F#
-    note = Note(pitch='e', octave=4, duration=4)
+    note = Note(pitches=[('e', 4, None)], duration=4)
     notes = expand_ornament('trill', note, key)
     
     assert len(notes) == 8
     # Should trill to F# (upper neighbor in G major)
-    assert notes[1].pitch == 'f'
-    assert notes[1].accidental == 'sharp'
+    assert notes[1].pitches[0][0] == 'f'
+    assert notes[1].pitches[0][2] == 'sharp'
 
 
 def test_expand_trill_fills_note_duration():
     """Trill expansion should preserve total duration of principal note"""
-    note = Note(pitch='c', octave=4, duration=2)  # half note
+    note = Note(pitches=[('c', 4, None)], duration=2)  # half note
     notes = expand_ornament('trill', note)
 
     total_units = 0
@@ -172,13 +172,13 @@ def test_expand_trill_fills_note_duration():
 
 def test_expand_mordent():
     """Test mordent expansion"""
-    note = Note(pitch='d', octave=4, duration=4)
+    note = Note(pitches=[('d', 4, None)], duration=4)
     notes = expand_ornament('mordent', note)
     
     assert len(notes) == 3  # Main, lower, main
-    assert notes[0].pitch == 'd'
-    assert notes[1].pitch == 'c'  # Lower neighbor
-    assert notes[2].pitch == 'd'
+    assert notes[0].pitches[0][0] == 'd'
+    assert notes[1].pitches[0][0] == 'c'  # Lower neighbor
+    assert notes[2].pitches[0][0] == 'd'
 
     total_units = 0
     for expanded_note in notes:
@@ -191,14 +191,14 @@ def test_expand_mordent():
 
 def test_expand_turn():
     """Test turn expansion"""
-    note = Note(pitch='d', octave=4, duration=4)
+    note = Note(pitches=[('d', 4, None)], duration=4)
     notes = expand_ornament('turn', note)
     
     assert len(notes) == 4  # Upper, main, lower, main
-    assert notes[0].pitch == 'e'  # Upper neighbor
-    assert notes[1].pitch == 'd'  # Main
-    assert notes[2].pitch == 'c'  # Lower neighbor
-    assert notes[3].pitch == 'd'  # Main
+    assert notes[0].pitches[0][0] == 'e'  # Upper neighbor
+    assert notes[1].pitches[0][0] == 'd'  # Main
+    assert notes[2].pitches[0][0] == 'c'  # Lower neighbor
+    assert notes[3].pitches[0][0] == 'd'  # Main
 
     total_units = 0
     for expanded_note in notes:
@@ -211,45 +211,45 @@ def test_expand_turn():
 
 def test_expand_tremolo():
     """Test tremolo expansion"""
-    note = Note(pitch='d', octave=4, duration=4)
+    note = Note(pitches=[('d', 4, None)], duration=4)
     notes = expand_ornament('tremolo', note)
 
     assert len(notes) == 4  # 4 x 16th notes in a quarter note
-    assert all(n.pitch == 'd' for n in notes)
+    assert all(n.pitches[0][0] == 'd' for n in notes)
     assert all(n.duration == 16 for n in notes)
 
 
 def test_apply_key_signature_to_note():
     """Test applying key signature to note"""
     key = KeySignatureInfo('g', 'major')  # F#
-    note = Note(pitch='f', octave=4, duration=4)
+    note = Note(pitches=[('f', 4, None)], duration=4)
     
     result = apply_key_signature_to_note(note, key)
     
-    assert result.pitch == 'f'
-    assert result.accidental == 'sharp'
+    assert result.pitches[0][0] == 'f'
+    assert result.pitches[0][2] == 'sharp'
 
 
 def test_apply_key_signature_preserves_explicit_accidental():
     """Test that explicit accidentals are not overridden"""
     key = KeySignatureInfo('g', 'major')  # F#
-    note = Note(pitch='f', octave=4, duration=4, accidental='natural')
+    note = Note(pitches=[('f', 4, 'natural')], duration=4)
     
     result = apply_key_signature_to_note(note, key)
     
     # Should preserve the natural accidental
-    assert result.accidental == 'natural'
+    assert result.pitches[0][2] == 'natural'
 
 
 def test_apply_key_signature_unaffected_pitch():
     """Test that unaffected pitches remain unchanged"""
     key = KeySignatureInfo('g', 'major')  # F#
-    note = Note(pitch='c', octave=4, duration=4)
+    note = Note(pitches=[('c', 4, None)], duration=4)
     
     result = apply_key_signature_to_note(note, key)
     
-    assert result.pitch == 'c'
-    assert result.accidental is None  # Should remain None
+    assert result.pitches[0][0] == 'c'
+    assert result.pitches[0][2] is None  # Should remain None
 
 
 if __name__ == '__main__':

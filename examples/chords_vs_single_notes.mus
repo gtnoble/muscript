@@ -1,0 +1,25 @@
+# Chords vs Single Notes Demo
+# Demonstrates the same musical material as single notes and as chords
+# Compare timbre, density, and how chords change harmony perception
+
+(tempo! 90);
+(time 4 4);
+(key c 'major);
+
+piano {
+  # Section A: Single-note melody (simple, clear)
+    @mf; :legato;
+  V1: c4/4 d4/4 e4/4 f4/4 | g4/2 e4/2 | d4/4 e4/4 f4/4 g4/4 | c5/1 ;
+
+  # Short pause
+  V1: r/2 r/2 ;
+
+  # Section B: Same melody voiced as block chords (simultaneous notes)
+  # Chord syntax: comma-separated notes in a single token produce a chord
+    @mf; :legato;
+    V1: c3,e3,g3,c4/4 d3,f3,a3,d4/4 e3,g3,b3,e4/4 f3,a3,c4,f4/4 |
+      g3,b3,d4,g4/2 e3,g3,c4,e4/2 |
+      d3,f3,a3,d4/4 e3,g3,b3,e4/4 f3,a3,c4,f4/4 g3,b3,d4,g4/4 |
+      c3,e3,g3,c5/1 ;
+
+}
